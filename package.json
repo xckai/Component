@@ -1,0 +1,33 @@
+{
+  "name": "component",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {    
+    "start": " concurrently \"npm run tsc:w\" \"gulp start\" ",
+    "tsc": "tsc",
+    "tsc:w": "tsc -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xckai/Component.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xckai/Component/issues"
+  },
+  "homepage": "https://github.com/xckai/Component#readme",
+  "devDependencies": {
+    "@types/d3": "^4.7.0",
+    "@types/jquery": "^2.0.41",
+    "@types/leaflet": "^1.0.60",
+    "@types/backbone": "^1.3.33",
+    "browser-sync": "^2.18.0",
+    "concurrently": "^3.4.0",
+    "gulp": "^3.9.1",
+    "gulp-less": "^3.3.0",
+    "typescript": "2.3.0"
+  }
+}
