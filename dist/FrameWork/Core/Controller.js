@@ -16,7 +16,7 @@ define(["require", "exports", "./View", "underscore"], function (require, export
                     height: null
                 }
             };
-            this.view = new View_1.View({ el: "div" });
+            this.view = new View_1.View({ el: "<div></div>" });
             this.setConfig(conf);
         }
         Controller.prototype.setConfig = function (c) {
@@ -30,8 +30,23 @@ define(["require", "exports", "./View", "underscore"], function (require, export
             return this;
         };
         Controller.prototype.renderAt = function (dom) {
+            this.invokeBeforeRender();
             this.view.render();
             this.view.getNode$().appendTo(dom);
+            this.invokeAterRender();
+        };
+        Controller.prototype.onAfterRender = function () { };
+        Controller.prototype.onBeforeRender = function () { };
+        Controller.prototype.invokeAterRender = function () {
+            if (this.onAfterRender) {
+                this.onAfterRender();
+            }
+            return this;
+        };
+        Controller.prototype.invokeBeforeRender = function () {
+            if (this.onBeforeRender) {
+                this.onBeforeRender();
+            }
         };
         return Controller;
     }());

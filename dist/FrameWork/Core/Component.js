@@ -15,13 +15,14 @@ define(["require", "exports", "./Controller", "./View", "underscore"], function 
         __extends(Component, _super);
         function Component(conf) {
             var _this = _super.call(this, conf) || this;
+            _this.children = [];
             if (conf && conf.id) {
                 _this.id = conf.id;
             }
             else {
                 _this.id = _.uniqueId("Component");
             }
-            _this.view = new View_1.View({ el: "section" });
+            _this.view = new View_1.View({ el: "<section></section>" });
             _this.setConfig(conf);
             return _this;
         }

@@ -8,15 +8,19 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "../Core/Controller"], function (require, exports, Controller_1) {
+define(["require", "exports", "../Core/Component", "./MapController"], function (require, exports, Component_1, MapController_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var MapController = (function (_super) {
-        __extends(MapController, _super);
-        function MapController() {
-            return _super !== null && _super.apply(this, arguments) || this;
+    var Map = (function (_super) {
+        __extends(Map, _super);
+        function Map(conf) {
+            var _this = _super.call(this, conf) || this;
+            _this.map = new MapController_1.MapController();
+            _this.view.render();
+            _this.map.renderAt(_this.view.getNode$());
+            return _this;
         }
-        return MapController;
-    }(Controller_1.Controller));
-    exports.MapController = MapController;
+        return Map;
+    }(Component_1.Component));
+    exports.Map = Map;
 });

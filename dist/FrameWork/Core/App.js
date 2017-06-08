@@ -21,7 +21,7 @@ define(["require", "exports", "Backbone", "./View", "underscore", "./Component"]
             else {
                 _this.id = _.uniqueId("App");
             }
-            if (conf.el) {
+            if (conf && conf.el) {
                 _this.view = new View_1.View({ el: conf.el });
             }
             else {
@@ -30,16 +30,18 @@ define(["require", "exports", "Backbone", "./View", "underscore", "./Component"]
             _this.setConfig(conf);
             return _this;
         }
-        App.prototype.enableRouter = function () {
-            if (this.router == undefined) {
-                this.router = new Backbone.Router();
-            }
+        App.prototype.start = function () {
+            Backbone.history.start();
         };
         App.prototype.addRule = function (str, name, fn) {
             if (this.router == undefined) {
                 this.router = new Backbone.Router();
             }
             this.router.route(str, name, fn);
+        };
+        App.prototype.proxy = function (fnStr) {
+            var self = this;
+            return this[fnStr].bind(self);
         };
         return App;
     }(Component_1.Component));

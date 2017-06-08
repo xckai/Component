@@ -11,17 +11,15 @@ export class App extends Component{
          }else{
              this.id=_.uniqueId("App")
          }
-         if(conf.el){
+         if(conf && conf.el){
              this.view=new View({el:conf.el})
          }else{
              this.view=new View({el:"body"})
          } 
          this.setConfig(conf)
      }
-     enableRouter(){
-         if(this.router==undefined){
-             this.router=new Backbone.Router()
-         }
+     start(){
+        Backbone.history.start()
      }
      addRule(str,name,fn){
          if(this.router==undefined){
@@ -29,5 +27,10 @@ export class App extends Component{
          }
          this.router.route(str,name,fn)
      }
+     proxy(fnStr){
+         let self=this
+         return this[fnStr].bind(self)
+     }
      router:Backbone.Router
+     
 }

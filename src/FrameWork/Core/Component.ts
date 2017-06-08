@@ -9,11 +9,11 @@ export class Component extends Controller{
          }else{
              this.id=_.uniqueId("Component")
          }
-         this.view=new View({el:"section"})
+         this.view=new View({el:"<section></section>"})
          this.setConfig(conf)
      }
     parent:Component
-    children:Component []
+    children:Component []=[]
     id:string
     addTo(c:Component,listen?){
         this.parent=c

@@ -2,7 +2,7 @@ import {View} from "./View"
 import _ =require("underscore")
 export class Controller {
     constructor(conf?){
-        this.view=new View({el:"div"})
+        this.view=new View({el:"<div></div>"})
         this.setConfig(conf)
     }
     view:View
@@ -30,9 +30,24 @@ export class Controller {
       return this
   }
    renderAt(dom){
+       this.invokeBeforeRender()
        this.view.render()
        this.view.getNode$().appendTo(dom)
+       this.invokeAterRender()
    }
+    onAfterRender(){}
+    onBeforeRender(){}
+    invokeAterRender(){
+        if(this.onAfterRender){
+            this.onAfterRender()
+        }
+        return this
+    }
+    invokeBeforeRender(){
+        if(this.onBeforeRender){
+            this.onBeforeRender()
+        }
+    }
 }
 export interface IControllerConfig{
             class:string [],
