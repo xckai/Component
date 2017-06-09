@@ -2,7 +2,8 @@ import Backbone =require( 'Backbone');
 import _=require("underscore")
 export class View extends  Backbone.View<Backbone.Model>{
     constructor(conf?){
-        super(conf)
+      
+        super(_.extend({el:"<div></div>"},conf))
     }
     getNode$(){
         return this.$el
@@ -12,7 +13,14 @@ export class View extends  Backbone.View<Backbone.Model>{
         return this
     }
     style(obj){
-        this.$el.css(obj)
+        _.each(obj,(v:string,k:string)=>{
+            if(v){
+                this.$el.css(k,v)
+            }else{
+                this.$el.css(k,"")
+            }
+        })
+        
         return this
     }
     setClass(cls:any []|string){

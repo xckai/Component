@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "../Jigsaw/Core/App", "../Jigsaw/Map/Map", "../Jigsaw/Bar/NavBar"], function (require, exports, App_1, Map_1, NavBar_1) {
+define(["require", "exports", "../Jigsaw/App", "../BlueDark/Map/Map", "../BlueDark/Bar/NavBar"], function (require, exports, App_1, Map_1, NavBar_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var MainApp = (function (_super) {
@@ -24,13 +24,16 @@ define(["require", "exports", "../Jigsaw/Core/App", "../Jigsaw/Map/Map", "../Jig
         MainApp.prototype.Main = function () {
             var _this = this;
             this.router.navigate("Pudong/", { trigger: false, replace: true });
-            this.mapComponent = new Map_1.Map();
+            this.mapComponent = new Map_1.Map({ style: {
+                    top: "3rem"
+                } });
             this.mapComponent.addTo(this);
             $.get("/dist/Pudong/mapConfig.json", function (c) {
                 console.log(c);
                 _this.mapComponent.map.setMapSetting(c);
             });
             this.bar = new NavBar_1.NavBar();
+            this.bar.addTo(this);
         };
         return MainApp;
     }(App_1.App));

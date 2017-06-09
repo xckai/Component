@@ -1,4 +1,4 @@
-define(["require", "exports", "./View", "underscore"], function (require, exports, View_1, _) {
+define(["require", "exports", "./View", "./Util"], function (require, exports, View_1, Util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Controller = (function () {
@@ -16,11 +16,11 @@ define(["require", "exports", "./View", "underscore"], function (require, export
                     height: null
                 }
             };
-            this.view = new View_1.View({ el: "<div></div>" });
+            this.view = new View_1.View(conf);
             this.setConfig(conf);
         }
         Controller.prototype.setConfig = function (c) {
-            this.config = _.extend(this.config, c);
+            this.config = Util_1.Util.deepExtend(this.config, c);
             this.updataConfig();
             return this;
         };

@@ -14,7 +14,7 @@ define(["require", "exports", "Backbone", "underscore"], function (require, expo
     var View = (function (_super) {
         __extends(View, _super);
         function View(conf) {
-            return _super.call(this, conf) || this;
+            return _super.call(this, _.extend({ el: "<div></div>" }, conf)) || this;
         }
         View.prototype.getNode$ = function () {
             return this.$el;
@@ -24,7 +24,15 @@ define(["require", "exports", "Backbone", "underscore"], function (require, expo
             return this;
         };
         View.prototype.style = function (obj) {
-            this.$el.css(obj);
+            var _this = this;
+            _.each(obj, function (v, k) {
+                if (v) {
+                    _this.$el.css(k, v);
+                }
+                else {
+                    _this.$el.css(k, "");
+                }
+            });
             return this;
         };
         View.prototype.setClass = function (cls) {

@@ -13,7 +13,7 @@ gulp.watch(['./src/**/*.html','./src/**/*.js'],(e)=>{
           
         console.log(e.path+"-------js changed")
 })
-gulp.watch('./src/css/*.less',(e)=>{
+gulp.watch('./src/**/*.less',(e)=>{
     gulp.src(e.path,{base:"src"})
         .pipe(less())
         .pipe(gulp.dest("./dist/"))

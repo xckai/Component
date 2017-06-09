@@ -1,8 +1,9 @@
 import {View} from "./View"
 import _ =require("underscore")
+import {Util}from "./Util"
 export class Controller {
     constructor(conf?){
-        this.view=new View({el:"<div></div>"})
+        this.view=new View(conf)
         this.setConfig(conf)
     }
     view:View
@@ -20,10 +21,11 @@ export class Controller {
                                     }
                                 }
    setConfig(c){
-      this.config=_.extend(this.config,c)
+      this.config=Util.deepExtend(this.config,c)
       this.updataConfig()
       return this
     }
+
   updataConfig(){
       this.view.setClass(this.config.class)
       this.view.style(this.config.style)
