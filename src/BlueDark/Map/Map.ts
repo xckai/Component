@@ -1,7 +1,7 @@
-import {Component} from"../Core/Component"
-import {Controller} from"../Core/Controller"
+import {Component} from"../../Jigsaw/Component"
+import {Controller} from"../../Jigsaw/Controller"
 import {MapController} from"./MapController"
-import { View } from "../Core/View"
+import { View } from ".../../Jigsaw/View"
 export class Map extends Component{
     constructor(conf?){
         super(conf)

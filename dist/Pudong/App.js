@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "../FrameWork/Core/App", "../FrameWork/Map/Map"], function (require, exports, App_1, Map_1) {
+define(["require", "exports", "../Jigsaw/Core/App", "../Jigsaw/Map/Map", "../Jigsaw/Bar/NavBar"], function (require, exports, App_1, Map_1, NavBar_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var MainApp = (function (_super) {
@@ -30,6 +30,7 @@ define(["require", "exports", "../FrameWork/Core/App", "../FrameWork/Map/Map"], 
                 console.log(c);
                 _this.mapComponent.map.setMapSetting(c);
             });
+            this.bar = new NavBar_1.NavBar();
         };
         return MainApp;
     }(App_1.App));

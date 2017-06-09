@@ -1,5 +1,5 @@
-import { Controller } from "../Core/Controller"
-import { View } from "../Core/View"
+import { Controller } from "../../Jigsaw/Controller"
+import { View } from "../../Jigsaw/View"
 import _ =require("underscore")
 import L=require("leaflet")
 class MapView extends View {
