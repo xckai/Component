@@ -2,7 +2,7 @@ import {Component} from"../../Jigsaw/Component"
 import {Controller} from"../../Jigsaw/Controller"
 import { View } from "../../Jigsaw/View"
 import _=require("underscore")
-class TitleView extends View{
+class SideBarView extends View{
     title:string
     setTitle(s){
         this.title=s
@@ -13,15 +13,15 @@ class TitleView extends View{
         return this
     }
 }
-class Title extends Controller{
+class Content extends Controller{
     constructor(str?){
         super()
-        this.view=new TitleView()
+        this.view=new SideBarView()
         this.setConfig({
-            class:["title"],
+            class:["content"],
             style:{
-            position:"static",
-            left:null,
+            position:"absolute",
+            left:"0px",
             right:null,
             top:null,
             bottom:null
@@ -29,13 +29,13 @@ class Title extends Controller{
         })
         this.setTitle(str)
     }
-    view:TitleView
+    view:SideBarView
     setTitle(str){
         this.view.setTitle(str)
         return this
     }
 }
-export class NavBar extends Component{
+export class SideBar extends Component{
     constructor(conf?){
         super(conf)
         this.setConfig({
@@ -47,7 +47,7 @@ export class NavBar extends Component{
            },
            class:["navbar"]
         })
-        this.title=new Title("Pudong Smart Traffic")
+        this.Content=new Content("Pudong Smart Traffic")
         this.title.renderAt(this.view.getNode$())
     }
     title:Title

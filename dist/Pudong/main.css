@@ -1,0 +1,15 @@
+.navbar {
+  justify-content: center;
+  background: linear-gradient(30deg, #04104c, #082882, #04104c);
+}
+.navbar .title {
+  color: white;
+  font-size: 1.5rem;
+  align-items: center;
+  display: flex;
+  font-family: 'Times New Roman', Times, serif;
+  text-shadow: 0 1px 0 #eeeeee, 0 2px 2px rgba(240, 240, 245, 0.5);
+}
+* {
+  box-sizing: content-box;
+}

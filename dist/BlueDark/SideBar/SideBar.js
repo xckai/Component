@@ -11,31 +11,31 @@ var __extends = (this && this.__extends) || (function () {
 define(["require", "exports", "../../Jigsaw/Component", "../../Jigsaw/Controller", "../../Jigsaw/View"], function (require, exports, Component_1, Controller_1, View_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var TitleView = (function (_super) {
-        __extends(TitleView, _super);
-        function TitleView() {
+    var SideBarView = (function (_super) {
+        __extends(SideBarView, _super);
+        function SideBarView() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        TitleView.prototype.setTitle = function (s) {
+        SideBarView.prototype.setTitle = function (s) {
             this.title = s;
             this.render();
         };
-        TitleView.prototype.render = function () {
+        SideBarView.prototype.render = function () {
             this.$el.html("<span>" + this.title + "</span>");
             return this;
         };
-        return TitleView;
+        return SideBarView;
     }(View_1.View));
     var Title = (function (_super) {
         __extends(Title, _super);
         function Title(str) {
             var _this = _super.call(this) || this;
-            _this.view = new TitleView();
+            _this.view = new SideBarView();
             _this.setConfig({
-                class: ["title"],
+                class: ["SideBar"],
                 style: {
-                    position: "static",
-                    left: null,
+                    position: "absolute",
+                    left: "0px",
                     right: null,
                     top: null,
                     bottom: null
