@@ -8,48 +8,34 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "../../Jigsaw/Component", "../../Jigsaw/Controller", "../../Jigsaw/View"], function (require, exports, Component_1, Controller_1, View_1) {
+define(["require", "exports", "../../Jigsaw/Component", "../../Jigsaw/View", "../../Jigsaw/Model"], function (require, exports, Component_1, View_1, Model_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    var TitleModel = (function (_super) {
+        __extends(TitleModel, _super);
+        function TitleModel(conf) {
+            return _super.call(this, conf) || this;
+        }
+        return TitleModel;
+    }(Model_1.Model));
     var TitleView = (function (_super) {
         __extends(TitleView, _super);
-        function TitleView() {
-            return _super !== null && _super.apply(this, arguments) || this;
+        function TitleView(conf) {
+            var _this = _super.call(this, { className: "title" }) || this;
+            _this.model = new TitleModel();
+            _this.listenTo(_this.model, "all", _this.render);
+            return _this;
+            //this.model.set("title","Title")
         }
         TitleView.prototype.setTitle = function (s) {
-            this.title = s;
-            this.render();
+            this.model.set("title", s);
         };
         TitleView.prototype.render = function () {
-            this.$el.html("<span>" + this.title + "</span>");
+            this.$el.html("<span>" + this.model.get("title") + "</span>");
             return this;
         };
         return TitleView;
     }(View_1.View));
-    var Title = (function (_super) {
-        __extends(Title, _super);
-        function Title(str) {
-            var _this = _super.call(this) || this;
-            _this.view = new TitleView();
-            _this.setConfig({
-                class: ["title"],
-                style: {
-                    position: "static",
-                    left: null,
-                    right: null,
-                    top: null,
-                    bottom: null
-                }
-            });
-            _this.setTitle(str);
-            return _this;
-        }
-        Title.prototype.setTitle = function (str) {
-            this.view.setTitle(str);
-            return this;
-        };
-        return Title;
-    }(Controller_1.Controller));
     var NavBar = (function (_super) {
         __extends(NavBar, _super);
         function NavBar(conf) {
@@ -60,10 +46,11 @@ define(["require", "exports", "../../Jigsaw/Component", "../../Jigsaw/Controller
                     bottom: null,
                     height: "3rem"
                 },
-                class: ["navbar"]
+                className: "navbar"
             });
-            _this.title = new Title("Pudong Smart Traffic");
-            _this.title.renderAt(_this.view.getNode$());
+            _this.title = new TitleView();
+            _this.title.setTitle("Pudong Smart Traffic");
+            _this.title.renderAt(_this.rootView.getNode$());
             return _this;
         }
         return NavBar;

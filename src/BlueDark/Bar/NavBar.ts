@@ -1,37 +1,26 @@
 import {Component} from"../../Jigsaw/Component"
-import {Controller} from"../../Jigsaw/Controller"
 import { View } from "../../Jigsaw/View"
+import { Model } from "../../Jigsaw/Model"
 import _=require("underscore")
-class TitleView extends View{
+class TitleModel extends Model{
+    constructor(conf?){
+        super(conf)
+    }
     title:string
+}
+class TitleView extends View{
+    constructor(conf?){
+        super({className:"title"})
+        this.model=new TitleModel()
+        this.listenTo(this.model,"all",this.render)
+        //this.model.set("title","Title")
+    }
+    model:Model
     setTitle(s){
-        this.title=s
-        this.render()
+        this.model.set("title",s)
     }
     render(){
-        this.$el.html(`<span>${this.title}</span>`)
-        return this
-    }
-}
-class Title extends Controller{
-    constructor(str?){
-        super()
-        this.view=new TitleView()
-        this.setConfig({
-            class:["title"],
-            style:{
-            position:"static",
-            left:null,
-            right:null,
-            top:null,
-            bottom:null
-        }
-        })
-        this.setTitle(str)
-    }
-    view:TitleView
-    setTitle(str){
-        this.view.setTitle(str)
+        this.$el.html(`<span>${this.model.get("title")}</span>`)
         return this
     }
 }
@@ -45,10 +34,11 @@ export class NavBar extends Component{
                 height:"3rem"
 
            },
-           class:["navbar"]
+           className:"navbar"
         })
-        this.title=new Title("Pudong Smart Traffic")
-        this.title.renderAt(this.view.getNode$())
+        this.title=new TitleView()
+        this.title.setTitle("Pudong Smart Traffic")
+        this.title.renderAt(this.rootView.getNode$())
     }
-    title:Title
+    title:TitleView
 }

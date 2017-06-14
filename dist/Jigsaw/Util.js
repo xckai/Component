@@ -67,6 +67,7 @@ define(["require", "exports", "underscore"], function (require, exports, _) {
             };
         });
         function deepExtend(des) {
+            var _this = this;
             var source = [];
             for (var _i = 1; _i < arguments.length; _i++) {
                 source[_i - 1] = arguments[_i];
@@ -75,17 +76,23 @@ define(["require", "exports", "underscore"], function (require, exports, _) {
                 des = {};
             }
             _.each(source, function (s) {
-                _.each(s, function (v, k) {
-                    if (_.isObject(v)) {
-                        if (_.isUndefined(des[k])) {
-                            des[k] = {};
+                if (_.isArray(s)) {
+                    var args = [des].concat(s);
+                    deepExtend.apply(_this, args);
+                }
+                else {
+                    _.each(s, function (v, k) {
+                        if (_.isObject(v)) {
+                            if (_.isUndefined(des[k])) {
+                                des[k] = {};
+                            }
+                            deepExtend(des[k], v);
                         }
-                        deepExtend(des[k], v);
-                    }
-                    else {
-                        des[k] = v;
-                    }
-                });
+                        else {
+                            des[k] = v;
+                        }
+                    });
+                }
             });
             return des;
         }

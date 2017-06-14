@@ -1,34 +1,22 @@
-import { Controller } from "../../Jigsaw/Controller"
 import { View } from "../../Jigsaw/View"
 import _ =require("underscore")
 import L=require("leaflet")
-class MapView extends View {
-    render() {
-        this.mapNode$ = $("<div></div>").css({
+
+export class MapView extends View {
+    constructor(conf?){
+        super(conf)
+        this.style({
             position: "absolute",
             left: "0px",
             right: "0px",
             top: "0px",
-            bottom: "0px",
-        }).appendTo(this.$el)
-        return this
+            bottom: "0px"
+        })
     }
-    getMapNode() {
-        return this.mapNode$.get(0)
-    }
-    mapNode$: JQuery
-}
-export class MapController extends Controller {
-    constructor(conf?){
-        super(conf)
-        this.view=new View({el:"<div></div>"})
-        this.updataConfig()
-    }
-    view:View
     mapSetting: IMapSetting
     leaflet: L.Map
     onAfterRender() {
-        this.leaflet=L.map(this.view.el,{scrollWheelZoom:true})
+        this.leaflet=L.map(this.el,{scrollWheelZoom:true})
     }
     setMapSetting(s){
         if(this.mapSetting){

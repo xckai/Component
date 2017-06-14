@@ -1,0 +1,53 @@
+.side{
+      background: radial-gradient(50% 50%,#103444 , #001533 400%);
+      padding:.2rem;
+      header{
+            height: 2rem;
+            width: 100%;
+            text-align: center;
+            margin: 0.2rem auto;
+            color:#fff
+      }
+      .toggle{
+            color: #fff;
+            font-size: 1.5rem;
+            padding: 0rem .1rem 0rem .1rem;
+            line-height:10rem;
+           
+        
+      }
+    
+     
+      .toggle.left{
+            background:linear-gradient(to right, #0c2d40, #001533 80%);
+            border-top-right-radius: .8rem;
+            border-bottom-right-radius: .8rem;
+            position: absolute;
+            left: 100%;
+            top:calc(45% - 5rem);
+            span{
+                  position: relative;
+                  left: -.1rem;
+            }  
+      }
+      .toggle.right{
+            background:linear-gradient(to left, #0c2d40, #001533 80%);
+            position: absolute;
+            right: 100%;
+            top:calc(45% - 5rem);
+            border-top-left-radius: .8rem;
+            border-bottom-left-radius: .8rem;
+            span{
+                  position: relative;
+                  left: .1rem;
+            }
+      }
+       .toggle:hover ,.toggle:focus{
+          background: #0b7ca8;
+          opacity: 1
+      }
+     transition: transform .3s ease-in-out 
+}
+.toggle-hidden .toggle{
+             opacity: .3;
+}

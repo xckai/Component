@@ -8,19 +8,15 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "../../Jigsaw/Component", "./MapView"], function (require, exports, Component_1, MapView_1) {
+define(["require", "exports", "Backbone"], function (require, exports, Backbone) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var Map = (function (_super) {
-        __extends(Map, _super);
-        function Map(conf) {
-            var _this = _super.call(this, conf) || this;
-            _this.map = new MapView_1.MapView();
-            _this.rootView.render();
-            _this.map.renderAt(_this.rootView.getNode$());
-            return _this;
+    var Model = (function (_super) {
+        __extends(Model, _super);
+        function Model(conf) {
+            return _super.call(this, conf) || this;
         }
-        return Map;
-    }(Component_1.Component));
-    exports.Map = Map;
+        return Model;
+    }(Backbone.Model));
+    exports.Model = Model;
 });

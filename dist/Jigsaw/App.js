@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "Backbone", "./View", "underscore", "./Component"], function (require, exports, Backbone, View_1, _, Component_1) {
+define(["require", "exports", "Backbone", "./View", "underscore", "./Component", "./Util"], function (require, exports, Backbone, View_1, _, Component_1, Util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var App = (function (_super) {
@@ -22,12 +22,12 @@ define(["require", "exports", "Backbone", "./View", "underscore", "./Component"]
                 _this.id = _.uniqueId("App");
             }
             if (conf && conf.el) {
-                _this.view = new View_1.View({ el: conf.el });
+                _this.rootView = new View_1.View({ el: conf.el });
             }
             else {
-                _this.view = new View_1.View({ el: "body" });
+                _this.rootView = new View_1.View({ el: "body" });
             }
-            _this.setConfig(conf);
+            _this.setConfig(Util_1.Util.deepExtend({ className: "app" }, conf));
             return _this;
         }
         App.prototype.start = function () {

@@ -1,13 +1,12 @@
 import {Component} from"../../Jigsaw/Component"
-import {Controller} from"../../Jigsaw/Controller"
-import {MapController} from"./MapController"
+import {MapView} from"./MapView"
 import { View } from ".../../Jigsaw/View"
 export class Map extends Component{
     constructor(conf?){
         super(conf)
-        this.map=new MapController()
-        this.view.render()
-        this.map.renderAt(this.view.getNode$())
+        this.map=new MapView()
+        this.rootView.render()
+        this.map.renderAt(this.rootView.getNode$())
     }
-    map:MapController
+    map:MapView
 }

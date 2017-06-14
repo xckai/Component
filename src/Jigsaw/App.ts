@@ -1,8 +1,8 @@
-import {Controller} from "./Controller"
 import Backbone =require( 'Backbone');
 import {View} from "./View"
 import _ =require("underscore")
 import {Component} from "./Component"
+import {Util}from "./Util"
 export class App extends Component{
     constructor(conf?){
          super(conf)
@@ -12,11 +12,11 @@ export class App extends Component{
              this.id=_.uniqueId("App")
          }
          if(conf && conf.el){
-             this.view=new View({el:conf.el})
+             this.rootView=new View({el:conf.el})
          }else{
-             this.view=new View({el:"body"})
-         } 
-         this.setConfig(conf)
+             this.rootView=new View({el:"body"})
+         }
+         this.setConfig(Util.deepExtend({className:"app"},conf))
      }
      start(){
         Backbone.history.start()

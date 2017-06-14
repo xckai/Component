@@ -14,13 +14,22 @@ define(["require", "exports", "Backbone", "underscore"], function (require, expo
     var View = (function (_super) {
         __extends(View, _super);
         function View(conf) {
-            return _super.call(this, _.extend({ el: "<div></div>" }, conf)) || this;
+            return _super.call(this, _.extend({ tagName: "div" }, conf)) || this;
         }
         View.prototype.getNode$ = function () {
             return this.$el;
         };
         View.prototype.attr = function (obj) {
             this.$el.attr(obj);
+            return this;
+        };
+        View.prototype.set = function (o, v) {
+            if (_.isString(o)) {
+                this.model.set(o, v);
+            }
+            if (_.isObject(o)) {
+                this.model.set(o);
+            }
             return this;
         };
         View.prototype.style = function (obj) {
@@ -37,7 +46,7 @@ define(["require", "exports", "Backbone", "underscore"], function (require, expo
         };
         View.prototype.setClass = function (cls) {
             var _this = this;
-            this.$el.removeClass();
+            //this.$el.removeClass()
             if (_.isArray(cls)) {
                 _.each(cls, function (v) {
                     _this.$el.addClass(v);
@@ -46,6 +55,42 @@ define(["require", "exports", "Backbone", "underscore"], function (require, expo
             if (_.isString(cls)) {
                 this.$el.addClass(cls);
             }
+        };
+        View.prototype.addClass = function (cls) {
+            this.$el.addClass(cls);
+            return this;
+        };
+        View.prototype.removeClass = function (cls) {
+            this.$el.removeClass(cls);
+            return this;
+        };
+        View.prototype.toogleClass = function (cls) {
+            this.$el.toggleClass(cls);
+            return this;
+        };
+        View.prototype.renderAt = function (dom) {
+            this.invokeBeforeRender();
+            this.render();
+            this.getNode$().appendTo(dom);
+            this.invokeAterRender();
+        };
+        View.prototype.onAfterRender = function () { };
+        View.prototype.onBeforeRender = function () { };
+        View.prototype.invokeAterRender = function () {
+            if (this.onAfterRender) {
+                this.onAfterRender();
+            }
+            return this;
+        };
+        View.prototype.invokeBeforeRender = function () {
+            if (this.onBeforeRender) {
+                this.onBeforeRender();
+            }
+        };
+        View.prototype.setModel = function (m) {
+            this.model = m;
+            this.listenTo(this.model, "change", this.render);
+            return this;
         };
         return View;
     }(Backbone.View));

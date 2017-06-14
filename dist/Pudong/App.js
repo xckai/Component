@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "../Jigsaw/App", "../BlueDark/Map/Map", "../BlueDark/Bar/NavBar"], function (require, exports, App_1, Map_1, NavBar_1) {
+define(["require", "exports", "../Jigsaw/App", "../BlueDark/Map/Map", "../BlueDark/Bar/NavBar", "./Side/LeftSide"], function (require, exports, App_1, Map_1, NavBar_1, LeftSide_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var MainApp = (function (_super) {
@@ -21,6 +21,7 @@ define(["require", "exports", "../Jigsaw/App", "../BlueDark/Map/Map", "../BlueDa
         MainApp.prototype.initApp = function () {
             this.addRule("*path", "Main", this.proxy("Main"));
         };
+        // rightSide:Side
         MainApp.prototype.Main = function () {
             var _this = this;
             this.router.navigate("Pudong/", { trigger: false, replace: true });
@@ -34,6 +35,24 @@ define(["require", "exports", "../Jigsaw/App", "../BlueDark/Map/Map", "../BlueDa
             });
             this.bar = new NavBar_1.NavBar();
             this.bar.addTo(this);
+            this.side = new LeftSide_1.LeftSide({ style: {
+                    top: "3rem",
+                    width: "40rem",
+                    bottom: "0px",
+                    "z-index": 2000
+                },
+                className: "left-api"
+            });
+            this.side.addTo(this);
+            // this.rightSide=new Side({style:{
+            //         top:"3rem",
+            //         left:null,
+            //         right:"0px",
+            //         width:"40rem",
+            //         bottom:"0px",
+            //         "z-index":2000
+            // },className:"right-api",direction:"right"})
+            // this.rightSide.addTo(this)
         };
         return MainApp;
     }(App_1.App));
