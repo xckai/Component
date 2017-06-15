@@ -1,8 +1,0 @@
-.navbar {
-  justify-content: center;
-  background: -webkit-linear-gradient(45deg, #04104c, #042992, #04104c);
-  background: linear-gradient(45deg, #04104c, #042992, #04104c);
-}
-.navbar .title {
-  color: white;
-}

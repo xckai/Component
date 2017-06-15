@@ -5,7 +5,8 @@
     "sourceMap": false,
     "outDir": "dist"
   },
-  "exclude": [
-    "./node_modules/*"
-  ]
+  "include":["./src/**/*","./node_modules/chart/src_new/**/*"]
+  // "exclude": [
+  //   "./node_modules/*"
+  // ]
 }

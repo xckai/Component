@@ -4,6 +4,7 @@ import { View } from "../../Jigsaw/View"
 import {Util}from "../../Jigsaw/Util"
 import _=require("underscore")
 import {Side} from "../../BlueDark/Side/Side"
+import {}from "smart_traffic_chart"
 export class LeftSide extends Side{
     constructor(conf?){
         super(conf)
