@@ -35,10 +35,13 @@ define(["require", "exports", "../../Jigsaw/Component", "../../Jigsaw/View", "..
             }
         };
         SideView.prototype.open = function () {
-            this.$el.css("transform", "");
-            this.$el.find(".fa").removeClass("fa-rotate-180");
-            this.removeClass("toggle-hidden");
-            this.addClass("toggle-show");
+            var _this = this;
+            requestAnimationFrame(function () {
+                _this.$el.css("transform", "");
+                _this.$el.find(".fa").removeClass("fa-rotate-180");
+                _this.removeClass("toggle-hidden");
+                _this.addClass("toggle-show");
+            });
         };
         SideView.prototype.hidden = function () {
             switch (this.config.direction) {
@@ -65,7 +68,7 @@ define(["require", "exports", "../../Jigsaw/Component", "../../Jigsaw/View", "..
         __extends(Side, _super);
         function Side(conf) {
             var _this = _super.call(this, conf) || this;
-            _this.rootView = new SideView(_.extend(conf, { tagName: "section", className: "side" }));
+            _this.rootView = new SideView(_.extend({ tagName: "section", className: "side" }, conf));
             _this.setConfig(Util_1.Util.deepExtend({
                 style: {
                     bottom: null,
@@ -79,6 +82,15 @@ define(["require", "exports", "../../Jigsaw/Component", "../../Jigsaw/View", "..
         }
         Side.prototype.getContentContainer = function () {
             return this.rootView.$("content");
+        };
+        Side.prototype.show = function () {
+            this.rootView.open();
+        };
+        Side.prototype.hidden = function () {
+            this.rootView.hidden();
+        };
+        Side.prototype.toggle = function () {
+            this.rootView.toggle();
         };
         return Side;
     }(Component_1.Component));

@@ -8,14 +8,30 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "../../Jigsaw/Component", "./MapView"], function (require, exports, Component_1, MapView_1) {
+define(["require", "exports", "../../Jigsaw/Component", "./MapView", "underscore"], function (require, exports, Component_1, MapView_1, _) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Map = (function (_super) {
         __extends(Map, _super);
         function Map(conf) {
-            var _this = _super.call(this, conf) || this;
-            _this.map = new MapView_1.MapView();
+            var _this = _super.call(this, _.extend({ className: "map" }, conf)) || this;
+            _this.config = {
+                className: "",
+                style: {
+                    position: "absolute",
+                    left: "0px",
+                    right: "0px",
+                    top: "0px",
+                    bottom: "0px",
+                    width: null,
+                    height: null
+                },
+                map: {
+                    zoomControl: true
+                }
+            };
+            _this.setConfig(conf);
+            _this.map = new MapView_1.MapView(_this.config);
             _this.rootView.render();
             _this.map.renderAt(_this.rootView.getNode$());
             return _this;

@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "../../Jigsaw/Component", "../../Jigsaw/View", "../../Jigsaw/Model"], function (require, exports, Component_1, View_1, Model_1) {
+define(["require", "exports", "../../Jigsaw/Component", "../../Jigsaw/View", "../../Jigsaw/Model", "underscore"], function (require, exports, Component_1, View_1, Model_1, _) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var TitleModel = (function (_super) {
@@ -21,7 +21,7 @@ define(["require", "exports", "../../Jigsaw/Component", "../../Jigsaw/View", "..
     var TitleView = (function (_super) {
         __extends(TitleView, _super);
         function TitleView(conf) {
-            var _this = _super.call(this, { className: "title" }) || this;
+            var _this = _super.call(this, _.extend({ className: "title" }, conf)) || this;
             _this.model = new TitleModel();
             _this.listenTo(_this.model, "all", _this.render);
             return _this;

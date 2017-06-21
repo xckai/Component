@@ -10,7 +10,7 @@ class TitleModel extends Model{
 }
 class TitleView extends View{
     constructor(conf?){
-        super({className:"title"})
+        super(_.extend({className:"title"},conf))
         this.model=new TitleModel()
         this.listenTo(this.model,"all",this.render)
         //this.model.set("title","Title")

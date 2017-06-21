@@ -1,8 +1,10 @@
 import {View} from "./View"
 import _ =require("underscore")
 import {Util}from "./Util"
-export class Component  {
+import {EventBus} from "./Evented"
+export class Component extends EventBus  {
      constructor(conf?){
+         super()
          if(conf && conf.id){
              this.id=conf.id
          }else{
@@ -46,6 +48,7 @@ export class Component  {
     add(nc:Component,listen?){
        let i=_.findIndex(this.children,c=>c.id==nc.id)
        nc.parent=this
+       this.observe(nc)
        if(i==-1){
            this.children.push(nc)
           
@@ -54,6 +57,9 @@ export class Component  {
        }
        nc.rootView.getNode$().appendTo(this.rootView.getNode$())
        return this
+    }
+    remove(){
+        this.rootView.remove()
     }
 }
 export interface IControllerConfig{

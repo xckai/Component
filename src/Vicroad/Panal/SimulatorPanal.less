@@ -1,0 +1,88 @@
+@import "../../BlueDark/Side/Side.less";
+.side{
+    .toggle{
+        top:0 ;
+        display: flex;
+        line-height: initial;
+        align-items: center;
+        height: 100%;
+        font-size: 1rem;
+         background: #103444 ;
+    }
+    background: #103444 ;
+    color: #fff;
+    section{
+        display: flex;
+        flex-wrap: wrap;
+        width:12rem;
+        padding: .2rem .5rem;
+    }
+    label{
+        width: 12rem;
+        font-size: .8rem;
+        margin: .3rem 0rem;
+    }
+    input{
+        height: 1.1rem;
+        padding: .1rem;
+        font-size: .8rem;
+        border: transparent 2px solid;
+        
+    }
+    input:focus{
+        border: #0b7ca8 2px solid;
+       
+    }
+    input + span{
+        font-size: .8rem;
+        padding: .1rem;
+    }
+    
+    .durationinput{
+        width: 8rem;
+        
+    }
+    .datetimeinput{
+        width:12rem;
+    }
+    .adjuster-btn::before{
+        width:1.2rem;
+        display: block;
+        font-size: 1.3rem;
+    }
+    .operation+.operation{
+        margin: 0rem .5rem
+    }
+    .router-btn:before{
+        font-size: 1rem;
+        width:1.2rem;
+        display: block;
+    }
+    .applypanal{
+        display: flex;
+        justify-content: center;
+        button{
+            padding-left:1rem;
+            padding-right:1rem;
+        }
+    }
+
+}
+
+
+    .datepicker{
+        background: #103444;
+        color:#fff
+    }
+     .datepicker--cell.-focus-{
+        background: black
+    }
+    .datepicker--nav-title:hover{
+        background: black
+    }
+   .datepicker--time-current-hours:after, .datepicker--time-current-minutes:after{
+         background: black 
+    }
+    .datepicker--pointer{
+         background: #103444;
+    }

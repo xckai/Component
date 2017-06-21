@@ -16,6 +16,18 @@ define(["require", "exports", "Backbone", "underscore"], function (require, expo
         function View(conf) {
             return _super.call(this, _.extend({ tagName: "div" }, conf)) || this;
         }
+        View.prototype.setEventBus = function (e) {
+            this.eventBus = e;
+        };
+        View.prototype.setMessage = function (t) {
+            var args = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                args[_i - 1] = arguments[_i];
+            }
+            if (this.eventBus) {
+                this.eventBus.send.apply(this.eventBus, [t].concat(args));
+            }
+        };
         View.prototype.getNode$ = function () {
             return this.$el;
         };
@@ -91,6 +103,15 @@ define(["require", "exports", "Backbone", "underscore"], function (require, expo
             this.model = m;
             this.listenTo(this.model, "change", this.render);
             return this;
+        };
+        View.prototype.toHtml = function () {
+            var _this = this;
+            this.invokeBeforeRender();
+            this.render();
+            setTimeout(function () {
+                _this.invokeAterRender();
+            });
+            return this.el;
         };
         return View;
     }(Backbone.View));

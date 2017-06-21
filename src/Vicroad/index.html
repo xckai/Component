@@ -4,18 +4,28 @@
 <head>
   <meta charset="utf-8">
   <title>Chart Test</title>
+  <link rel="stylesheet" href="./dist/Vicroad/circleLoader.css">
+</head>
+<!--<script  src="../lib/bootstrap/dist/js/bootstrap.js"></script>-->
+<body >
+  <div id="app"></div>
+</body>
+  <script src="./dist/Vicroad/circleLoader.js"></script>
   <link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css">
   <!--<link rel="stylesheet" href="../lib/bootstrap/dist/css/bootstrap.css"></link>-->
-</head>
-<script  src="../lib/requirejs/require.js"></script>
-<script src="./dist/requireConfig.js"></script>
-<link rel="stylesheet" href="../lib/leaflet/dist/leaflet.css"></link>
-<link rel="stylesheet" href="/dist/Vicroad/main.css">
-<body >
-<div id="app"></div>
-</body>
+  <link href="../lib/air-datepicker/dist/css/datepicker.min.css" rel="stylesheet" type="text/css">
+  <script  src="../lib/requirejs/require.js"></script>
+  <script src="./dist/requireConfig.js"></script>
+  <link rel="stylesheet" href="../lib/leaflet/dist/leaflet.css"></link>
+  <link rel="stylesheet" href="/dist/Vicroad/main.css">
 <script>
-     requirejs(["dist/Vicroad/main"])
+   window.onload=function(){
+       requirejs(["dist/Vicroad/main"],function(){
+          if(window.initLoader){
+              window.initLoader.removeLoader()
+          }
+       })
+   }
     
 </script>
 

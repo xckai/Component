@@ -24,16 +24,16 @@ export class DropListView extends View{
         super({className:"droplist",tagName:"div"})    
         this.model=new DropModel()
         
-        this.listenTo(this.model,"change:data",this.render)
+        this.listenTo(this.model,"change",this.render)
     }
     template=_.template(`<div class="dropdown nav-dropdown fade in">
             <button class="btn btn-default" >
             <span class="value"> <%= curValue%></span>
-                <span class="caret"></span>
+                <i class="fa fa-caret-down"></i>
             </button>
-            <ul class="dropdown-menu"  style="min-width: 8rem">
+            <ul class="dropdown-menu "  >
                 <% _.each(items,function(item){ %>
-                    <li><a href="#" ><%= item.value %></a></li>
+                    <li><a href="#<%= item %>" ><%= item %></a></li>
                 <% }) %>
             </ul>
         </div>`)
@@ -44,14 +44,28 @@ export class DropListView extends View{
     }
     events(){
         return{
-            "change select":"onChange"
+            "click .btn": "onBtn",
+            "click li":"onLi"
         }
     }
-    onChange(e:JQueryEventObject){
-        console.log(e)
-        this.model.set("curValue",this.$("select").val())
+    onBtn(e:JQueryEventObject){
+
+        this.$(".dropdown-menu").toggleClass("dropdown-show")
     }
-    setData(ds){
-        this.model.set("data",ds)
+    onLi(e:JQueryEventObject){
+        console.log("li")
+         this.model.set("curValue",$(e.target).text())
+        this.$(".dropdown-menu").removeClass("dropdown-show")
+    }
+    setItems(ds){
+        this.model.set("items",ds)
+        if(!_.isEmpty(ds)){
+            this.model.set("curValue",ds[0])
+        }
+    }
+    setDate(d){
+        _.each(d,(v,k)=>{
+            this.model.set(k,v)
+        })
     }
 }

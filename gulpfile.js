@@ -55,14 +55,14 @@ gulp.task('tsall', function() {
 
 
 gulp.task("vicroad",["vicroadinit"],()=>{
-    gulp.watch('./src/**/*.less',(e)=>{
+    gulp.watch('src/**/*.less',{cwd:'./'},(e)=>{
         gulp.src('./src/Vicroad/main.less',{base:"src"})
             .pipe(less())
             .pipe(gulp.dest("./dist/"))
             console.log(e.path+"-------css changed")    
     })
     
-    gulp.watch("./src/**/*.ts",(f)=>{
+    gulp.watch("src/**/*.ts",{cwd:'./'},(f)=>{
         gulp.src(f.path,{base:"src"})
             .pipe(ts({
                 "target": "es5",
@@ -70,7 +70,7 @@ gulp.task("vicroad",["vicroadinit"],()=>{
         })).pipe(gulp.dest('./dist'))
     })
     
-    gulp.watch(["./src/**/*.js","./src/**/*.json","./src/**/*.html"],(f)=>{
+    gulp.watch(["src/**/*.js","src/**/*.json","src/**/*.html","src/**/*.css"],{cwd:'./'},(f)=>{
          gulp.src(f.path,{base:"src"})
             .pipe(gulp.dest('./dist'))
     })
@@ -80,7 +80,7 @@ gulp.task("vicroad",["vicroadinit"],()=>{
         baseDir:"./",
         index:"dist/Vicroad/index.html"
     }})
-    gulp.watch('./dist/**/*.*',()=>{
+    gulp.watch('dist/**/*.*',{cwd:'./'},()=>{
          server.reload()
     })
 
@@ -93,10 +93,10 @@ gulp.task("vicroadinit",()=>{
                 "target": "es5",
                 "module": "amd"
             })).pipe(gulp.dest('./dist'))
-    gulp.src(["./src/**/*.js","./src/**/*.json","./src/**/*.html"],{base:"src"})
+    gulp.src(["./src/**/*.js","./src/**/*.json","./src/**/*.html","src/**/*.css"],{base:"src"})
         .pipe(gulp.dest("./dist"))
-    gulp.src(["./src/**/*.js","./src/**/*.json","./src/**/*.html"],{base:"src"})
-        .pipe(gulp.dest("./dist"))
+    // gulp.src(["./src/**/*.js","./src/**/*.json","./src/**/*.html"],{base:"src"})
+    //     .pipe(gulp.dest("./dist"))
     gulp.src('./src/Vicroad/main.less',{base:"src"})
             .pipe(less())
             .pipe(gulp.dest("./dist/"))

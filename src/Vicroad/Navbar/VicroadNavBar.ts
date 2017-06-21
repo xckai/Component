@@ -12,11 +12,14 @@ export class VicroadNavBar extends Component{
                 height:"3rem"
 
            },
-           className:"navbar"
+           className:"vicroadnavbar"
         })
         this.dropSelector=new DropListView()
-        this.dropSelector.setData([{name:"Router",value:"Router"},{name:"Adjuster",value:"Adjuster"}])
+       
         this.dropSelector.renderAt(this.rootView.getNode$())
     }
     dropSelector:DropListView
+    initDropDown(c){
+         this.dropSelector.setDate(c)
+    }
 }

@@ -15,6 +15,7 @@ define(["require", "exports", "../../Jigsaw/View", "underscore", "leaflet"], fun
         __extends(MapView, _super);
         function MapView(conf) {
             var _this = _super.call(this, conf) || this;
+            _this.setConfig(conf);
             _this.style({
                 position: "absolute",
                 left: "0px",
@@ -24,8 +25,11 @@ define(["require", "exports", "../../Jigsaw/View", "underscore", "leaflet"], fun
             });
             return _this;
         }
+        MapView.prototype.setConfig = function (c) {
+            this.config = _.extend({}, this.config, c);
+        };
         MapView.prototype.onAfterRender = function () {
-            this.leaflet = L.map(this.el, { scrollWheelZoom: true });
+            this.leaflet = L.map(this.el, _.extend({ scrollWheelZoom: true }, _.pick(this.config, "zoomControl")));
         };
         MapView.prototype.setMapSetting = function (s) {
             if (this.mapSetting) {

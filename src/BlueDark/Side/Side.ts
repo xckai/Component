@@ -18,7 +18,7 @@ class SideView extends View{
              direction:string,
               style:any  
             }
-    toggle(e){
+    toggle(e?){
         if(this.$el.hasClass("toggle-hidden")){
             ///close
             this.open()
@@ -30,10 +30,12 @@ class SideView extends View{
        
     }
     open(){
-           this.$el.css("transform","")
-           this.$el.find(".fa").removeClass("fa-rotate-180")
-           this.removeClass("toggle-hidden") 
-           this.addClass("toggle-show") 
+          requestAnimationFrame(()=>{
+               this.$el.css("transform","")
+            this.$el.find(".fa").removeClass("fa-rotate-180")
+            this.removeClass("toggle-hidden") 
+            this.addClass("toggle-show") 
+          })
     }
     hidden(){
         switch(this.config.direction){
@@ -64,7 +66,7 @@ class SideView extends View{
 export class Side extends Component{
     constructor(conf?){
         super(conf)
-        this.rootView=new SideView(_.extend(conf,{tagName:"section",className:"side"}))
+        this.rootView=new SideView(_.extend({tagName:"section",className:"side"},conf))
         this.setConfig(Util.deepExtend({
            style:{
                 bottom:null,
@@ -79,4 +81,13 @@ export class Side extends Component{
         return this.rootView.$("content")
     }
     rootView:SideView
+    show(){
+        this.rootView.open()
+    }
+    hidden(){
+        this.rootView.hidden()
+    }
+    toggle(){
+        this.rootView.toggle()
+    }
 }

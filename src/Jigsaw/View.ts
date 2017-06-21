@@ -1,7 +1,17 @@
 import Backbone =require( 'Backbone');
 import _=require("underscore")
 import {Util}from "./Util"
+import {EventBus} from "./Evented"
 export class View extends  Backbone.View<Backbone.Model>{
+    setEventBus(e){
+        this.eventBus=e
+    }
+    setMessage(t,...args){
+        if(this.eventBus){
+            this.eventBus.send.apply(this.eventBus,[t].concat(args))
+        }
+    }
+    eventBus:EventBus
     constructor(conf?){
         super(_.extend({tagName:"div"},conf))
     }
@@ -78,5 +88,13 @@ export class View extends  Backbone.View<Backbone.Model>{
         this.model=m
         this.listenTo(this.model,"change",this.render)
         return this
+    }
+    toHtml(){
+      this.invokeBeforeRender()
+       this.render()
+       setTimeout(()=>{
+            this.invokeAterRender()
+       })
+       return this.el
     }
 }
