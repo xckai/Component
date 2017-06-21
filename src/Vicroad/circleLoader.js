@@ -90,7 +90,7 @@ Loader.prototype.removeWithAnimation=function(){
     var loader =document.getElementById(this.id)
     loader.style.transform="translate(-100%,0)"
     setTimeout(function(){
-        laoder.remove()
+        loader.remove()
     },1000)
 }
 window.initLoader=new Loader(200,200,5)

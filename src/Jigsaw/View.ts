@@ -3,15 +3,6 @@ import _=require("underscore")
 import {Util}from "./Util"
 import {EventBus} from "./Evented"
 export class View extends  Backbone.View<Backbone.Model>{
-    setEventBus(e){
-        this.eventBus=e
-    }
-    setMessage(t,...args){
-        if(this.eventBus){
-            this.eventBus.send.apply(this.eventBus,[t].concat(args))
-        }
-    }
-    eventBus:EventBus
     constructor(conf?){
         super(_.extend({tagName:"div"},conf))
     }

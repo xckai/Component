@@ -1,9 +1,11 @@
 import _ =require("underscore")
 import L=require("leaflet")
+import {BaseLayer}from '../../BlueDark/Map/BaseLayer'
 import {PointDrawer}from '../../BlueDark/Map/MapDrawer'
 import {Adjuster} from "./Adjuster"
-export class AdjustableLayer {
+export class AdjustableLayer extends BaseLayer {
     constructor(conf?){
+        super()
         this.layer=L.layerGroup([])
     }
     begin(){
@@ -78,14 +80,16 @@ export class RoadAdjusterLayer{
        
         this.layer=L.layerGroup([])
         this.adjuster=new Adjuster()
-        this.adjuster.on("onClick",()=>{
-            console.log(this.adjuster.getValue())
-        })
     }
    
     begin(){
         if(this.leaflet){
             this.leaflet.on("click",this.onClick,this)
+        }
+    }
+    end(){
+        if(this.leaflet){
+            this.leaflet.off("click",this.onClick,this)
         }
     }
     cancel(){
@@ -97,11 +101,13 @@ export class RoadAdjusterLayer{
        if(this.marker){
            this.marker.setLatLng(e.latlng)
        }else{
-           this.marker=L.marker(e.latlng)
+           this.marker=L.marker(e.latlng,{draggable:true})
            this.marker.bindPopup(this.adjuster.toHtml())
+           this.adjuster.setRoads([{name:"road1",isOpen:false},{name:"road2",isOpen:false}])
            this.layer.addLayer(this.marker)
        }
        this.marker.openPopup()
+       this.end()
     }
     adjuster:Adjuster
     layer:L.LayerGroup

@@ -52,7 +52,7 @@ export class PointDrawer extends BaseDrawer{
            this.fire("drawing",{latlngs:this.latlngs.concat(e.latlng)})
         }
     }
-    protected endDraw(cancled?){
+    endDraw(cancled?){
         this.map.off("click",this.onClick,this);
         this.map.off("dblclick",this.onDbclick,this);
         this.map.off("mousemove",this.onMouseMove,this);

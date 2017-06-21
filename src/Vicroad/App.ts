@@ -33,19 +33,14 @@ export class MainApp extends App{
     Simulator(){
         this.router.navigate("Simulator/",{trigger: false, replace: true})
         this.initAll()
-        this.mapComponent.beginSimulator()
         this.simulatorPanal=new SimulatorPanal()
         this.simulatorPanal.addTo(this)
         this.simulatorPanal.show()
-        this.on("adjuster-btn-click",()=>{
-            console.log("adjuster-btn-click")
-        })
       
     }
     Router(){
          this.router.navigate("Router/",{trigger: false, replace: true})
          this.initAll()
-         this.mapComponent.beginRouter()
         
     }
     initAll(){

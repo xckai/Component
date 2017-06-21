@@ -1,8 +1,10 @@
 import _ =require("underscore")
 import L=require("leaflet")
+import {BaseLayer}from '../../BlueDark/Map/BaseLayer'
 import {PointDrawer}from '../../BlueDark/Map/MapDrawer'
-export class RouterLayer {
+export class RouterLayer extends BaseLayer{
     constructor(conf?){
+        super()
         this.layer=L.layerGroup([])
         this.line=L.polyline([])
         this.layer.addLayer(this.line)
@@ -15,6 +17,9 @@ export class RouterLayer {
           })
           this.drawer.on("cancel",()=>{
               this.line.setLatLngs([])
+          })
+          this.drawer.on("end",()=>{
+                this.fire("drawCompelted",{latlngs:this.paths})
           })
     }
     layer:L.LayerGroup
@@ -46,5 +51,8 @@ export class RouterLayer {
         this.line=L.polyline([])
         this.layer.clearLayers()
         this.layer.remove()
+    }
+    end(){
+        this.drawer.endDraw()
     }
 }

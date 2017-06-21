@@ -5,23 +5,30 @@ import {RouterLayer} from "./RouterLayer"
 export class VicroadMap extends Map{
     constructor(conf?){
         super(_.extend({zoomControl:false},conf))
+        this.init()
+    }
+    init(){
+        this.on("adjuster-btn-click",this.beginSelectAdjuster,this)
+        this.on("router-btn-click",this.beginRouter,this)
+         
     }
     beginRouter(){
-        if(this.routerLayer){
-            this.routerLayer.remove()
-        }
-        this.routerLayer=new RouterLayer()
-        this.routerLayer.addTo(this.map.leaflet)
         this.routerLayer.begin()
+        this.adjusterLayer.end()
+    }
+    beginSelectAdjuster(){
+        this.adjusterLayer.begin()
+        this.routerLayer.end()
     }
     beginSimulator(){
-        if(this.simulatorLayer){
-            this.simulatorLayer.remove()
+        if(this.adjusterLayer){
+            this.adjusterLayer.remove()
         }
-        this.simulatorLayer=new RoadAdjusterLayer()
-        this.simulatorLayer.addTo(this.map.leaflet)
-        this.simulatorLayer.begin()
+        this.adjusterLayer=new RoadAdjusterLayer()
+        this.adjusterLayer.addTo(this.map.leaflet)
+        this.adjusterLayer.begin()
     }
+    
     // beginAdjuster(){
     //     if(this.adjusterLayer){
     //         this.adjusterLayer.remove()
@@ -31,17 +38,20 @@ export class VicroadMap extends Map{
     //     this.adjusterLayer.begin()
     // }
     //adjusterLayer:AdjustableLayer
-    simulatorLayer:RoadAdjusterLayer
+    adjusterLayer:RoadAdjusterLayer
     routerLayer:RouterLayer
     initAll(){
         if(this.routerLayer){
             this.routerLayer.remove()
-            this.routerLayer=null
+           
         }
-        if(this.simulatorLayer){   
-            this.simulatorLayer.remove()
-             this.simulatorLayer=null
+        this.routerLayer=new RouterLayer()
+        this.routerLayer.addTo(this.map.leaflet)
+        if(this.adjusterLayer){   
+            this.adjusterLayer.remove()
         }
+        this.adjusterLayer=new RoadAdjusterLayer()
+        this.adjusterLayer.addTo(this.map.leaflet)
         // if(this.adjusterLayer){
         //     this.adjusterLayer.remove()
         //     this.adjusterLayer=null

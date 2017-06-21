@@ -16,18 +16,6 @@ define(["require", "exports", "Backbone", "underscore"], function (require, expo
         function View(conf) {
             return _super.call(this, _.extend({ tagName: "div" }, conf)) || this;
         }
-        View.prototype.setEventBus = function (e) {
-            this.eventBus = e;
-        };
-        View.prototype.setMessage = function (t) {
-            var args = [];
-            for (var _i = 1; _i < arguments.length; _i++) {
-                args[_i - 1] = arguments[_i];
-            }
-            if (this.eventBus) {
-                this.eventBus.send.apply(this.eventBus, [t].concat(args));
-            }
-        };
         View.prototype.getNode$ = function () {
             return this.$el;
         };

@@ -3,3 +3,10 @@
     <input placeholder="Date Time" type="datetime">
     <button class ="btn btn-default"> Confirm</buttom>
 </section>
+<div class="roads">
+    <ul>
+    <% _.each(items,function(item){ %>
+        <li><a href="#" class='<%= item.class%>' ><%= item.value %></a></li>
+    <% }) %>
+    </ul>
+</div>

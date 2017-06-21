@@ -18,8 +18,13 @@ export class SimulatorPanal extends Side{
         })
         this.rootView.render()
         this.simulatorView=new SimulatorView()
-        this.simulatorView.setEventBus(this)
         this.simulatorView.renderAt(this.rootView.getNode$())
+        this.simulatorView.on("adjuster-btn-click",()=>{
+            this.send("adjuster-btn-click")
+        })
+        this.simulatorView.on("router-btn-click",()=>{
+            this.send("router-btn-click")
+        })
     }
    simulatorView:SimulatorView
    
@@ -28,11 +33,15 @@ export class SimulatorPanal extends Side{
 class SimulatorView extends View{
     events(){
         return {
-            "click .adjuster-btn":"onAdjuster"
+            "click .adjuster-btn":"onAdjuster",
+            "click .router-btn":"onRouter"
         }
     }
     onAdjuster(){
-       this.setMessage("adjuster-btn-click")
+       this.trigger("adjuster-btn-click")
+    }
+    onRouter(){
+        this.trigger("router-btn-click")
     }
     render(){
         this.$el.html(`<section>
