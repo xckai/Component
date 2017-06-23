@@ -1,5 +1,6 @@
 var gulp = require('gulp');
 const browserSync = require('browser-sync')
+var proxy = require('http-proxy-middleware')
 var less = require('gulp-less');
 var ts = require('gulp-typescript');
 gulp.task("start",()=>{
@@ -76,10 +77,28 @@ gulp.task("vicroad",["vicroadinit"],()=>{
     })
 
     var server= browserSync.create()
-    server.init({server:{
-        baseDir:"./",
-        index:"dist/Vicroad/index.html"
-    }})
+    // server.init({server:{
+    //     baseDir:"./",
+    //     index:"dist/Vicroad/index.html"
+    // }})
+ 
+    var middleware=proxy('/apps', {
+            target: 'http://10.58.75.98:8080'
+        })
+    var middleware3=proxy(['/sap_logon.html','/j_spring_security_check'], {
+            target: 'http://10.58.75.98:8080'
+        })
+    var middleware2=proxy('/service', {
+            target: 'http://10.58.75.98:8080'
+        })
+    server.init({
+        port: 3000,
+		server: {
+			baseDir: ['./'],
+            index:"dist/Vicroad/index.html"
+		},
+		middleware: [middleware,middleware2,middleware3],
+    })
     gulp.watch('dist/**/*.*',{cwd:'./'},()=>{
          server.reload()
     })

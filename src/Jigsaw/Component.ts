@@ -5,19 +5,20 @@ import {EventBus} from "./Evented"
 export class Component extends EventBus  {
      constructor(conf?){
          super()
-         if(conf && conf.id){
-             this.id=conf.id
-         }else{
-             this.id=_.uniqueId("Component")
-         }
-         this.rootView=new View({tagName:"section"})
-         this.setConfig(conf)
-     }
+         this.id=_.uniqueId("Component")
+         this.config=this.defaultConfig()
+         this.mergeConfig(conf)
+         this.rootView=new View(this.getViewConfig(conf))
+         this.updateStyle()
+    }
     rootView:View
     parent:Component
     children:Component []=[]
     id:string
-    config:IControllerConfig={
+    defaultConfig(){
+        return {
+                                el:null,
+                                $el:null,
                                 className:"",
                                 style:{
                                     position:"absolute",
@@ -29,16 +30,32 @@ export class Component extends EventBus  {
                                     height:null
                                     }
                                 }
-    setConfig(c){
-      this.config=Util.deepExtend(this.config,c)
-      this.updataConfig()
-      return this
     }
-
-    updataConfig(){
+    setConfig(c){
+        this.mergeConfig(c)
+        this.updateConfig()
+    }
+    updateConfig(){
+        this.updateStyle()
         this.rootView.setClass(this.config.className)
-        this.rootView.style(this.config.style)
+    }
+    config:IComponentConfig
+    mergeConfig(c){
+        if(c){
+            this.config= _.extend(this.defaultConfig(),_.pick(c,"className","el","$el","tagName"))
+            this.config.style=_.extend(this.defaultConfig().style,c["style"])
+        }
         return this
+    }
+    getViewConfig(c){
+        return _.extend({},_.pick(this.defaultConfig(),"tagName","el","className","$el"),c)
+    }
+    style(c){
+        this.config.style=_.extend(this.defaultConfig().style,c)
+    }
+    updateStyle(){
+        this.rootView.style(this.config.style)
+        this.rootView.setClass(this.config.className)
     }
     addTo(c:Component,listen?){
         this.parent=c
@@ -59,11 +76,23 @@ export class Component extends EventBus  {
        return this
     }
     remove(){
+        if(this.parent){
+            this.parent.removeChild(this)
+        }
         this.rootView.remove()
+        this.destroy()
+    }
+    removeChild(c:Component){
+        
+    }
+    setBusy(b){
+        this.rootView.setBusy(b)
     }
 }
-export interface IControllerConfig{
+export interface IComponentConfig{
             className:string ,
+            $el:JQuery|null
+            el:any|null,
             style:{
                     position:string | null |undefined,
                     left:string | null |undefined,

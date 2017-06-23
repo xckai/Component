@@ -56,7 +56,7 @@ export class PointDrawer extends BaseDrawer{
         this.map.off("click",this.onClick,this);
         this.map.off("dblclick",this.onDbclick,this);
         this.map.off("mousemove",this.onMouseMove,this);
-        this.latlngs=null;
+        this.latlngs=[];
         this.drawing=false;
         this.map.dragging.enable();
         this.map.doubleClickZoom.enable(); 

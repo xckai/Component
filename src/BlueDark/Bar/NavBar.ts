@@ -38,7 +38,7 @@ export class NavBar extends Component{
         })
         this.title=new TitleView()
         this.title.setTitle("Pudong Smart Traffic")
-        this.title.renderAt(this.rootView.getNode$())
+        this.title.appendAt(this.rootView.getNode$())
     }
     title:TitleView
 }

@@ -1,17 +1,19 @@
-import {Component ,IControllerConfig} from"../../Jigsaw/Component"
+import {Component ,IComponentConfig} from"../../Jigsaw/Component"
 import { View } from "../../Jigsaw/View"
 import _=require("underscore")
 import L=require("leaflet")
 export class Map extends Component{
     constructor(conf?){
-        super(_.extend({className:"map"},conf))
-        this.setConfig(conf)
+        super(conf)
         this.map=new MapView(this.config)
         this.rootView.render()
-        this.map.renderAt(this.rootView.getNode$())
+        this.map.appendAt(this.rootView.getNode$())
     }
-    config:IMapConfig={
-                                className:"",
+    defaultConfig(){
+        return {
+                                className:"map",
+                                el:null,
+                                $el:null,
                                 style:{
                                     position:"absolute",
                                     left:"0px",
@@ -25,10 +27,14 @@ export class Map extends Component{
                                     zoomControl:true
                                 }
                         }
+    }
+    config:IMapConfig
     map:MapView
 }
-interface IMapConfig extends IControllerConfig{
+interface IMapConfig extends IComponentConfig{
             className:string ,
+            el:any,
+            $el:any,
             style:{
                     position:string | null |undefined,
                     left:string | null |undefined,
@@ -63,7 +69,7 @@ export class MapView extends View {
     mapSetting: IMapSetting
     leaflet: L.Map
     onAfterRender() {
-        this.leaflet=L.map(this.el,_.extend({scrollWheelZoom:true},_.pick(this.config,"zoomControl")))
+        this.leaflet=L.map(this.el,_.extend({scrollWheelZoom:true},this.config.map))
     }
     setMapSetting(s){
         if(this.mapSetting){

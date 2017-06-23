@@ -9,11 +9,14 @@ export class View extends  Backbone.View<Backbone.Model>{
     getNode$(){
         return this.$el
     }
+    getNode(){
+        return this.el
+    }
     attr(obj){
         this.$el.attr(obj)
         return this
     }
-    set(o:string|Object,v?:string){
+    setDate(o:string|Object,v?:string){
         if(_.isString(o)){
             this.model.set(o,v)
         }
@@ -56,12 +59,12 @@ export class View extends  Backbone.View<Backbone.Model>{
         this.$el.toggleClass(cls)
         return this
     }
-    renderAt(dom){
+    appendAt(dom){
        this.invokeBeforeRender()
        this.render()
        this.getNode$().appendTo(dom)
        this.invokeAterRender()
-   }
+    }
     onAfterRender(){}
     onBeforeRender(){}
     invokeAterRender(){
@@ -72,7 +75,10 @@ export class View extends  Backbone.View<Backbone.Model>{
     }
     invokeBeforeRender(){
         if(this.onBeforeRender){
-            this.onBeforeRender()
+            setTimeout(()=>{
+                 this.onBeforeRender()
+            })
+           
         }
     }
     setModel(m){
@@ -80,12 +86,16 @@ export class View extends  Backbone.View<Backbone.Model>{
         this.listenTo(this.model,"change",this.render)
         return this
     }
-    toHtml(){
-      this.invokeBeforeRender()
-       this.render()
-       setTimeout(()=>{
-            this.invokeAterRender()
-       })
-       return this.el
+    doRender(){
+        this.invokeBeforeRender()
+        this.render()
+        this.invokeAterRender()
+    }
+    setBusy(busy:boolean,size?){
+        if(busy){
+            this.$el.append(Util.genBallBusy(size||.5))
+        }else{
+            this.$(".busyContainer").remove()
+        }
     }
 }

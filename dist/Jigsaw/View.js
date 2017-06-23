@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "Backbone", "underscore"], function (require, exports, Backbone, _) {
+define(["require", "exports", "Backbone", "underscore", "./Util"], function (require, exports, Backbone, _, Util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var View = (function (_super) {
@@ -19,11 +19,14 @@ define(["require", "exports", "Backbone", "underscore"], function (require, expo
         View.prototype.getNode$ = function () {
             return this.$el;
         };
+        View.prototype.getNode = function () {
+            return this.el;
+        };
         View.prototype.attr = function (obj) {
             this.$el.attr(obj);
             return this;
         };
-        View.prototype.set = function (o, v) {
+        View.prototype.setDate = function (o, v) {
             if (_.isString(o)) {
                 this.model.set(o, v);
             }
@@ -68,7 +71,7 @@ define(["require", "exports", "Backbone", "underscore"], function (require, expo
             this.$el.toggleClass(cls);
             return this;
         };
-        View.prototype.renderAt = function (dom) {
+        View.prototype.appendAt = function (dom) {
             this.invokeBeforeRender();
             this.render();
             this.getNode$().appendTo(dom);
@@ -83,8 +86,11 @@ define(["require", "exports", "Backbone", "underscore"], function (require, expo
             return this;
         };
         View.prototype.invokeBeforeRender = function () {
+            var _this = this;
             if (this.onBeforeRender) {
-                this.onBeforeRender();
+                setTimeout(function () {
+                    _this.onBeforeRender();
+                });
             }
         };
         View.prototype.setModel = function (m) {
@@ -92,14 +98,18 @@ define(["require", "exports", "Backbone", "underscore"], function (require, expo
             this.listenTo(this.model, "change", this.render);
             return this;
         };
-        View.prototype.toHtml = function () {
-            var _this = this;
+        View.prototype.doRender = function () {
             this.invokeBeforeRender();
             this.render();
-            setTimeout(function () {
-                _this.invokeAterRender();
-            });
-            return this.el;
+            this.invokeAterRender();
+        };
+        View.prototype.setBusy = function (busy, size) {
+            if (busy) {
+                this.$el.append(Util_1.Util.genBallBusy(size || .5));
+            }
+            else {
+                this.$(".busyContainer").remove();
+            }
         };
         return View;
     }(Backbone.View));

@@ -63,9 +63,4 @@ export class DropListView extends View{
             this.model.set("curValue",ds[0])
         }
     }
-    setDate(d){
-        _.each(d,(v,k)=>{
-            this.model.set(k,v)
-        })
-    }
 }

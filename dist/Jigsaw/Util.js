@@ -1,4 +1,4 @@
-define(["require", "exports", "underscore"], function (require, exports, _) {
+define(["require", "exports", "underscore", "./FP"], function (require, exports, _, FP_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Util;
@@ -58,7 +58,7 @@ define(["require", "exports", "underscore"], function (require, exports, _) {
             return n;
         }
         Util.min = min;
-        Util.d3Invoke = curry(function (method, obj) {
+        Util.d3Invoke = FP_1.curry(function (method, obj) {
             return function (d3Selection) {
                 _.each(obj, function (v, k) {
                     d3Selection[method](k, v);
@@ -143,23 +143,21 @@ define(["require", "exports", "underscore"], function (require, exports, _) {
             };
         }
         Util.CacheAble = CacheAble;
-        function curry(f) {
-            var arity = f.length;
-            return function f1(r1, r2, r3) {
-                var args = Array.prototype.slice.call(arguments, 0);
-                if (args.length < arity) {
-                    var f2 = function () {
-                        var args2 = Array.prototype.slice.call(arguments, 0); // parameters of returned curry func
-                        return f1.apply(null, args.concat(args2)); // compose the parameters for origin func f
-                    };
-                    return f2;
-                }
-                else {
-                    return f.apply(null, args); //all parameters are provided call the origin function
-                }
-            };
-        }
-        Util.curry = curry;
+        // export function curry(f) {
+        //         var arity = f.length;
+        //         return function f1(r1?,r2?,r3?) {
+        //             var args = Array.prototype.slice.call(arguments, 0);
+        //             if(args.length < arity) {
+        //                 var f2= function() {
+        //                     var args2 = Array.prototype.slice.call(arguments, 0); // parameters of returned curry func
+        //                     return f1.apply(null, args.concat(args2)); // compose the parameters for origin func f
+        //                 }
+        //                 return f2;
+        //             } else {
+        //                 return f.apply(null, args); //all parameters are provided call the origin function
+        //             }
+        //         }
+        //     }
         function arguments2Array(args) {
             var r = [];
             for (var i = 0; i < args.length; ++i) {
@@ -238,6 +236,46 @@ define(["require", "exports", "underscore"], function (require, exports, _) {
             }
         }
         Util.addKeyFrames = addKeyFrames;
+        function genBallBusy(size, num) {
+            var i = num == undefined ? 3 : num;
+            var $div = $("<div class='busyContainer'></div>").css({
+                position: "absolute",
+                top: "0px",
+                bottom: "0px",
+                left: "0px",
+                right: "0px",
+                display: "flex",
+                "align-items": "center",
+                "justify-content": "center",
+                "z-index": 10000
+            });
+            var c = $("<div></div>").css({
+                display: "inline-flex"
+            });
+            var w = size;
+            for (var ii = 0; ii < i; ++ii) {
+                var t = $("<div class='ball'></div>");
+                t.css({
+                    width: w + "rem",
+                    height: w + "rem",
+                    margin: 0.6 * w + "rem",
+                    "border-radius": "100%",
+                    animation: "shake 1s ease-in-out+" + 2 * ii / i + "s infinite  alternate"
+                });
+                c.append(t);
+            }
+            var beginkey = 100 / i + "%", endkey = 300 / i + "%", frame = {
+                name: "shake",
+                from: { "-webkit-transform": "scale(1); " },
+                "to": { "-webkit-transform": "scale(2); " }
+            };
+            // frame[beginkey]={ "-webkit-transform":"scale(2); "}
+            // frame[endkey]={ "-webkit-transform":"scale(1); "}
+            addKeyFrames(frame);
+            $div.append(c);
+            return $div.get(0);
+        }
+        Util.genBallBusy = genBallBusy;
         function genBusyDiv(width, height, i, color) {
             var $div = $("<div class='busyContainer'></div>").css({
                 position: "absolute",
@@ -248,8 +286,7 @@ define(["require", "exports", "underscore"], function (require, exports, _) {
                 display: "flex",
                 "align-items": "center",
                 "justify-content": "center",
-                "z-index": 1000,
-                background: "rgba(0,0,0,.5)"
+                "z-index": 10000
             });
             var c = $("<div></div>").css({
                 display: "inline-flex"
@@ -258,10 +295,10 @@ define(["require", "exports", "underscore"], function (require, exports, _) {
             for (var ii = 0; ii < i; ++ii) {
                 var t = $("<div></div>");
                 t.css({
-                    width: w + "px",
-                    height: w + "px",
+                    width: w + "rem",
+                    height: w + "rem",
                     background: color || "blue",
-                    margin: 0.6 * w + "px",
+                    margin: 0.6 * w + "rem",
                     "border-radius": "100%",
                     animation: "shake 1s ease-in-out+" + 2 * ii / i + "s infinite  alternate"
                 });

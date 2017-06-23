@@ -14,6 +14,7 @@ export class MainApp extends App{
         this.addRule("Re Time","retime",this.proxy("Simulator"))
         this.bar=new VicroadNavBar()
         this.bar.initDropDown({curValue:"Router",items:["Re Time","Router"]})
+        
         this.bar.addTo(this)
         this.mapComponent=new VicroadMap({style:{
             top:"3rem"
@@ -23,7 +24,6 @@ export class MainApp extends App{
                 this.mapComponent.map.setMapSetting(c)
                 //this.mapComponent.beginRouter()
             })
-        
       
     }
     mapComponent:VicroadMap

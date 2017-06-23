@@ -14,9 +14,17 @@ define(["require", "exports", "../../Jigsaw/Component", "../../Jigsaw/View", "un
     var Map = (function (_super) {
         __extends(Map, _super);
         function Map(conf) {
-            var _this = _super.call(this, _.extend({ className: "map" }, conf)) || this;
-            _this.config = {
-                className: "",
+            var _this = _super.call(this, conf) || this;
+            _this.map = new MapView(_this.config);
+            _this.rootView.render();
+            _this.map.appendAt(_this.rootView.getNode$());
+            return _this;
+        }
+        Map.prototype.defaultConfig = function () {
+            return {
+                className: "map",
+                el: null,
+                $el: null,
                 style: {
                     position: "absolute",
                     left: "0px",
@@ -30,12 +38,7 @@ define(["require", "exports", "../../Jigsaw/Component", "../../Jigsaw/View", "un
                     zoomControl: true
                 }
             };
-            _this.setConfig(conf);
-            _this.map = new MapView(_this.config);
-            _this.rootView.render();
-            _this.map.renderAt(_this.rootView.getNode$());
-            return _this;
-        }
+        };
         return Map;
     }(Component_1.Component));
     exports.Map = Map;
@@ -57,7 +60,7 @@ define(["require", "exports", "../../Jigsaw/Component", "../../Jigsaw/View", "un
             this.config = _.extend({}, this.config, c);
         };
         MapView.prototype.onAfterRender = function () {
-            this.leaflet = L.map(this.el, _.extend({ scrollWheelZoom: true }, _.pick(this.config, "zoomControl")));
+            this.leaflet = L.map(this.el, _.extend({ scrollWheelZoom: true }, this.config.map));
         };
         MapView.prototype.setMapSetting = function (s) {
             if (this.mapSetting) {

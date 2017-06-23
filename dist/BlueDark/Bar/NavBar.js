@@ -50,7 +50,7 @@ define(["require", "exports", "../../Jigsaw/Component", "../../Jigsaw/View", "..
             });
             _this.title = new TitleView();
             _this.title.setTitle("Pudong Smart Traffic");
-            _this.title.renderAt(_this.rootView.getNode$());
+            _this.title.appendAt(_this.rootView.getNode$());
             return _this;
         }
         return NavBar;

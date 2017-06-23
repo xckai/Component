@@ -1,4 +1,5 @@
 import _ =require("underscore")
+import {curry}from "./FP"
 export module Util{
 export function isEndWith(s:any,ed:string){
     let ss= s.toString();
@@ -50,7 +51,7 @@ export function min (ns:any [],key?){
        n= n == Number.MAX_VALUE?0:n;
        return n;
     }
-export let d3Invoke = curry((method?,obj?)=>{
+export let d3Invoke = curry((method?:string,obj?:any)=>{
     return (d3Selection)=>{
         _.each(obj,(v,k)=>{
             d3Selection[method](k,v)
@@ -127,21 +128,21 @@ export function CacheAble(fn:any,keyFn?){
         }
     }
 }
-export function curry(f) {
-        var arity = f.length;
-        return function f1(r1?,r2?,r3?) {
-            var args = Array.prototype.slice.call(arguments, 0);
-            if(args.length < arity) {
-                var f2= function() {
-                    var args2 = Array.prototype.slice.call(arguments, 0); // parameters of returned curry func
-                    return f1.apply(null, args.concat(args2)); // compose the parameters for origin func f
-                }
-                return f2;
-            } else {
-                return f.apply(null, args); //all parameters are provided call the origin function
-            }
-        }
-    }
+// export function curry(f) {
+//         var arity = f.length;
+//         return function f1(r1?,r2?,r3?) {
+//             var args = Array.prototype.slice.call(arguments, 0);
+//             if(args.length < arity) {
+//                 var f2= function() {
+//                     var args2 = Array.prototype.slice.call(arguments, 0); // parameters of returned curry func
+//                     return f1.apply(null, args.concat(args2)); // compose the parameters for origin func f
+//                 }
+//                 return f2;
+//             } else {
+//                 return f.apply(null, args); //all parameters are provided call the origin function
+//             }
+//         }
+//     }
 function arguments2Array(args){
     let r=[]
     for(let i=0;i<args.length;++i){
@@ -221,6 +222,46 @@ export function enableAutoResize(dom:any,fn){
                 .html(css).appendTo("head")
         }
     }
+    export function genBallBusy(size,num?){
+        let i=num==undefined?3:num
+        let $div=$("<div class='busyContainer'></div>").css({
+            position:"absolute",
+            top:"0px",
+            bottom:"0px",
+            left:"0px",
+            right:"0px",
+            display:"flex",
+            "align-items":"center",
+            "justify-content":"center",
+            "z-index":10000
+        })
+        let c=$("<div></div>").css({
+            display:"inline-flex"
+        })
+        let w=size
+        for(let ii=0;ii<i;++ii){
+            let t=$("<div class='ball'></div>")
+            t.css({
+                width:w+"rem",
+                height:w+"rem",
+                margin:0.6*w+"rem",
+                "border-radius":"100%",
+                animation:"shake 1s ease-in-out+"+2*ii/i+"s infinite  alternate"
+            })
+            
+            c.append(t)
+        }
+        let beginkey=100/i +"%",endkey=300/i +"%",frame={
+                name:"shake",
+                from:{"-webkit-transform":"scale(1); "},
+                "to":{ "-webkit-transform":"scale(2); "}
+            }
+       // frame[beginkey]={ "-webkit-transform":"scale(2); "}
+       // frame[endkey]={ "-webkit-transform":"scale(1); "}
+        addKeyFrames(frame)
+        $div.append(c)
+        return $div.get(0)
+    }
     export function genBusyDiv(width,height,i,color?){
         let $div=$("<div class='busyContainer'></div>").css({
             position:"absolute",
@@ -231,8 +272,7 @@ export function enableAutoResize(dom:any,fn){
             display:"flex",
             "align-items":"center",
             "justify-content":"center",
-            "z-index":1000,
-            background:"rgba(0,0,0,.5)"
+            "z-index":10000
         })
         let c=$("<div></div>").css({
             display:"inline-flex"
@@ -241,10 +281,10 @@ export function enableAutoResize(dom:any,fn){
         for(let ii=0;ii<i;++ii){
             let t=$("<div></div>")
             t.css({
-                width:w+"px",
-                height:w+"px",
+                width:w+"rem",
+                height:w+"rem",
                 background:color||"blue",
-                margin:0.6*w+"px",
+                margin:0.6*w+"rem",
                 "border-radius":"100%",
                 animation:"shake 1s ease-in-out+"+2*ii/i+"s infinite  alternate"
             })

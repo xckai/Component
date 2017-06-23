@@ -16,7 +16,7 @@ export class VicroadNavBar extends Component{
         })
         this.dropSelector=new DropListView()
        
-        this.dropSelector.renderAt(this.rootView.getNode$())
+        this.dropSelector.appendAt(this.rootView.getNode$())
     }
     dropSelector:DropListView
     initDropDown(c){

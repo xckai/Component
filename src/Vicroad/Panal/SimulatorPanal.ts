@@ -18,7 +18,7 @@ export class SimulatorPanal extends Side{
         })
         this.rootView.render()
         this.simulatorView=new SimulatorView()
-        this.simulatorView.renderAt(this.rootView.getNode$())
+        this.simulatorView.appendAt(this.rootView.getNode$())
         this.simulatorView.on("adjuster-btn-click",()=>{
             this.send("adjuster-btn-click")
         })

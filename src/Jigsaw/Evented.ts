@@ -87,18 +87,18 @@ export class EventBus {
         _.each(this.eventBusChildren,c=>c.eventBusParent=null)
 
         if(this.eventBusParent){
-            this.eventBusParent.removeChildren(this)
+            this.eventBusParent.removeChildrenEventBus(this)
         }
     }
     listenTo(c:EventBus){
         c.eventBusParent=this
-        this.addChildren(c)
+        this.addChildrenEventBus(c)
     }
     observe(c:EventBus){
         c.eventBusParent=this
-        this.addChildren(c)
+        this.addChildrenEventBus(c)
     }
-    addChildren(c:EventBus){
+    private addChildrenEventBus(c:EventBus){
         if(_.some(this.eventBusChildren,(i)=>c.eventId==i.eventId)){
             return 
         }else{
@@ -106,7 +106,7 @@ export class EventBus {
         }
        
     }
-    removeChildren(c:EventBus){
+    private removeChildrenEventBus(c:EventBus){
         this.eventBusChildren=_.reject(this.eventBusChildren,(e)=>e.eventId==c.eventId)
         c.eventBusParent=null;
     }

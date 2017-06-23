@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./View", "underscore", "./Util", "./Evented"], function (require, exports, View_1, _, Util_1, Evented_1) {
+define(["require", "exports", "./View", "underscore", "./Evented"], function (require, exports, View_1, _, Evented_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Component = (function (_super) {
@@ -16,7 +16,17 @@ define(["require", "exports", "./View", "underscore", "./Util", "./Evented"], fu
         function Component(conf) {
             var _this = _super.call(this) || this;
             _this.children = [];
-            _this.config = {
+            _this.id = _.uniqueId("Component");
+            _this.config = _this.defaultConfig();
+            _this.mergeConfig(conf);
+            _this.rootView = new View_1.View(_this.getViewConfig(conf));
+            _this.updateStyle();
+            return _this;
+        }
+        Component.prototype.defaultConfig = function () {
+            return {
+                el: null,
+                $el: null,
                 className: "",
                 style: {
                     position: "absolute",
@@ -28,25 +38,31 @@ define(["require", "exports", "./View", "underscore", "./Util", "./Evented"], fu
                     height: null
                 }
             };
-            if (conf && conf.id) {
-                _this.id = conf.id;
-            }
-            else {
-                _this.id = _.uniqueId("Component");
-            }
-            _this.rootView = new View_1.View({ tagName: "section" });
-            _this.setConfig(conf);
-            return _this;
-        }
+        };
         Component.prototype.setConfig = function (c) {
-            this.config = Util_1.Util.deepExtend(this.config, c);
-            this.updataConfig();
+            this.mergeConfig(c);
+            this.updateConfig();
+        };
+        Component.prototype.updateConfig = function () {
+            this.updateStyle();
+            this.rootView.setClass(this.config.className);
+        };
+        Component.prototype.mergeConfig = function (c) {
+            if (c) {
+                this.config = _.extend(this.defaultConfig(), _.pick(c, "className", "el", "$el", "tagName"));
+                this.config.style = _.extend(this.defaultConfig().style, c["style"]);
+            }
             return this;
         };
-        Component.prototype.updataConfig = function () {
-            this.rootView.setClass(this.config.className);
+        Component.prototype.getViewConfig = function (c) {
+            return _.extend({}, _.pick(this.defaultConfig(), "tagName", "el", "className", "$el"), c);
+        };
+        Component.prototype.style = function (c) {
+            this.config.style = _.extend(this.defaultConfig().style, c);
+        };
+        Component.prototype.updateStyle = function () {
             this.rootView.style(this.config.style);
-            return this;
+            this.rootView.setClass(this.config.className);
         };
         Component.prototype.addTo = function (c, listen) {
             this.parent = c;
@@ -67,7 +83,16 @@ define(["require", "exports", "./View", "underscore", "./Util", "./Evented"], fu
             return this;
         };
         Component.prototype.remove = function () {
+            if (this.parent) {
+                this.parent.removeChild(this);
+            }
             this.rootView.remove();
+            this.destroy();
+        };
+        Component.prototype.removeChild = function (c) {
+        };
+        Component.prototype.setBusy = function (b) {
+            this.rootView.setBusy(b);
         };
         return Component;
     }(Evented_1.EventBus));

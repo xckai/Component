@@ -1,5 +1,5 @@
 {
-    "center":{"lat":31.2,"lng":121},
+    "center":{"lat":-37,"lng":145},
     "zoom":9,
     "baseLayer":{
         "mapUrl":"http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",

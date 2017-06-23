@@ -8,28 +8,32 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "Backbone", "./View", "underscore", "./Component", "./Util"], function (require, exports, Backbone, View_1, _, Component_1, Util_1) {
+define(["require", "exports", "Backbone", "underscore", "./Component"], function (require, exports, Backbone, _, Component_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var App = (function (_super) {
         __extends(App, _super);
         function App(conf) {
             var _this = _super.call(this, conf) || this;
-            if (conf && conf.id) {
-                _this.id = conf.id;
-            }
-            else {
-                _this.id = _.uniqueId("App");
-            }
-            if (conf && conf.el) {
-                _this.rootView = new View_1.View({ el: conf.el });
-            }
-            else {
-                _this.rootView = new View_1.View({ el: "body" });
-            }
-            _this.setConfig(Util_1.Util.deepExtend({ className: "app" }, conf));
+            _this.id = _.uniqueId("App");
             return _this;
         }
+        App.prototype.defaultConfig = function () {
+            return {
+                el: "body",
+                $el: null,
+                className: "app",
+                style: {
+                    position: "absolute",
+                    left: "0px",
+                    right: "0px",
+                    top: "0px",
+                    bottom: "0px",
+                    width: null,
+                    height: null
+                }
+            };
+        };
         App.prototype.start = function () {
             Backbone.history.start();
         };

@@ -1,8 +1,10 @@
-import _ =require("underscore")
+import _ = require('underscore');
 import L=require("leaflet")
-import {BaseLayer}from '../../BlueDark/Map/BaseLayer'
-import {PointDrawer}from '../../BlueDark/Map/MapDrawer'
-import {Adjuster} from "./Adjuster"
+import { BaseLayer } from '../../BlueDark/Map/BaseLayer';
+import { PointDrawer } from '../../BlueDark/Map/MapDrawer';
+import { FeatureCollection } from '../../Jigsaw/map/GeoJSON';
+import { Adjuster } from './Adjuster';
+import { RoadPicker } from './RoadPicker';
 export class AdjustableLayer extends BaseLayer {
     constructor(conf?){
         super()
@@ -36,6 +38,8 @@ export class AdjustableLayer extends BaseLayer {
 export class SingleMarkLayer {
     constructor(conf?){
         this.layer=L.layerGroup([])
+        this.picker=new RoadPicker()
+        this.picker.baseUrl='/service/apps/itm/maps/itm/query/point2edge.json?'
     }
     begin(){
         if(this.leaflet){
@@ -47,16 +51,38 @@ export class SingleMarkLayer {
             this.leaflet.off("click",this.onClick,this)
         }
     }
+    end(){
+        if(this.leaflet){
+            this.leaflet.off("click",this.onClick,this)
+        }
+    }
     onClick(e:L.MouseEvent){
-       if(this.marker){
-           this.marker.setLatLng(e.latlng)
-       }else{
-           this.marker=L.marker(e.latlng)
-           this.layer.addLayer(this.marker)
-       }
+       this.picker.setLatlng(e.latlng)
+       this.picker.on("done",(d)=>{
+           let f=new FeatureCollection(d)
+           let m=_.first(f.getPoint())
+           let p=_.first(f.getPolyline())
+           if(m){
+                if(this.marker){
+                    this.marker.remove()
+                }
+                this.marker=m.toLeafletMarker()
+                this.layer.addLayer(this.marker)
+               
+           }
+           if(p){
+                if(this.road){
+                    this.road.remove()
+                }
+                this.road=p.toLeafletPolyline()
+                this.layer.addLayer(this.road)
+           }
+       })
     }
     layer:L.LayerGroup
     marker:L.Marker
+    road:L.Polyline
+    picker:RoadPicker
     leaflet:L.Map
     addTo(map){
         this.layer.addTo(map)
@@ -81,7 +107,7 @@ export class RoadAdjusterLayer{
         this.layer=L.layerGroup([])
         this.adjuster=new Adjuster()
     }
-   
+    
     begin(){
         if(this.leaflet){
             this.leaflet.on("click",this.onClick,this)
@@ -101,11 +127,13 @@ export class RoadAdjusterLayer{
        if(this.marker){
            this.marker.setLatLng(e.latlng)
        }else{
-           this.marker=L.marker(e.latlng,{draggable:true})
-           this.marker.bindPopup(this.adjuster.toHtml())
-           this.adjuster.setRoads([{name:"road1",isOpen:false},{name:"road2",isOpen:false}])
-           this.layer.addLayer(this.marker)
+           this.marker=L.marker(e.latlng)
+           
        }
+      this.marker.bindPopup(this.adjuster.getNode())
+      this.adjuster.doRender()
+      this.adjuster.setLatlng(e.latlng)
+       this.layer.addLayer(this.marker)
        this.marker.openPopup()
        this.end()
     }
