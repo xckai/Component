@@ -1,16 +1,23 @@
 import Backbone =require( 'Backbone');
 import _=require("underscore")
-import {Util}from "./Util"
+import {Util}from "./Utils/Util"
 import {EventBus} from "./Evented"
 export class View extends  Backbone.View<Backbone.Model>{
     constructor(conf?){
         super(_.extend({tagName:"div"},conf))
+        this.addClass(_.pick(conf,"class"))
     }
     getNode$(){
         return this.$el
     }
     getNode(){
         return this.el
+    }
+    getContentNode(){
+        return this.el
+    }
+    getContentNode$(){
+        return this.$el
     }
     attr(obj){
         this.$el.attr(obj)
@@ -48,7 +55,9 @@ export class View extends  Backbone.View<Backbone.Model>{
         }
     }
     addClass(cls){
-        this.$el.addClass(cls)
+        if(cls){
+             this.$el.addClass(cls)
+        }
         return this
     }
     removeClass(cls){

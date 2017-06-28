@@ -22,7 +22,8 @@ define(["require", "exports", "Backbone", "underscore", "./Component"], function
             return {
                 el: "body",
                 $el: null,
-                className: "app",
+                className: "",
+                class: "app",
                 style: {
                     position: "absolute",
                     left: "0px",

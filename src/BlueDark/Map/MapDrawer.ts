@@ -1,7 +1,8 @@
 import { Evented} from "../../Jigsaw/Evented";
 import L=require("leaflet")
-class BaseDrawer extends Evented{
+export class BaseDrawer extends Evented{
     map:L.Map
+    interactiveLayer:L.Layer 
     drawing:boolean
     drawOn(m:L.Map){
         this.map=m
@@ -11,24 +12,28 @@ class BaseDrawer extends Evented{
     setMap(m:L.Map){
         this.map=m
     }
+    setInteractiveLayer(l:L.Layer){
+        this.interactiveLayer=l
+        return this
+    }
 }
 export class PointDrawer extends BaseDrawer{
     constructor(){
         super()
-        this.on("begindraw",this.beginDraw.bind(this))
+        this.on("begindraw",this.begin,this)
     }
     latlngs:L.LatLng[]=[]
-    beginDraw(){
-        if(this.map){
+    begin(){
+        if(this.interactiveLayer){
             this.drawing=true;
-            this.map.on("click",this.onClick,this);
-            this.map.on("dblclick",this.onDbclick,this);
-            this.map.on("mousemove",this.onMouseMove,this);
+            this.interactiveLayer.on("click",this.onClick,this);
+            this.interactiveLayer.on("dblclick",this.onDbclick,this);
+            this.interactiveLayer.on("mousemove",this.onMouseMove,this);
             this.map.dragging.disable();
             this.map.doubleClickZoom.disable(); 
         }
     }
-    cancelDraw(){
+    cancel(){
         this.fire("cancel")
         this.endDraw(true)
     }
@@ -53,9 +58,12 @@ export class PointDrawer extends BaseDrawer{
         }
     }
     endDraw(cancled?){
-        this.map.off("click",this.onClick,this);
-        this.map.off("dblclick",this.onDbclick,this);
-        this.map.off("mousemove",this.onMouseMove,this);
+        if(!cancled){
+             this.fire("drawend",{latlngs:this.latlngs});
+        }
+        this.interactiveLayer.off("click",this.onClick,this);
+        this.interactiveLayer.off("dblclick",this.onDbclick,this);
+        this.interactiveLayer.off("mousemove",this.onMouseMove,this);
         this.latlngs=[];
         this.drawing=false;
         this.map.dragging.enable();
@@ -64,8 +72,46 @@ export class PointDrawer extends BaseDrawer{
         // setTimeout(function(){
         //     self.map.doubleClickZoom.enable(); 
         // },100)
-        if(!cancled){
-             this.fire("drawend",{latlngs:this.latlngs});
+        
+    }
+}
+export class RoadPicker extends BaseDrawer{
+    baseUrl:string
+    oldLatlng:any
+    latlng:any
+    marker:L.Marker
+    path:L.Polygon
+    paths:any[]
+    begin(){
+       if(this.interactiveLayer){
+            this.interactiveLayer.on("click",this.onclick,this)
+       }
+    }
+    end(){
+        if(this.interactiveLayer){
+            this.interactiveLayer.off("click",this.onclick,this)
         }
+    }
+    cancel(){
+        if(this.interactiveLayer){
+            this.interactiveLayer.off("click",this.onclick,this)
+        }
+    }
+    private onclick(e:L.MouseEvent){
+        this.drawing=true
+        this.fire("drawing",e)
+        this.oldLatlng=e.latlng
+        this.fetch()
+    }
+    fetch(){
+        this.fire("fetching")
+        $.get(this.baseUrl+`lng=${this.oldLatlng.lng}&lat=${this.oldLatlng.lat}`)
+        .done((d)=>{
+            this.fire("drawend",d)
+            
+        })
+        .fail((d)=>{
+            this.fire("cancel",null)
+        })
     }
 }

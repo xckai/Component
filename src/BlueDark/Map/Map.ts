@@ -11,9 +11,10 @@ export class Map extends Component{
     }
     defaultConfig(){
         return {
-                                className:"map",
+                                className:"",
                                 el:null,
                                 $el:null,
+                                class:"map",
                                 style:{
                                     position:"absolute",
                                     left:"0px",
@@ -35,6 +36,7 @@ interface IMapConfig extends IComponentConfig{
             className:string ,
             el:any,
             $el:any,
+            class:string,
             style:{
                     position:string | null |undefined,
                     left:string | null |undefined,

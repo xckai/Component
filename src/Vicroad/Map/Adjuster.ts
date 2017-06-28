@@ -5,14 +5,7 @@ export class Adjuster extends View{
     constructor(conf?){
         super(conf)
         this.style({position:"relative"})
-        this.model=new RoadAdjusterModel()
-        this.model.on("change:latlng",this.model.getDetail,this.model)
-        this.model.on("change:roads",this.render,this)
-        this.model.on("fetching",()=>{
-            this.setBusy(true)
-        })
     }
-    model:RoadAdjusterModel
     events(){
        return{
             "click .operation .btn":"onBtn"
@@ -20,15 +13,13 @@ export class Adjuster extends View{
     }
     onBtn(e){
         let i=$(e.currentTarget ).attr("index")
-        let roads=this.model.get("roads")
+        let roads=this.data.roads
         roads[i].isOpen=!roads[i].isOpen
-        this.model.set("roads",roads)
+        this.trigger("simulate-road-change",this.data)
         this.render()
     }
-    setLatlng(latlng){
-        this.model.set("latlng",latlng)
-    }
     template=_.template(`<div class="adjuster">
+                    <header><%= name %></header>
                     <table>
                     <thead>
                         <tr>
@@ -38,7 +29,7 @@ export class Adjuster extends View{
                         </tr>
                     </thead>
                     <% _.each(roads,function(item,i){ %>
-                        <tr class=" <%= item.class %>"><td class='name'><%= item.name %></td><td class='status'><%= item.status %></td><td class='operation'><button class='btn btn-default' index=<%= i %> ><span class='fa'></span></button></td></tr>
+                        <tr class=" <%= item.class %>"><td class='name' nowrap><%= item.name %></td><td class='status'><%= item.status %></td><td class='operation'><button class='btn btn-default' index=<%= i %> ><span class='fa'></span></button></td></tr>
                     <% }) %>
                     </table>
                 </div>`)
@@ -48,7 +39,7 @@ export class Adjuster extends View{
         return this
     }
     getRenderData(){
-        let n= _.pick(this.model.toJSON(),"roads")
+        let n= _.pick(this.data,"roads","name","id")
         n.roads=_.map(n.roads,(dd:any)=>{
                         let n:any={}
                         n.name=dd.name;
@@ -63,27 +54,17 @@ export class Adjuster extends View{
                     })
       return n
     }
-    roads:road[]
-    setRoads(d){
-        this.roads=d;
+    data:any
+    setData(d){
+        this.data=d
         this.render()
     }
-}
-class RoadAdjusterModel extends Model{
-    defaults(){
-        return{
-            latlng:{lat:0,lng:0},
-            roads:[]
+    setRoadNumber(n){
+        let roads=[]
+        for(let i=0;i<n;++i){
+            roads.push({name:`Lane-${i+1}`,isOpen:true})
         }
-    }
-    getDetail(){
-         this.set("roads",[])
-        this.trigger("fetching")
-        setTimeout(()=>{
-              this.set("roads",[{name:"road1",status:"opened",isOpen:true,class:"open"},
-                            {name:"road2",status:"opened",isOpen:true,class:"open"},
-                            {name:"road3",isOpen:false,status:"closed",class:"close"}])
-        },1000)
+       this.setData({roads:roads})
     }
 }
 interface road{

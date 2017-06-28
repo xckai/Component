@@ -2,7 +2,7 @@ import Backbone =require( 'Backbone');
 import {View} from "./View"
 import _ =require("underscore")
 import {Component} from "./Component"
-import {Util}from "./Util"
+import {Util}from "./Utils/Util"
 export class App extends Component{
     constructor(conf?){
         super(conf)
@@ -12,7 +12,8 @@ export class App extends Component{
         return {
                                 el:"body",
                                 $el:null,
-                                className:"app",
+                                className:"",
+                                class:"app",
                                 style:{
                                     position:"absolute",
                                     left:"0px",

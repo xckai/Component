@@ -12,7 +12,7 @@ export class VicroadNavBar extends Component{
                 height:"3rem"
 
            },
-           className:"vicroadnavbar"
+           class:"vicroadnavbar"
         })
         this.dropSelector=new DropListView()
        

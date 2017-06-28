@@ -1,7 +1,8 @@
-import {App} from "../Jigsaw/App"
-import {VicroadMap} from "./Map/VicroadMap"
-import { VicroadNavBar } from "./NavBar/VicroadNavBar"
-import {SimulatorPanal} from "./Panal/SimulatorPanal"
+import { App } from '../Jigsaw/App';
+import { TimeSlider } from './Chart/TimeSlider';
+import { VicroadMap } from './Map/VicroadMap';
+import { VicroadNavBar } from './NavBar/VicroadNavBar';
+import { SimulatorPanal } from './Panal/SimulatorPanal';
 export class MainApp extends App{
     constructor(conf?){
         super(conf)
@@ -20,12 +21,20 @@ export class MainApp extends App{
             top:"3rem"
         }})
         this.mapComponent.addTo(this)
+        this.timeSlider=new TimeSlider()
+        this.timeSlider.style({
+            top:null,
+            bottom:"1rem",
+            left:"20rem"
+        })
+        this.timeSlider.addTo(this)
         $.get("/dist/Vicroad/mapConfig.json",(c)=>{
                 this.mapComponent.map.setMapSetting(c)
                 //this.mapComponent.beginRouter()
             })
-      
-    }
+            
+    }   
+    timeSlider:TimeSlider
     mapComponent:VicroadMap
     bar:VicroadNavBar
     simulatorPanal:SimulatorPanal

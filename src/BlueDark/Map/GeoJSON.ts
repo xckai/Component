@@ -1,4 +1,4 @@
-import { checkIteratorCollection, curry, curry2, curry3 } from '../FP';
+import { checkIteratorCollection, curry, curry2, curry3 } from '../../Jigsaw/Utils/FP';
 import _ = require('underscore');
 import L = require('leaflet');
 type coordinate=[number,number]
@@ -19,7 +19,7 @@ export interface IFeatureCollection{
     features:Feature []
     properties:properties
 }
-let getProperty=function(paths:string,obj){
+let getProperty=function(obj,paths:string){
     let spliter="/"
     let path=paths.split("/")
     let r=obj
@@ -33,7 +33,7 @@ let getProperty=function(paths:string,obj){
     return r
 }
 let comparer=curry(function(path:string,target:any,obj:any){
-    return getProperty(path,obj)==target
+    return getProperty(obj,path)==target
 })
 
 let isFeature=comparer("type","Feature")
@@ -56,7 +56,7 @@ export class Feature{
         this.properties=d.properties
     }
     getCoordinates(){
-       return getProperty("geometry/coordinates",this)
+       return getProperty(this,"geometry/coordinates")
     }
     toGeoJSON(){
         return {
@@ -65,11 +65,14 @@ export class Feature{
             properties:this.properties
         }
     }
+    getProperty(path){
+        return getProperty(this,path)
+    }
 }
 export class Point extends Feature{
     type="Point"
     getCoordinates(){
-       return getProperty("geometry/coordinates",this)
+       return getProperty(this,"geometry/coordinates")
     }
     toLeafletMarker(options?){
         return L.marker(this.getleafletCoorinates(),options)
@@ -86,7 +89,7 @@ export class Point extends Feature{
 export class Polygon extends Feature{
     type="Polygon"
     getCoordinates(){
-       return getProperty("geometry/coordinates/0",this)
+       return getProperty(this,"geometry/coordinates/0")
     }
     getleafletCoorinates(){
       return _.map(this.getCoordinates(),(c:coordinate)=>{
@@ -103,7 +106,7 @@ export class Polygon extends Feature{
 export class Polyline extends Feature{
     type="Polyline"
     getCoordinates(){
-       return getProperty("geometry/coordinates",this)
+       return getProperty(this,"geometry/coordinates")
     }
     getleafletCoorinates(){
       return _.map(this.getCoordinates(),(c:coordinate)=>{
@@ -116,6 +119,10 @@ export class Polyline extends Feature{
     toLeafletPolyline(options?){
         return L.polyline(this.getleafletCoorinates(),options)
     }
+    getLeafletLatlngs(){
+        return this.getleafletCoorinates()
+    }
+    
 }
 export class FeatureCollection implements IFeatureCollection{
     type:string

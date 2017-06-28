@@ -22,9 +22,10 @@ define(["require", "exports", "../../Jigsaw/Component", "../../Jigsaw/View", "un
         }
         Map.prototype.defaultConfig = function () {
             return {
-                className: "map",
+                className: "",
                 el: null,
                 $el: null,
+                class: "map",
                 style: {
                     position: "absolute",
                     left: "0px",

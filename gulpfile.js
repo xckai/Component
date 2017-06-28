@@ -82,14 +82,8 @@ gulp.task("vicroad",["vicroadinit"],()=>{
     //     index:"dist/Vicroad/index.html"
     // }})
  
-    var middleware=proxy('/apps', {
-            target: 'http://10.58.75.98:8080'
-        })
-    var middleware3=proxy(['/sap_logon.html','/j_spring_security_check'], {
-            target: 'http://10.58.75.98:8080'
-        })
-    var middleware2=proxy('/service', {
-            target: 'http://10.58.75.98:8080'
+    var middleware=proxy(['/service','/apps','/lib','/sap_logon.html','/j_spring_security_check','/resources'], {
+            target: 'http://10.58.75.98:8123'
         })
     server.init({
         port: 3000,
@@ -97,7 +91,7 @@ gulp.task("vicroad",["vicroadinit"],()=>{
 			baseDir: ['./'],
             index:"dist/Vicroad/index.html"
 		},
-		middleware: [middleware,middleware2,middleware3],
+		middleware:middleware,
     })
     gulp.watch('dist/**/*.*',{cwd:'./'},()=>{
          server.reload()

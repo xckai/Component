@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "../../Jigsaw/Component", "../../Jigsaw/View", "../../Jigsaw/Util", "underscore"], function (require, exports, Component_1, View_1, Util_1, _) {
+define(["require", "exports", "../../Jigsaw/Component", "../../Jigsaw/View", "../../Jigsaw/Utils/Util", "underscore"], function (require, exports, Component_1, View_1, Util_1, _) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var SideView = (function (_super) {

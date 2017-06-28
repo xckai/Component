@@ -1,15 +1,15 @@
 import {View} from "./View"
 import _ =require("underscore")
-import {Util}from "./Util"
+import {Util}from "./Utils/Util"
 import {EventBus} from "./Evented"
+const getProperty=Util.getProperty
 export class Component extends EventBus  {
      constructor(conf?){
          super()
          this.id=_.uniqueId("Component")
          this.config=this.defaultConfig()
-         this.mergeConfig(conf)
-         this.rootView=new View(this.getViewConfig(conf))
-         this.updateStyle()
+         this.rootView=new View(_.extend({},_.pick(this.defaultConfig(),"tagName","el","className","$el"),conf))
+         this.setConfig(conf)
     }
     rootView:View
     parent:Component
@@ -20,6 +20,7 @@ export class Component extends EventBus  {
                                 el:null,
                                 $el:null,
                                 className:"",
+                                class:"",
                                 style:{
                                     position:"absolute",
                                     left:"0px",
@@ -37,21 +38,26 @@ export class Component extends EventBus  {
     }
     updateConfig(){
         this.updateStyle()
-        this.rootView.setClass(this.config.className)
+        this.rootView.addClass(this.config.class)
     }
     config:IComponentConfig
     mergeConfig(c){
         if(c){
-            this.config= _.extend(this.defaultConfig(),_.pick(c,"className","el","$el","tagName"))
-            this.config.style=_.extend(this.defaultConfig().style,c["style"])
+            this.config= _.extend(this.defaultConfig(),_.pick(c,"className","el","$el","tagName","class"))
+            this.config.style=_.extend(this.defaultConfig().style,getProperty(this.config,"style"),c["style"])
         }
         return this
     }
-    getViewConfig(c){
-        return _.extend({},_.pick(this.defaultConfig(),"tagName","el","className","$el"),c)
-    }
     style(c){
-        this.config.style=_.extend(this.defaultConfig().style,c)
+        this.config.style=_.extend(this.defaultConfig().style,getProperty(this.config,"style"),c)
+        this.updateStyle()
+    }
+    addClass(c){
+        this.rootView.addClass(c)
+        return this
+    }
+    removeClass(c){
+        this.rootView.removeClass(c)
     }
     updateStyle(){
         this.rootView.style(this.config.style)
@@ -80,7 +86,7 @@ export class Component extends EventBus  {
             this.parent.removeChild(this)
         }
         this.rootView.remove()
-        this.destroy()
+        super.destroy()
     }
     removeChild(c:Component){
         
@@ -91,6 +97,7 @@ export class Component extends EventBus  {
 }
 export interface IComponentConfig{
             className:string ,
+            class:string,
             $el:JQuery|null
             el:any|null,
             style:{

@@ -8,19 +8,27 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "Backbone", "underscore", "./Util"], function (require, exports, Backbone, _, Util_1) {
+define(["require", "exports", "Backbone", "underscore", "./Utils/Util"], function (require, exports, Backbone, _, Util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var View = (function (_super) {
         __extends(View, _super);
         function View(conf) {
-            return _super.call(this, _.extend({ tagName: "div" }, conf)) || this;
+            var _this = _super.call(this, _.extend({ tagName: "div" }, conf)) || this;
+            _this.addClass(_.pick(conf, "class"));
+            return _this;
         }
         View.prototype.getNode$ = function () {
             return this.$el;
         };
         View.prototype.getNode = function () {
             return this.el;
+        };
+        View.prototype.getContentNode = function () {
+            return this.el;
+        };
+        View.prototype.getContentNode$ = function () {
+            return this.$el;
         };
         View.prototype.attr = function (obj) {
             this.$el.attr(obj);
@@ -60,7 +68,9 @@ define(["require", "exports", "Backbone", "underscore", "./Util"], function (req
             }
         };
         View.prototype.addClass = function (cls) {
-            this.$el.addClass(cls);
+            if (cls) {
+                this.$el.addClass(cls);
+            }
             return this;
         };
         View.prototype.removeClass = function (cls) {

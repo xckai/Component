@@ -54,7 +54,7 @@ export class DropListView extends View{
     }
     onLi(e:JQueryEventObject){
         console.log("li")
-         this.model.set("curValue",$(e.target).text())
+        this.model.set("curValue",$(e.target).text())
         this.$(".dropdown-menu").removeClass("dropdown-show")
     }
     setItems(ds){

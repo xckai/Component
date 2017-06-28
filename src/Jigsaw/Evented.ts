@@ -12,6 +12,10 @@ interface IEventMessage{
     eventKey:string,
     args:any[]
 }
+interface IEvented{
+    on(key:string,callback?:Function,ctx?:any)
+    off(key:string,callback?:Function,ctx?:any)
+}
 export class EventBus {
     constructor(){
         this.eventId=_.uniqueId("eventbus")
@@ -22,9 +26,19 @@ export class EventBus {
     private eventBusParent:EventBus
     private eventBusChildren :EventBus []
     private events:IEvents
-    on(t:string,callback:Function,ctx?){
+    on(str:string,callback:Function,ctx?){
+       _.each( str.split(" "),(t)=>{
+           this._on(t,callback,ctx)
+       })
+    }
+    off(str:string ,callback?:Function,ctx?){
+        _.each( str.split(" "),(t)=>{
+           this._off(t,callback,ctx)
+        })
+    }
+    _on(t:string,callback:Function,ctx?){
         if (this.events[t]!=undefined) {
-            if (_.some(this.events[t], (e) => e.callback == callback && e.ctx == ctx)) {
+            if (_.some(this.events[t], (e) => e.callback.toString() == callback.toString() && e.ctx == ctx)) {
                 return this
             } else {
                 let obj: any = {};
@@ -41,7 +55,7 @@ export class EventBus {
         }
         return this
     }
-    off(t:string ,callback?:Function,ctx?){
+    _off(t:string ,callback?:Function,ctx?){
         if(this.events[t]==undefined){
             return this
         }else{
@@ -80,7 +94,7 @@ export class EventBus {
     }
     fire(t:string,args?){
         _.each(this.events[t],(e)=>{
-               e.callback.apply(e.ctx,[t].concat(args))
+               e.callback.apply(e.ctx,args)
         })
     }
     destroy(){
@@ -114,6 +128,13 @@ export class EventBus {
         this.events[t]=[]
         return this
     }
+    proxyEvents(obj:IEvented,...args){
+        _.each(args,(k)=>{
+            obj.on(k,(...objs)=>{
+                this.send.apply(this,[k].concat(objs))
+            })
+        })
+    }
 }
 export class Evented {
     constructor() {
@@ -131,7 +152,7 @@ export class Evented {
     }
     private _on(t: string, fn: Function, ctx ? : Object) {
         if (this.events[t]) {
-            if (_.some(this.events[t], (e: any) => e.fn == fn && e.ctx == ctx)) {
+            if (_.some(this.events[t], (e: any) => e.fn.toString() == fn.toString() && e.ctx == ctx)) {
                 return
             } else {
                 let obj: any = {};
@@ -148,13 +169,16 @@ export class Evented {
         }
     }
     private _off(t: string, fn ? : Function, ctx ? ) {
+        if(t=="*"){
+            this.events={}
+        }
         if (!this.events[t]) {
             return this;
         } else {
             let nEs = [];
             if (fn) {
                 this.events[t].forEach(o => {
-                    if (o.fn != fn && o.ctx != ctx) {
+                    if (o.fn.toString() != fn.toString() && o.ctx != ctx) {
                         nEs.push(o);
                     }
                 });
@@ -162,7 +186,7 @@ export class Evented {
             this.events[t] = nEs;
         }
     }
-    off(t: string, fn: Function) {
+    off(t: string, fn?: Function) {
         var st = t.split(" ");
         st.forEach(s => this._off(s, fn))
         return this;

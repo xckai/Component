@@ -128,21 +128,20 @@ export function CacheAble(fn:any,keyFn?){
         }
     }
 }
-// export function curry(f) {
-//         var arity = f.length;
-//         return function f1(r1?,r2?,r3?) {
-//             var args = Array.prototype.slice.call(arguments, 0);
-//             if(args.length < arity) {
-//                 var f2= function() {
-//                     var args2 = Array.prototype.slice.call(arguments, 0); // parameters of returned curry func
-//                     return f1.apply(null, args.concat(args2)); // compose the parameters for origin func f
-//                 }
-//                 return f2;
-//             } else {
-//                 return f.apply(null, args); //all parameters are provided call the origin function
-//             }
-//         }
-//     }
+export function getProperty(obj,paths:string){
+    let spliter="/"
+    let path=paths.split("/")
+    let r=obj
+    for(let i=0;i<path.length;++i){
+        if(_.has(r,path[i])){
+              r=r[path[i]]
+        }else{
+            r=undefined
+        }
+    }
+    return r
+}
+
 function arguments2Array(args){
     let r=[]
     for(let i=0;i<args.length;++i){

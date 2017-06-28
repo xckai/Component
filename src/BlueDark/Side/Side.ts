@@ -1,7 +1,7 @@
 import {Component} from"../../Jigsaw/Component"
 import {Model} from"../../Jigsaw/Model"
 import { View } from "../../Jigsaw/View"
-import {Util}from "../../Jigsaw/Util"
+import {Util}from "../../Jigsaw/Utils/Util"
 import _=require("underscore")
 class SideView extends View{
     constructor(conf?){

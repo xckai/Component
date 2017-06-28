@@ -2,15 +2,16 @@
         //By default load any module IDs from js/lib
         baseUrl: './',
         paths:{
-                leaflet:"../lib/leaflet/dist/leaflet-src",
-                underscore:"../lib/underscore/underscore",
-                jquery:"../lib/jquery/dist/jquery",
-                bootstrap:"../lib/bootstrap/dist/js/bootstrap",
-                d3:"../lib/d3/d3",
-                text : "../lib/text/text",
-                Backbone:"../lib/backbone/backbone",
-                timepicker:"../lib/air-datepicker/dist/js/i18n/datepicker.en",
-                timepicker_main:"../lib/air-datepicker/dist/js/datepicker"
+                leaflet:"../vendor/leaflet/dist/leaflet-src",
+                underscore:"../vendor/underscore/underscore",
+                jquery:"../vendor/jquery/dist/jquery",
+                bootstrap:"../vendor/bootstrap/dist/js/bootstrap",
+                d3:"../vendor/d3/d3",
+                text : "../vendor/text/text",
+                Backbone:"../vendor/backbone/backbone",
+                timepicker:"../vendor/air-datepicker/dist/js/i18n/datepicker.en",
+                timepicker_main:"../vendor/air-datepicker/dist/js/datepicker",
+                "VicroadChart":'../dist/Chart/VicroadChart'
         },
         shim:{
                 leaflet:{
