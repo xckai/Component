@@ -58,7 +58,7 @@ gulp.task('tsall', function() {
 
 gulp.task("vicroad",["vicroadinit"],()=>{
     gulp.watch('src/**/*.less',{cwd:'./'},(e)=>{
-        gulp.src('./src/Vicroad/main.less',{base:"src"})
+        gulp.src('./src/Apps/Vicroad/main.less',{base:"src"})
             .pipe(less())
             .pipe(gulp.dest("./dist/"))
             console.log(e.path+"-------css changed")    

@@ -3,8 +3,9 @@ import { TimeSlider } from './Chart/TimeSlider';
 import { VicroadMap } from './Map/VicroadMap';
 import { VicroadNavBar } from './NavBar/VicroadNavBar';
 import { SimulatorPanal } from './Panal/SimulatorPanal';
-import { Util } from "../../Jigsaw/Utils/Util";
-import {G2Map} from ".../../Jigsaw/Component/Map/G2Map"
+import { G2Map } from '.../../Jigsaw/Component/Map/G2Map';
+import { IProgressLoader } from '../../Jigsaw/Component/Loader/ILoader';
+
 
 export class MainApp extends App {
     constructor(conf?){
@@ -67,20 +68,18 @@ export class MainApp extends App {
          }
     }
     showProgressBar(){
-        let progressBar=this.progressBar
-        this.rootView.$el.append(progressBar.toHtml())
-        progressBar.show()
-        this.on("calculation_progress",(d)=>{progressBar.setProgress(d.value)},this) 
+        if(this.progressBar){
+            let progressBar=this.progressBar
+            progressBar.show()
+            this.on("calculation_progress",(d)=>{progressBar.setProgress(d.value)},this) 
+        }
+       
     }
-    progressBar:Util.loader.ProgressBarLoader=new Util.loader.ProgressBarLoader(300,150)
+    progressBar:IProgressLoader
     hiddenProgressBar(){
         this.progressBar.remove()
     }
-    // Adjuster(){
-    //      this.router.navigate("Adjuster/",{trigger: false, replace: true})
-    //      this.mapComponent.initAll()
-    //      this.mapComponent.beginAdjuster()
-    // }
+
 
 }
 function doInitMap(map:G2Map){
