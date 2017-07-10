@@ -197,7 +197,8 @@ export function enableAutoResize(dom:any,fn){
             oldWidth=dom.offsetWidth,oldHeight=dom.offsetHeight
         }
     }
-    export function addKeyFrames(frameData){
+    export namespace loader{
+         export function addKeyFrames(frameData){
         let frameName=frameData.name||""
         let css=""
         css+=("@-webkit-keyframes "+frameName+"{")
@@ -260,6 +261,112 @@ export function enableAutoResize(dom:any,fn){
         addKeyFrames(frame)
         $div.append(c)
         return $div.get(0)
+    }
+    export class ProgressBarLoader{
+        constructor(w?,h?,str?){
+            this.width=w||300
+            this.height=h||300
+            this.loadingText=str||"Loading..."
+        }
+        container:any
+        loadingText:string
+        width:number
+        height:number
+        svgNode:any
+        barLineNode:any
+        makeSVG(tag,attributes){
+             let SVG_NS = "http://www.w3.org/2000/svg"
+             var elem = document.createElementNS(SVG_NS, tag);  
+                for (var attribute in attributes) {
+                    var name = attribute;  
+                    var value = attributes[attribute];  
+                    elem.setAttribute(name, value);  
+                }  
+                return elem; 
+        }
+        toHtml(){
+            let container=this.container =$("<div class='progressContainer'></div>").css({
+                    position:"absolute",
+                    top:"0px",
+                    bottom:"0px",
+                    left:"0px",
+                    right:"0px",
+                    display:"flex",
+                    "align-items":"center",
+                    "justify-content":"center",
+                    "z-index":10000,
+                    "transform":"translate(-100%,0)",
+                    transition: "transform 1s linear"
+                })[0],svgNode;
+            this.svgNode= svgNode= this.makeSVG("svg",{ width:this.width,height:this.height});
+
+            let defs = this.makeSVG("defs",{});
+            let linearGradient = this.makeSVG("linearGradient",{id:"color-gradient",x1:"0", y1:"0%", x2:"99.33%", y2:"0%", gradientUnits:"userSpaceOnUse"})
+            let stop1 = this.makeSVG("stop",{offset:"0%",style:"stop-color:yellow"});
+            let stop2 = this.makeSVG("stop",{offset:"100%",style:"stop-color:aqua"});
+            linearGradient.appendChild(stop1);
+            linearGradient.appendChild(stop2); 
+            defs.appendChild(linearGradient);
+            svgNode.appendChild(defs);
+
+            let lineBase = this.makeSVG("line",{ "stroke-width": 30,
+                                                    stroke:"#fff",
+                                                    "stroke-dasharray":"5.5",
+                                                     x1:"0", y1:this.height/3,
+                                                     x2:"100%",y2:this.height/3+0.001,
+                                                    class:"linebase"})
+            
+            let lineColor =this.barLineNode = this.makeSVG("line",{transition: "all 0.5s ease",
+                                                                        "stroke-width": 30,
+                                                                        "stroke-dasharray":"5.5",
+                                                                        x1:"0",y1:this.height/3, 
+                                                                        x2:"0%",y2:this.height/3+0.001,
+                                                                        class:"linecolor"})
+          
+            svgNode.appendChild(lineBase);
+            svgNode.appendChild(lineColor);
+
+            let text = this.makeSVG("text",{transform:"translate("+this.width/2+","+this.height/3*2+")",
+                                                "font-size": "20px",
+                                                "text-anchor":" middle",
+                                                fill:"#fff",
+                                                "stroke-width":0,
+                                                class:"texts"
+                                             })
+         
+            let str = this.loadingText;
+            for(let i = 0; i < str.length; i++) {
+                let tspan = this.makeSVG("tspan",{});
+                tspan.textContent=str.charAt(i);
+                let animateSize = this.makeSVG("animate",{id:"ani"+i,attributeName:"font-size",values:"20;24;20",begin:(i==0?"0s":("ani"+(i-1)+".end")),dur:"0.5s",repeatCount:"indefinite"});
+                let animateColor = this.makeSVG("animate",{attributeName:"fill",from:"yellow",to:"aqua",begin:(i==0?"0s":("ani"+(i-1)+".end")),dur:"0.5s",repeatCount:"indefinite"});
+                tspan.appendChild(animateSize);
+                tspan.appendChild(animateColor);
+                text.appendChild(tspan);
+            }
+            svgNode.appendChild(text);
+
+            container.appendChild(svgNode);
+            return container
+        }
+        setProgress(v:number){
+            if(this.barLineNode){
+                this.barLineNode.setAttribute("x2",`${v}%`)
+            }
+        }
+        show(){
+            setTimeout(()=>{
+                  this.container.style.transform="translate(0,0)"
+            },10)
+        }
+        remove(){
+            if(this.container.parent){
+                this.container.style.transform="translate(-100%,0)"
+                setTimeout(()=>{
+                     this.container.parent.removeChild(this.container)
+                },1000)
+            }
+        }
     }
     export function genBusyDiv(width,height,i,color?){
         let $div=$("<div class='busyContainer'></div>").css({
@@ -388,5 +495,6 @@ export function enableAutoResize(dom:any,fn){
        
 
         return $div.get(0)
+    }
     }
 }

@@ -1,0 +1,34 @@
+*{
+    box-sizing: content-box
+}
+.app{
+    overflow: hidden;
+    z-index: 1
+}
+@import "../BlueDark/base.less";
+@import "./Navbar/VicroadNavBar.less";
+@import "../BlueDark/DropList/DropList.less";
+@import "./Panal/SimulatorPanal.less";
+@import "./Map/map.less";
+@import "./Chart/chart.less";
+.progressContainer{
+    background: rgba(0,0,0,.8);
+    .linecolor{
+        stroke:green
+    }
+    .texts{
+        fill:#Fff
+    }
+}
+.vicroadnavbar{
+    z-index: 11;
+}
+.side{
+    z-index: 10
+}
+.map{
+    z-index: 9;
+}
+.timeSlider{
+    z-index: 12
+}

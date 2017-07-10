@@ -55,6 +55,7 @@ gulp.task('tsall', function() {
 });
 
 
+
 gulp.task("vicroad",["vicroadinit"],()=>{
     gulp.watch('src/**/*.less',{cwd:'./'},(e)=>{
         gulp.src('./src/Vicroad/main.less',{base:"src"})
@@ -82,26 +83,40 @@ gulp.task("vicroad",["vicroadinit"],()=>{
     //     index:"dist/Vicroad/index.html"
     // }})
  
-    var middleware=proxy(['/service','/apps','/lib','/sap_logon.html','/j_spring_security_check','/resources'], {
-            target: 'http://10.58.75.98:8123'
+    var middleware=proxy(['/service/apps',
+    '/apps','/lib','/sap_logon.html','/j_spring_security_check','/resources'], {
+             target: 'http://10.58.75.98:8080',
+        
+            //target:"http://10.59.176.34:8080"
         })
+    var middleware2=proxy(['/eventbus','/socket.io'], {
+            //target: 'http://10.59.179.231:8081/',
+            target: 'http://10.58.75.98:8089',
+            ws: true,
+        
+           
+        })
+    var m3=proxy(['/services/vicroad/tasks/','/eventbus/info'],{
+       target: 'http://10.58.75.98:8089',
+       
+      
+    })
     server.init({
         port: 3000,
 		server: {
 			baseDir: ['./'],
-            index:"dist/Vicroad/index.html"
+            index:"dist/Apps/Vicroad/index.html"
 		},
-		middleware:middleware,
+		middleware:[middleware,middleware2,m3],
     })
-    gulp.watch('dist/**/*.*',{cwd:'./'},()=>{
-         server.reload()
-    })
+    // gulp.watch('dist/**/*.*',{cwd:'./'},()=>{
+    //      server.reload()
+    // })
 
-    ////copy all
-   
+
 })
 gulp.task("vicroadinit",()=>{
-    gulp.src('./src/**/*.ts',{base:"src"})
+    gulp.src(['./src/Jigsaw/**/*.ts','./src/Apps/Vicroad/**/*.ts'],{base:"src"})
                 .pipe(ts({
                 "target": "es5",
                 "module": "amd"
