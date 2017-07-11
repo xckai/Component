@@ -156,13 +156,13 @@ class SimulatorView extends View{
     }
     onRouter(e:JQueryMouseEventObject){
         if($(e.currentTarget).hasClass("btn-active")){
-            this.trigger("router-btn-off")
+            this.trigger("simulate-router-btn-off")
             $(e.currentTarget).removeClass("btn-active")
 
         }else{
             $(".operation").removeClass("btn-active")
             $(e.currentTarget).addClass("btn-active")
-            this.trigger("router-btn-on")
+            this.trigger("simulate-router-btn-on")
         }
     }
     onSimulateTimeChange(){

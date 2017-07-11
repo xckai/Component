@@ -189,7 +189,7 @@ export class VicroadMap extends G2Map{
         this.on("simulate-road-change",()=>{
              this.roadPicker.off("*")
         })
-        this.roadPicker.off("*")
+        this.routerPicker.off("*")
         let roadMark= L.marker([0,0],{icon:L.divIcon({className: 'adjusterIcon fa fa-times'})})
         roadMark.addTo(this.map.leaflet)
         //roadMark.addTo(this.map.leaflet)
@@ -259,6 +259,8 @@ export class VicroadMap extends G2Map{
     // routerLayer:RouterLayer
     // roadLayer:SingleMarkLayer
     initAll(){
+       this.roadPicker.off("*")
+        this.routerPicker.off("*")
         // if(this.routerLayer){
         //     this.routerLayer.remove()
            
