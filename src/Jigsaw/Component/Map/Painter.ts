@@ -2,9 +2,6 @@ import { W2 } from '../../Data/DataDefine';
 import { Style } from './G2Map';
 import _ = require('underscore');
 import { W } from './DS';
-interface IBrush{
-
-}
 export interface IStyleResult{
     [k:string]:any
 }
@@ -62,9 +59,25 @@ export namespace Painter{
             return memo;
         },[])
     }
+    export function paint(brush:IBrush,f:W2.feature,style:W.Wrapper<Style,IStyleResult>){
+            let s=style.value("symbolizer")
+            if(s=="polygon"){
+                brush.polygon(f,s)
+            }else if(s=="line"){
+                brush.line(f,s)
+            }else if(s=="marker"){
+                brush.marker(f,s)
+            }
+    }
    
 }
-export class CanvasBrush
+export interface IBrush{
+    polygon:(f:W2.feature,style:W.Wrapper<Style,IStyleResult>)=>void
+    line:(f:W2.feature,style:W.Wrapper<Style,IStyleResult>)=>void
+    marker:(f:W2.feature,style:W.Wrapper<Style,IStyleResult>,np?,ix?)=>void
+
+}
+export class CanvasBrush implements IBrush
 {
     constructor(ctx){
         this._ctx=ctx
@@ -134,7 +147,7 @@ export class CanvasBrush
         }
 
     }
-    marker(f:W2.feature,style:W.Wrapper<Style,IStyleResult>,np,ix){
+    marker(f:W2.feature,style:W.Wrapper<Style,IStyleResult>,np?,ix?){
         let s=style.setDefalut({
                 width: 0,
                 height: 0,

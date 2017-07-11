@@ -7,50 +7,18 @@ export class Component extends EventBus  {
      constructor(conf?){
          super()
          this.id=_.uniqueId("Component")
-         this.config=this.defaultConfig()
-         this.rootView=new View(_.extend({},_.pick(this.defaultConfig(),"tagName","el","className","$el"),conf))
-         this.setConfig(conf)
+         this.rootView=new View(_.extend({tagName:"section"},conf))
     }
     rootView:View
     parent:Component
     children:Component []=[]
     id:string
-    defaultConfig(){
-        return {
-                                el:null,
-                                $el:null,
-                                className:"",
-                                class:"",
-                                style:{
-                                    position:"absolute",
-                                    left:"0px",
-                                    right:"0px",
-                                    top:"0px",
-                                    bottom:"0px",
-                                    width:null,
-                                    height:null
-                                    }
-                                }
+    deepExtend(...args){
+        return Util.deepExtend.apply(null,args)
     }
-    setConfig(c){
-        this.mergeConfig(c)
-        this.updateConfig()
-    }
-    updateConfig(){
-        this.updateStyle()
-        this.rootView.addClass(this.config.class)
-    }
-    config:IComponentConfig
-    mergeConfig(c){
-        if(c){
-            this.config= _.extend(this.defaultConfig(),_.pick(c,"className","el","$el","tagName","class"))
-            this.config.style=_.extend(this.defaultConfig().style,getProperty(this.config,"style"),c["style"])
-        }
+    setStyle(s){
+        this.rootView.style(s)
         return this
-    }
-    style(c){
-        this.config.style=_.extend(this.defaultConfig().style,getProperty(this.config,"style"),c)
-        this.updateStyle()
     }
     addClass(c){
         this.rootView.addClass(c)
@@ -58,10 +26,6 @@ export class Component extends EventBus  {
     }
     removeClass(c){
         this.rootView.removeClass(c)
-    }
-    updateStyle(){
-        this.rootView.style(this.config.style)
-        this.rootView.setClass(this.config.className)
     }
     addTo(c:Component,listen?){
         this.parent=c

@@ -2,7 +2,8 @@ import {Component} from"../../Core/Component"
 import { View } from "../../Core/View"
 import { Model } from "../../Core/Model"
 import _=require("underscore")
-class TitleModel extends Model{
+import { Util } from "../../Utils/Util";
+class TitleModel extends Model {
     constructor(conf?){
         super(conf)
     }
@@ -26,16 +27,15 @@ class TitleView extends View{
 }
 export class NavBar extends Component{
     constructor(conf?){
-        super(conf)
-        this.setConfig({
+        super(Util.deepExtend({
            style:{
                 display:"flex",
                 bottom:null,
                 height:"3rem"
 
            },
-           className:"navbar"
-        })
+           class:"navbar"
+        },conf))
         this.title=new TitleView()
         this.title.setTitle("Pudong Smart Traffic")
         this.title.appendAt(this.rootView.getNode$())

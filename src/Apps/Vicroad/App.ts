@@ -2,8 +2,10 @@ import { App } from '../../Jigsaw/Core/App';
 import { TimeSlider } from './Chart/TimeSlider';
 import { VicroadMap } from './Map/VicroadMap';
 import { VicroadNavBar } from './NavBar/VicroadNavBar';
+import { ReTimePanal } from './Panal/ReTimePanal';
 import { SimulatorPanal } from './Panal/SimulatorPanal';
 import { G2Map } from '.../../Jigsaw/Component/Map/G2Map';
+import { CircleLoader } from '../../Jigsaw/Component/Loader/CircleLoader';
 import { IProgressLoader } from '../../Jigsaw/Component/Loader/ILoader';
 
 
@@ -30,7 +32,7 @@ export class MainApp extends App {
         }})
         this.mapComponent.addTo(this)
         this.timeSlider=new TimeSlider()
-        this.timeSlider.style({
+        this.timeSlider.setStyle({
             top:null,
             bottom:"1rem",
             left:"calc(50% - 15rem)"
@@ -42,16 +44,23 @@ export class MainApp extends App {
          requestAnimationFrame(()=>{
             doInitMap(this.mapComponent)
         })
+        this.progressBar=new CircleLoader(200,300,5)
+        this.progressBar.toElement()
             
     }   
     timeSlider:TimeSlider
     mapComponent:VicroadMap
     bar:VicroadNavBar
     simulatorPanal:SimulatorPanal
+    reTimePanal:ReTimePanal
    // rightSide:Side
     reTime(){
         this.router.navigate("reTime/",{trigger: false, replace: true})
         this.initAll()
+        this.reTimePanal=new ReTimePanal
+        this.reTimePanal.addTo(this)
+        this.reTimePanal.show()
+        this.send("begin-retime")
     }
     reRouter(){
         this.router.navigate("reRouter/",{trigger: false, replace: true})
@@ -59,6 +68,7 @@ export class MainApp extends App {
         this.simulatorPanal=new SimulatorPanal()
         this.simulatorPanal.addTo(this)
         this.simulatorPanal.show()
+       
     }
     initAll(){
          this.mapComponent.initAll()
@@ -66,10 +76,15 @@ export class MainApp extends App {
              this.simulatorPanal.remove()
              this.simulatorPanal=null;
          }
+         if(this.reTimePanal){
+             this.reTimePanal.remove()
+             this.reTimePanal=null
+         }
     }
     showProgressBar(){
         if(this.progressBar){
             let progressBar=this.progressBar
+            progressBar.addTo(this.rootView.getNode())
             progressBar.show()
             this.on("calculation_progress",(d)=>{progressBar.setProgress(d.value)},this) 
         }
@@ -77,7 +92,10 @@ export class MainApp extends App {
     }
     progressBar:IProgressLoader
     hiddenProgressBar(){
-        this.progressBar.remove()
+          if(this.progressBar){
+                this.progressBar.remove()
+            }
+      
     }
 
 

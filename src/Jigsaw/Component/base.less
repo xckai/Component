@@ -1,3 +1,4 @@
+@import "./color";
 .btn{
     display: inline-block;
     padding: .1rem .3rem;
@@ -20,24 +21,24 @@
     border-radius: 4px;
 }
 .btn-default{
-    background: #001533;
-    color:#fff;
-    border-color:#8c8c8c;
+    background: @darkcolor;
+    color:contrast((@darkcolor));
+    border-color:@basebordercolor;
 }
 .btn-default:hover{
-      background: #0b7ca8;
+      background: @lightcolor;
 }
 .btn-disable{
     opacity: .6;
     pointer-events: none;
-    background: #4e5052
+    background: fadeout(greyscale(desaturate(@darkcolor,30%)),20%)
 }
 .btn-active{
-     background: #0b7ca8;
+     background: @lightcolor;
 }
 .busyContainer{
-    background: rgba(0,0,0,.7);
+    background: @busybackground;
     .ball{
-         background: #0b7ca8;
+         background:@lightcolor;
     }
 }

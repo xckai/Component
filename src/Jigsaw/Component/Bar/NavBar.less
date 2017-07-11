@@ -1,14 +1,14 @@
 .navbar{
     justify-content: center;
-      background: linear-gradient(30deg, #001533 30%, #103444 50%, #001533 70%);
+      background: @darkcolor;
     .title{
-        color: white;
+        color: @basefontcolor;
         font-size: 1.5rem;
         align-items: center;
         display: flex;
         font-family: 'Times New Roman', Times, serif;
-        text-shadow: 0 1px 0 #eeeeee,
-                     0 2px 2px rgba(240,240,245,.5)
+        text-shadow: 0 1px 0 darken(@basefontcolor,20%),
+                     0 2px 2px fadeout(@basefontcolor,50%)
                      
     }
 }

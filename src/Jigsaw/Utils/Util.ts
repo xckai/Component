@@ -6,18 +6,44 @@ export function isEndWith(s:any,ed:string){
     let matcher= new RegExp(ed+"$")
     return matcher.test(ss);
   }
-export function toPixel(s:string,ctx?:string){
-    if(isEndWith(s,"px")){
-        return parseFloat(s)
+export function toPixel(str:string|number,ctx?:string){
+    let string2Pixel = (s)=>{
+        if(_.isNumber(s)) {
+            return s
+        }
+        else if(isEndWith(s,"px")) {
+            return parseFloat(s)
+        }
+        else if(isEndWith(s,"rem")) {
+            let font=window.getComputedStyle(document.body).getPropertyValue('font-size')||"16px"
+            return parseFloat(s) * parseFloat(font)
+        }
+        else if(isEndWith(s,"%")){
+            return parseFloat(s)* toPixel(ctx)/100
+        }else{
+            return 0
+        }
     }
-    if(isEndWith(s,"rem")){
-         let font=window.getComputedStyle(document.body).getPropertyValue('font-size')||"16px"
-         return parseFloat(s) * parseFloat(font)
+    if(_.isNumber(str)) {
+        return string2Pixel(str)
     }
-    if(isEndWith(s,"%")){
-        return parseFloat(s)* toPixel(ctx)/100
+    else if(_.isUndefined(str)||_.isNull(str)) {
+        return str
     }
-        return 0
+    else if(_.isFunction(str)) {
+        return toPixel(str.call(null))
+    }
+    else {
+        if(str.split("+").length>= 2){
+            return toPixel(str.split("+").slice(0,1).join(""))+toPixel(str.split("+").slice(1).join("+"))    
+        }
+        else if(str.split("-").length>= 2){
+            return toPixel(str.split("-").slice(0,1).join(""))-toPixel(str.split("-").slice(1).join("-"))    
+        }
+        else{
+            return string2Pixel(str)
+        }
+    }
 }
 export function isBeginWith(s:any,bs:string){
     let ss= s.toString();

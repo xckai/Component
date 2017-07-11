@@ -42,12 +42,19 @@
                 text-align: center
             }
         }
+        .name{
+            min-width: 5rem;
+        }
         .open {
             .fa {
                 color: red
             }
             .fa:before {
                 content: "\f00d"
+            }
+            .name{
+                opacity: .6;
+                text-decoration:line-through; 
             }
         }
         .close {
@@ -57,9 +64,7 @@
             .fa:before {
                 content: "\f00c"
             }
-            .name,.status{
-                opacity: .6
-            }
+           
         }
         .operation {
             text-align: center;
@@ -75,10 +80,10 @@
     font-size: 1rem;
     display: flex;
     justify-content: center;
-    color: #fff;
+    color:@basefontcolor;
     section{
             padding: .2rem 1rem .5rem;
-        background: rgba(16, 52, 68, .7);
+        background: fadeout(@basecolor,30%);
         border-bottom-left-radius: .6rem;
         border-bottom-right-radius: .6rem
     }
@@ -114,6 +119,6 @@
     width: initial !important;
 }
 .leaflet-popup-content-wrapper, .leaflet-popup-tip{
-    background: black; 
-    color: #fff
+    background: @basecolor; 
+    color: @basefontcolor
 }

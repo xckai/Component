@@ -7,10 +7,11 @@
         align-items: center;
         height: 100%;
         font-size: 1rem;
-         background: #103444 ;
+        background:lighten(@darkcolor,4%) ;
+        color:contrast(@darkcolor)
     }
-    background: #103444 ;
-    color: #fff;
+    background: lighten(@darkcolor,4%) ;
+    color: contrast(@darkcolor);
     section{
         display: flex;
         flex-wrap: wrap;
@@ -30,7 +31,7 @@
         
     }
     input:focus{
-        border: #0b7ca8 2px solid;
+        border: @lightcolor 2px solid;
        
     }
     input + span{
@@ -73,21 +74,19 @@
     }
 
 }
-
-
-    .datepicker{
-        background: #103444;
-        color:#fff
-    }
-     .datepicker--cell.-focus-{
-        background: black
-    }
-    .datepicker--nav-title:hover{
-        background: black
-    }
-   .datepicker--time-current-hours:after, .datepicker--time-current-minutes:after{
-         background: black 
-    }
-    .datepicker--pointer{
-         background: #103444;
-    }
+//     .datepicker{
+//         background: @basecolor;
+//         color:@basefontcolor
+//     }
+//      .datepicker--cell.-focus-{
+//         background: @darkcolor
+//     }
+//     .datepicker--nav-title:hover{
+//         background: @darkcolor
+//     }
+//    .datepicker--time-current-hours:after, .datepicker--time-current-minutes:after{
+//          background: @darkcolor 
+//     }
+//     .datepicker--pointer{
+//          background: @lightcolor;
+//     }

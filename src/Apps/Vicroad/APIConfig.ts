@@ -47,7 +47,7 @@ export namespace API{
     }
     export function beginSimulation(controls,from){
         let r=new JRequest()
-        r.url="/services/vicroad/tasks/simulation"
+        r.url="/services/vicroad/localtasks/simulation"
         r.method="POST"
         r.data={
             controls:[],

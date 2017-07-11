@@ -10,11 +10,16 @@
 @import "./Navbar/VicroadNavBar.less";
 @import "../../Jigsaw/Component/DropList/DropList.less";
 @import "./Panal/SimulatorPanal.less";
-
-// @import "./Map/map.less";
+@import "./Map/map.less";
+@basecolor:#fff;
+@basefontcolor:#333333;
+@basebordercolor:gray;
+@darkcolor:#3b5c78;
+@lightcolor:#3f92db;
+@busybackground:fadeout(@basecolor,30%);
 // @import "./Chart/chart.less";
 .progressContainer{
-    background: rgba(0,0,0,.8);
+    background: fadeout(@darkcolor,30%);
     .linecolor{
         stroke:green
     }

@@ -6,11 +6,11 @@
             width: 100%;
             text-align: center;
             margin: 0.2rem auto;
-            color:#fff
+            color:contrast(@darkcolor)
       }
       .toggle{
-             background:#001533;
-            color: #fff;
+             background:lighten(@darkcolor,5%);
+            color:contrast(@darkcolor);
             font-size: 1.5rem;
             padding: 0rem .1rem 0rem .1rem;
             line-height:10rem;
@@ -31,7 +31,7 @@
             }  
       }
       .toggle.right{
-            background:#001533;
+            background:lighten(@darkcolor,5%);
             position: absolute;
             right: 100%;
             top:calc(45% - 5rem);
@@ -43,7 +43,7 @@
             }
       }
        .toggle:hover ,.toggle:focus{
-          background: #0b7ca8;
+          background:@lightcolor;
           opacity: 1
       }
      transition: transform .3s ease-in-out 

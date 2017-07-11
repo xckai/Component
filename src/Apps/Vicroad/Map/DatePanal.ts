@@ -1,9 +1,10 @@
 import { View } from '../../../Jigsaw/Core/View';
 import * as moment from '../../../../vendor/moment/moment'
 import _ = require('underscore');
-export class DatePanal extends View{
+import { Util } from "../../../Jigsaw/Utils/Util";
+export class DatePanal extends View {
     constructor(conf?){
-        super(conf)
+        super(Util.deepExtend({style:{bottom:null}},conf))
         this.setTime(new Date())
     }
     dataTime:{

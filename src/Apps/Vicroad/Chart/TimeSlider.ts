@@ -6,7 +6,7 @@ export class TimeSlider extends DragAblePanal{
     constructor(conf?){
         super(conf)
         this.rootView.addClass("timeSlider")
-        this.style({height:"5rem",width:'30rem'})
+        this.setStyle({height:"5rem",width:'30rem'})
         this.timeAdjuster=new TimeAdjust("adjuster",{style:{
             width:"30rem",height:"4.5rem"
         },padding:0})

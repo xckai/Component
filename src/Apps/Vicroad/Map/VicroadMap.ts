@@ -5,8 +5,20 @@ import L=require('leaflet')
 import { Adjuster } from './Adjuster';
 import {DatePanal}from "./DatePanal";
 import { API } from "../APIConfig";
+import { Util } from "../../../Jigsaw/Utils/Util";
 class RouterPicker extends PointDrawer {
+    begin(){
+        if(this.interactiveLayer){
+            this.drawing=true;
+            this.interactiveLayer.on("click",this.onClick,this);
+            this.interactiveLayer.on("dblclick",this.onDbclick,this);
+            this.interactiveLayer.on("mousemove",this.onMouseMove,this);
+            //this.map.dragging.disable();
+            this.map.doubleClickZoom.disable(); 
+        }
+    }
     onClick(e:L.MouseEvent){
+
         if(this.latlngs && this.latlngs.length>0){
             this.latlngs.push(e.latlng);
             this.fire("to",{latlngs:this.latlngs});
@@ -15,6 +27,7 @@ class RouterPicker extends PointDrawer {
             this.latlngs=[];
             this.latlngs.push(e.latlng);
             this.fire("from",{latlngs:this.latlngs});
+            this.fire("drawbegin",{latlngs:this.latlngs});
         }
     }
 }
@@ -80,28 +93,8 @@ class RoadPicker extends BaseDrawer{
 
 export class VicroadMap extends G2Map{
     constructor(conf?){
-        super(conf)
+        super(Util.deepExtend({zoomControl:false,class:"map"},conf))
         this.init()
-    }
-    defaultConfig(){
-        return {
-                    className:"",
-                    class:"map",
-                    el:null,
-                    $el:null,
-                    style:{
-                        position:"absolute",
-                                    left:"0px",
-                                    right:"0px",
-                                    top:"0px",
-                                    bottom:"0px",
-                                    width:null,
-                                    height:null
-                                },
-                                map:{
-                                    zoomControl:false
-                                }
-                        }
     }
     roadPicker:RoadPicker
     adjuster:Adjuster
@@ -110,7 +103,7 @@ export class VicroadMap extends G2Map{
     adjusterRoadMarker:L.Marker
     adjusterRoadPath:L.Polyline
     init(){
-        this.datePanal=new DatePanal({className:"datapanal"})
+        this.datePanal=new DatePanal({class:"datapanal"})
         this.datePanal.appendAt(this.rootView.$el)
         this.datePanal.style({
             "z-index":2000,
@@ -121,8 +114,9 @@ export class VicroadMap extends G2Map{
             this.datePanal.setTime(d.date)
         })
         this.on("adjuster-btn-on",this.doSelectAdjuster,this)
-        this.on("adjuster-btn-off router-btn-off",this.doRoadPick,this)
-        this.on("router-btn-on",this.doRouter,this)
+        //this.on("adjuster-btn-off router-btn-off",this.doRoadPick,this)
+        this.on("begin-retime",this.doReTimeRouter,this)
+        this.on("simulate-router-btn-on",this.doRouter,this)
         this.roadPicker=new RoadPicker()
         this.roadPicker.baseUrl="/service/apps/itm/maps/itm/query/point2edge.json?"
         this.roadPicker.setMap(this.map.leaflet)
@@ -133,6 +127,37 @@ export class VicroadMap extends G2Map{
         this.adjusterRoadPath=L.polyline([],{color:"red"})
         this.adjusterRoadMarker.addTo(this.map.leaflet)
         this.adjusterRoadPath.addTo(this.map.leaflet)
+    }
+    doReTimeRouter(){
+        this.roadPicker.off("*")
+        let mBegin=L.marker([0,0]),mEnd=L.marker([0,0]),mPath=L.polyline([],{interactive:false})
+        mBegin.addTo(this.map.leaflet)
+        mEnd.addTo(this.map.leaflet)
+        mPath.addTo(this.map.leaflet)
+ 
+        this.routerPicker.on("from",(e)=>{
+            mBegin.setLatLng(e.latlngs[0])
+            mEnd.setLatLng([0,0])
+            mPath.setLatLngs([])
+        })
+        this.routerPicker.on("to",(e)=>{
+            mEnd.setLatLng(e.latlngs[1])
+        })
+        this.routerPicker.on("drawend",(e)=>{
+            mPath.setLatLngs(e.latlngs)
+            this.send("retime-router-done",{latlngs:e.latlngs})
+          setTimeout(()=>{
+                this.routerPicker.begin()
+          },200)
+        })
+        this.routerPicker.on("drawing",(e)=>{
+             mPath.setLatLngs(e.latlngs)
+            
+        })
+        this.routerPicker.on("drawbegin",(e)=>{
+             this.send("retime-router-drawing",{latlngs:e.latlngs})
+        })
+        this.routerPicker.begin()
     }
     doRoadPick(){
         this.roadPicker.off("*")
@@ -286,7 +311,7 @@ export class VicroadMap extends G2Map{
         if(this.pickableArea){
              this.roadPicker.setInteractiveLayer(this.pickableArea)
              this.routerPicker.setInteractiveLayer(this.pickableArea)
-             this.doRoadPick()
+            // this.doRoadPick()
         }
     }
     pickableArea:L.Polygon

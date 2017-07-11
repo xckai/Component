@@ -3,7 +3,8 @@ import { Style ,ILayerConfig,IMap} from './G2Map';
 import _ = require('underscore');
 import { W } from './DS';
 import * as leaflet from 'leaflet';
-export class Layer{
+import { Painter ,CanvasBrush,IBrush} from "./Painter";
+export class Layer {
     constructor(map,id,options?){
         this.map=map
         
@@ -62,7 +63,7 @@ export class Layer{
     // features(){
     //     return this._data
     // }
-    render(data,cxt:{extent:any [],zoom:any},painter){
+    render(data,cxt:{extent:any [],zoom:any},brush:IBrush){
              var mercator = W.mercator(256);
              var transform = function (pt) {
                  return mercator.lonLat2Pixel(pt,cxt.extent, cxt.zoom);
@@ -111,7 +112,7 @@ export class Layer{
                          }, [])
                          _.chain(r.value()).sortBy("z")
                                             .each(function (instruction) {
-                                                painter.paint(instruction.g, instruction.s, cxt);
+                                                Painter.paint(brush,instruction.g, instruction.s);
                                             })
 
                  });
@@ -160,11 +161,11 @@ export class PngLayer extends Layer{
         return L.tileLayer(W.buildUrl(this._config.url,this.getContext()),this._config.leafletLayerOption)
     }
 }
-export class CanvasLayer extends Layer {
-    painter(canvasDom){
-        return null
+export class CanvasTileLayer extends Layer {
+    getBrush(canvas){
+        return new CanvasBrush(canvas.getContext("2d"))
     }
-    createLeafletLayer(){
+    createLeafletLayer():L.Layer{
             let l=this
             let CanvasTile =  class CanvasTile extends L.GridLayer{
             createTile(tilePoint,done){
@@ -183,13 +184,13 @@ export class CanvasLayer extends Layer {
                      //cxt.putAll(self.parameters);
                      if(!l._config.url){
                          setTimeout(()=>{
-                             l.render({},l.getContext(ctx),l.painter(canvasTile))
+                             l.render({},l.getContext(ctx),l.getBrush(canvasTile))
                               done(false,canvasTile)
                          },10)
                      }else{
                          W.doGet(l._config.url,l.getContext(ctx)).done((data)=>{
                            let fs= W.toGeometries(data,ext,zoom)
-                           l.render(fs,l.getContext(ctx),l.painter(canvasTile))
+                           l.render(fs,l.getContext(ctx),l.getBrush(canvasTile))
                            done(false,canvasTile)
                          })
                      }
@@ -199,10 +200,56 @@ export class CanvasLayer extends Layer {
             return new CanvasTile
         }          
 }
+export class CanvasLayer extends CanvasTileLayer{
+
+          createLeafletLayer():L.Layer {
+              let l=this
+              let leafletCanvasLayer=class LeafletCanvasLayerL extends L.Layer{
+                  canvas:any
+                  options:any
+                  map:L.Map
+                  onAdd(map:L.Map){
+                        this.map=map
+                        let pane=map.getPane(this.options.pane)
+                        this.canvas=L.DomUtil.create("canvas","custom_canvas_layer")
+                        pane.appendChild(this.canvas)
+                        this.canvas.style.width=map.getSize().x+"px"
+                        this.canvas.style.height=map.getSize().y+"px"
+
+                        this.map.on("update",this.update,this)
+                        return this
+                  }
+                  update(){
+                        let ctx={zoom:this.map.getZoom(),extent:this.map.getBounds()}
+                         if(!l._config.url){
+                         setTimeout(()=>{
+                             l.render({},l.getContext(ctx),l.getBrush(this.canvas))
+                           
+                         },10)
+                        }else{
+                            W.doGet(l._config.url,l.getContext(ctx)).done((data)=>{
+                            let fs= W.toGeometries(data,ctx.extent,ctx.zoom)
+                            l.render(fs,l.getContext(ctx),l.getBrush(this.canvas))
+                          
+                            })
+                        }
+
+                  }
+                  onRemove(map:L.Map){
+                      L.DomUtil.remove(this.canvas)
+                      map.off("update",this.update,this)
+                      return this
+                  }
+              }
+              return new leafletCanvasLayer   
+         }
+}
 export function layerFactor(map,id,options){
-    if(options.renderer=="canvas"){
-        return new CanvasLayer(map,id,options)
+    if(options.renderer=="canvastile"){
+        return new CanvasTileLayer(map,id,options)
     }else if(options.renderer=="png"){
         return new PngLayer(map,id,options)
+    }else if(options.renderer=="canvas"){
+        return new CanvasLayer(map,id,options)
     }
 }

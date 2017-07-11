@@ -98,29 +98,10 @@ export interface IMap{
 export class G2Map  extends Component implements IMap{
      constructor(conf?){
         super(conf)
+        this.config=_.extend({zoomControl:true},conf)
         this.map=new MapView(this.config)
         this.rootView.render()
         this.map.appendAt(this.rootView.getNode$())
-    }
-    defaultConfig(){
-        return {
-                                className:"",
-                                el:null,
-                                $el:null,
-                                class:"map",
-                                style:{
-                                    position:"absolute",
-                                    left:"0px",
-                                    right:"0px",
-                                    top:"0px",
-                                    bottom:"0px",
-                                    width:null,
-                                    height:null
-                                },
-                                map:{
-                                    zoomControl:true
-                                }
-                        }
     }
     config:IMapConfig
     map:MapView
@@ -155,7 +136,7 @@ export class G2Map  extends Component implements IMap{
     constructor(conf?){
         super(conf)
         if(conf){
-              this.mapSetting=_.extend({center:{lat:0,lng:0},zoom:8,scrollWheelZoom:true},conf.map)
+              this.mapSetting=_.extend({center:{lat:0,lng:0},zoom:8,scrollWheelZoom:true},conf)
         }else{
               this.mapSetting=_.extend({center:{lat:0,lng:0},zoom:8,scrollWheelZoom:true})
         }
@@ -183,23 +164,8 @@ export class G2Map  extends Component implements IMap{
         return this
     }
 }
-interface IMapConfig extends IComponentConfig{
-            className:string ,
-            el:any,
-            $el:any,
-            class:string,
-            style:{
-                    position:string | null |undefined,
-                    left:string | null |undefined,
-                    right:string | null |undefined,
-                    top:string | null |undefined,
-                    bottom:string | null |undefined,
-                    width:string | null |undefined,
-                    height:string | null |undefined
-            }
-            map:{
-                zoomControl:boolean
-            }
+interface IMapConfig {
+    zoomControl:boolean
 }
 interface IMapSetting {
     center: { lat: number, lng: number },

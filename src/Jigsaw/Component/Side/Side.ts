@@ -6,7 +6,7 @@ import _=require("underscore")
 class SideView extends View{
     constructor(conf?){
         super(conf)
-        this.config=_.extend({},this.config,{direction:"left"},conf)
+        this.config=_.extend({direction:"left"},conf)
         this.render()
     }
     events(){
@@ -66,13 +66,10 @@ class SideView extends View{
 export class Side extends Component{
     constructor(conf?){
         super(conf)
-        this.rootView=new SideView(_.extend({tagName:"section",className:"side"},conf))
-        this.setConfig(Util.deepExtend({
-           style:{
+        this.rootView=new SideView(Util.deepExtend({tagName:"section",class:"side", style:{
                 bottom:null,
                 right:null
-           }
-        },conf))
+           }},conf))
         this.rootView.hidden()
         // this.Content=new Content("Pudong Smart Traffic")
         // this.title.renderAt(this.view.getNode$())

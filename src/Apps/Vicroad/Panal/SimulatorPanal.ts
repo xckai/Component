@@ -6,23 +6,21 @@ import { Component } from '../../../Jigsaw/Core/Component';
 import { Model } from '../../../Jigsaw/Core/Model';
 import { View } from '../../../Jigsaw/Core/View';
 import { IRoad } from '../Map/Adjuster';
+import{API}from "../ApiConfig"
 import _ = require('underscore');
+import { Util } from "../../../Jigsaw/Utils/Util";
 declare var EventBus: any
 export class SimulatorPanal extends Side{
     constructor(conf?){
-        super(conf)
-        this.setConfig({
-           style:{
+        super(Util.deepExtend({style:{
                 left:"0rem",
                 top:"3.05rem",
                 bottom:null,
                 right:null,
-           }
-        })
+           }},conf))
         this.rootView.render()
         this.simulatorView=new SimulatorView()
-        this.simulatorView.appendAt(this.rootView.getNode$())
-        this.baseUrl="/services/vicroad/tasks/simulation"
+        this.simulatorView.appendAt(this.getContentContainer())
         this.roads=[]
        this.initSimulatorView()
        this.applyButtonInit()
@@ -30,7 +28,6 @@ export class SimulatorPanal extends Side{
     }
     dateTime:Date
     duration:number
-    baseUrl:string
     roads:RoadPickerMessage[]
     addRoads(road:RoadPickerMessage){
        let i= _.findIndex(this.roads,{id:road.id})
@@ -101,8 +98,8 @@ export class SimulatorPanal extends Side{
    initSimulatorView(){
        this.proxyEvents(this.simulatorView,"adjuster-btn-off",
                                                 "adjuster-btn-on",
-                                                "router-btn-off",
-                                                "router-btn-on",
+                                                "simulate-router-btn-off",
+                                                "simulate-router-btn-on",
                                                 "simulate-timepicker-change",
                                                 "simulate-duration-change",
                                                 )
@@ -111,6 +108,11 @@ export class SimulatorPanal extends Side{
 }
 
 class SimulatorView extends View{
+    constructor(conf?){
+        super(Util.deepExtend({style:{
+            position:"initial"
+        }},conf))
+    }
     events(){
         return {
             "click .adjuster-btn":"onAdjuster",

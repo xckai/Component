@@ -34,12 +34,12 @@ export class Adjuster extends View{
                     <thead>
                         <tr>
                         <th>Road</th>
+                      
                         <th>Status</th>
-                        <th>Operation</th>
                         </tr>
                     </thead>
                     <% _.each(roads,function(item,i){ %>
-                        <tr class=" <%= item.class %>"><td class='name' nowrap><%= item.name %></td><td class='status'><%= item.status %></td><td class='operation'><button class='btn btn-default' index=<%= i %> ><span class='fa'></span></button></td></tr>
+                        <tr class=" <%= item.class %>"><td class='name' nowrap><%= item.name %></td><td class='operation'><button class='btn btn-default' index=<%= i %> ><span class='fa'></span></button></td></tr>
                     <% }) %>
                     </table>
                 </div>`)
@@ -54,11 +54,11 @@ export class Adjuster extends View{
                         let n:any={}
                         n.name=dd.name
                         if(dd.isOpen){
-                                n.status="Opened"
-                                n.class="open"
-                            }else{
-                                n.status="Closed"
+                               
                                 n.class="close"
+                            }else{
+                            
+                                n.class="open"
                             }
                         return n
                     })
