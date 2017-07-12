@@ -11,7 +11,13 @@ class TitleModel extends Model {
 }
 class TitleView extends View{
     constructor(conf?){
-        super(_.extend({className:"title"},conf))
+        super(_.extend({className:"title",style:{
+             position:"inherit",
+             left:null,
+             right:null,
+             bottom:null,
+             top:null
+        }},conf))
         this.model=new TitleModel()
         this.listenTo(this.model,"all",this.render)
         //this.model.set("title","Title")
@@ -33,12 +39,15 @@ export class NavBar extends Component{
                 bottom:null,
                 height:"3rem"
 
-           },
-           class:"navbar"
+           }
         },conf))
         this.title=new TitleView()
         this.title.setTitle("Pudong Smart Traffic")
         this.title.appendAt(this.rootView.getNode$())
+    }
+     initRootView(conf){
+         this.rootView=new View(_.extend({tagName:"section"},conf))
+         this.rootView.addClass("navbar")
     }
     title:TitleView
 }

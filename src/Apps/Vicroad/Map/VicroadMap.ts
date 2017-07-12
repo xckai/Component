@@ -1,3 +1,4 @@
+
 import {G2Map} from "../../../Jigsaw/Component/Map/G2Map"
 import _ = require('underscore');
 import {BaseDrawer,PointDrawer}from '../../../Jigsaw/Component/Map/MapDrawer'
@@ -6,6 +7,7 @@ import { Adjuster } from './Adjuster';
 import {DatePanal}from "./DatePanal";
 import { API } from "../APIConfig";
 import { Util } from "../../../Jigsaw/Utils/Util";
+import { VicroadLineChart } from "../Chart/LineChart";
 class RouterPicker extends PointDrawer {
     begin(){
         if(this.interactiveLayer){
@@ -100,8 +102,9 @@ export class VicroadMap extends G2Map{
     adjuster:Adjuster
     routerPicker:RouterPicker
     datePanal:DatePanal
-    adjusterRoadMarker:L.Marker
-    adjusterRoadPath:L.Polyline
+    adjusterLayerGroup:L.LayerGroup
+    reTimeRouterLayerGroup:L.LayerGroup
+    simulateRouterLayerGroup:L.LayerGroup
     init(){
         this.datePanal=new DatePanal({class:"datapanal"})
         this.datePanal.appendAt(this.rootView.$el)
@@ -123,17 +126,14 @@ export class VicroadMap extends G2Map{
         this.routerPicker=new RouterPicker()
         this.routerPicker.setMap(this.map.leaflet)
         this.adjuster=new Adjuster
-        this.adjusterRoadMarker=L.marker([0,0],{icon:L.divIcon({className: 'adjusterIcon fa fa-times'})})
-        this.adjusterRoadPath=L.polyline([],{color:"red"})
-        this.adjusterRoadMarker.addTo(this.map.leaflet)
-        this.adjusterRoadPath.addTo(this.map.leaflet)
+        this.adjusterLayerGroup=L.layerGroup([]).addTo(this.map.leaflet)
+        this.reTimeRouterLayerGroup=L.layerGroup([]).addTo(this.map.leaflet)
+        this.simulateRouterLayerGroup=L.layerGroup([]).addTo(this.map.leaflet)
     }
     doReTimeRouter(){
         this.roadPicker.off("*")
         let mBegin=L.marker([0,0]),mEnd=L.marker([0,0]),mPath=L.polyline([],{interactive:false})
-        mBegin.addTo(this.map.leaflet)
-        mEnd.addTo(this.map.leaflet)
-        mPath.addTo(this.map.leaflet)
+        this.reTimeRouterLayerGroup.addLayer(mBegin).addLayer(mEnd).addLayer(mPath)
  
         this.routerPicker.on("from",(e)=>{
             mBegin.setLatLng(e.latlngs[0])
@@ -146,9 +146,15 @@ export class VicroadMap extends G2Map{
         this.routerPicker.on("drawend",(e)=>{
             mPath.setLatLngs(e.latlngs)
             this.send("retime-router-done",{latlngs:e.latlngs})
-          setTimeout(()=>{
-                this.routerPicker.begin()
-          },200)
+            API.getReTimeRouter(e.latlngs).done((d)=>{
+                let linechart=new VicroadLineChart({style:{width:"30rem",height:"20rem"}})
+                linechart.loadMeasures(d)
+                mEnd.bindPopup(linechart.toElement())
+                mEnd.openPopup()
+            })
+            setTimeout(()=>{
+                    this.routerPicker.begin()
+            },200)
         })
         this.routerPicker.on("drawing",(e)=>{
              mPath.setLatLngs(e.latlngs)
@@ -191,10 +197,10 @@ export class VicroadMap extends G2Map{
         })
         this.routerPicker.off("*")
         let roadMark= L.marker([0,0],{icon:L.divIcon({className: 'adjusterIcon fa fa-times'})})
-        roadMark.addTo(this.map.leaflet)
+        this.adjusterLayerGroup.addLayer(roadMark)
         //roadMark.addTo(this.map.leaflet)
         let road=L.polyline([],{color:"red"})
-        road.addTo(this.map.leaflet)
+        this.adjusterLayerGroup.addLayer(road)
         this.roadPicker.on("drawing",(e)=>{
            roadMark.setOpacity(1)
            roadMark.setLatLng(e.latlng)
@@ -232,9 +238,8 @@ export class VicroadMap extends G2Map{
     doRouter(){
         this.roadPicker.off("*")
         let mBegin=L.marker([0,0]),mEnd=L.marker([0,0]),mPath=L.polyline([],{interactive:false})
-        mBegin.addTo(this.map.leaflet)
-        mEnd.addTo(this.map.leaflet)
-        mPath.addTo(this.map.leaflet)
+        this.simulateRouterLayerGroup.addLayer(mBegin).addLayer(mEnd).addLayer(mPath)
+
  
         this.routerPicker.on("from",(e)=>{
             mBegin.setLatLng(e.latlngs[0])
@@ -259,8 +264,11 @@ export class VicroadMap extends G2Map{
     // routerLayer:RouterLayer
     // roadLayer:SingleMarkLayer
     initAll(){
-       this.roadPicker.off("*")
+        this.roadPicker.off("*")
         this.routerPicker.off("*")
+        this.adjusterLayerGroup.clearLayers()
+        this.simulateRouterLayerGroup.clearLayers()
+        this.reTimeRouterLayerGroup.clearLayers()
         // if(this.routerLayer){
         //     this.routerLayer.remove()
            
@@ -277,6 +285,7 @@ export class VicroadMap extends G2Map{
         // } 
         // this.roadLayer=new SingleMarkLayer()
         // this.roadLayer.addTo(this.map.leaflet)
+
         this.showArea()
         // if(this.adjusterLayer){
         //     this.adjusterLayer.remove()

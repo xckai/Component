@@ -99,6 +99,7 @@ export class G2Map  extends Component implements IMap{
      constructor(conf?){
         super(conf)
         this.config=_.extend({zoomControl:true},conf)
+        this.addClass("map")
         this.map=new MapView(this.config)
         this.rootView.render()
         this.map.appendAt(this.rootView.getNode$())

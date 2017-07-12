@@ -66,13 +66,14 @@ class SideView extends View{
 export class Side extends Component{
     constructor(conf?){
         super(conf)
-        this.rootView=new SideView(Util.deepExtend({tagName:"section",class:"side", style:{
+        this.rootView.hidden()
+    }
+    initRootView(conf){
+         this.rootView=new SideView(Util.deepExtend({tagName:"section", style:{
                 bottom:null,
                 right:null
            }},conf))
-        this.rootView.hidden()
-        // this.Content=new Content("Pudong Smart Traffic")
-        // this.title.renderAt(this.view.getNode$())
+         this.rootView.addClass("side")
     }
     getContentContainer(){
         return this.rootView.$("content")

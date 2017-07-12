@@ -61,11 +61,11 @@ class ReTimeView extends View{
                 <label>Departure Time:</label>
                 <input type="datetime" readonly="readonly" placeholder="Date Time" class='datetimeinput notreadonly'>
                 <label>Simulation Duration:</label>
-                <input type="number" placeholder="Number of hours" value=2 readonly="readonly" class="durationinput"><span>Hour</span>  
-            </section>
-        <section class="applypanal">
-            <button class="btn btn-default btn-disable applybtn">Apply</button>
-        </section>`)
+                        <input type="number" placeholder="Number of hours" value=2 readonly="readonly" class="durationinput"><span>Hour</span>  
+                    </section>
+                <section class="applypanal">
+                    <button class="btn btn-default btn-disable applybtn">Apply</button>
+                </section>`)
         return this
     }
     onAfterRender(){

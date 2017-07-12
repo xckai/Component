@@ -51,7 +51,7 @@ export class CircleLoader implements IProgressLoader{
     toElement() {
         this.el = document.createElementNS("http://www.w3.org/1999/xhtml", "div")  
         this.el.setAttribute("id",this.id)
-        this.el.setAttribute("class","loaderContainer")
+        this.el.setAttribute("class","porgressLoaderContainer")
 
         let centerX = this.width / 2,
             centerY = this.width / 2,

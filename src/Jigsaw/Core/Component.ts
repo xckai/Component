@@ -7,7 +7,12 @@ export class Component extends EventBus  {
      constructor(conf?){
          super()
          this.id=_.uniqueId("Component")
+         this.initRootView(conf)
+
+    }
+    initRootView(conf){
          this.rootView=new View(_.extend({tagName:"section"},conf))
+         this.rootView.addClass("componentContainer")
     }
     rootView:View
     parent:Component

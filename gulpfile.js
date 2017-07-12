@@ -96,7 +96,7 @@ gulp.task("vicroad",["vicroadinit"],()=>{
         
            
         })
-    var m3=proxy(['/services/vicroad/tasks/','/eventbus/info'],{
+    var m3=proxy(['/services/vicroad/tasks/','/eventbus/info','/services/vicroad/localtasks/'],{
        target: 'http://10.58.75.98:8089',
        
       

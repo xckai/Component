@@ -5,11 +5,13 @@ export class DragAblePanal extends Component{
     constructor(conf?){
         super(conf)
         this.rootView=new DragComponentView()
-        this.addClass("dragablepanal")
         this.rootView.doRender()
     }
     rootView:DragComponentView
-    
+    initRootView(conf){
+         this.rootView=new DragComponentView(conf)
+         this.rootView.addClass("dragablepanal")
+    }
 }
 class DragComponentView extends View{
     events(){

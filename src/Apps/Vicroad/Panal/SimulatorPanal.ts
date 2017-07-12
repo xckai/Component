@@ -6,7 +6,7 @@ import { Component } from '../../../Jigsaw/Core/Component';
 import { Model } from '../../../Jigsaw/Core/Model';
 import { View } from '../../../Jigsaw/Core/View';
 import { IRoad } from '../Map/Adjuster';
-import{API}from "../ApiConfig"
+import{API}from "../APIConfig"
 import _ = require('underscore');
 import { Util } from "../../../Jigsaw/Utils/Util";
 declare var EventBus: any
@@ -59,7 +59,10 @@ export class SimulatorPanal extends Side{
             this.addRoads(e)
             this.simulatorView.setAdjusterEnable(false) 
             isButtonEnable()            
-        })     
+        })
+        this.on("calculation_done",()=>{
+            this.simulatorView.setRouterEnable(true)
+        })  
    }
    beginSimulator(){
     //    var postDate={
@@ -154,6 +157,13 @@ class SimulatorView extends View{
             this.$(".adjuster-btn").removeClass("btn-active")
         }
     }
+    setRouterEnable(isable){
+        if(isable){
+             this.$('.router-btn').removeClass('btn-disable')
+        }else{
+             this.$('.applybtn').addClass('btn-disable')              
+        }
+    }
     onRouter(e:JQueryMouseEventObject){
         if($(e.currentTarget).hasClass("btn-active")){
             this.trigger("simulate-router-btn-off")
@@ -194,7 +204,7 @@ class SimulatorView extends View{
         </section>
         <section>
             <button class="btn btn-default operation adjuster-btn fa fa-times"></button>
-            <button class="btn btn-default operation router-btn  fa fa-car"></button>
+            <button class="btn btn-default operation btn-disable router-btn  fa fa-car"></button>
         </section>
         <section class="applypanal">
             <button class="btn btn-default btn-disable applybtn">Apply</button>

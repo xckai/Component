@@ -2,13 +2,14 @@
     justify-content: center;
       background: @darkcolor;
     .title{
-        color: @basefontcolor;
+        color: contrast(@darkcolor);
         font-size: 1.5rem;
         align-items: center;
+        margin: .5rem;
         display: flex;
         font-family: 'Times New Roman', Times, serif;
-        text-shadow: 0 1px 0 darken(@basefontcolor,20%),
-                     0 2px 2px fadeout(@basefontcolor,50%)
+        text-shadow: 0 1px 0 darken(contrast(@darkcolor),20%),
+                     0 2px 2px fadeout(contrast(@darkcolor),50%)
                      
     }
 }

@@ -1,21 +1,22 @@
-import {Component} from"../../../Jigsaw/Core/Component"
-import { View } from "../../../Jigsaw/Core/View"
-import { Model } from "../../../Jigsaw/Core/Model"
 import { DropListView } from "../../../Jigsaw/Component/DropList/DropList"
 import _=require("underscore")
 import { Util } from "../../../Jigsaw/Utils/Util";
-export class VicroadNavBar extends Component {
+import {NavBar} from "../../../Jigsaw/Component/Bar/NavBar"
+export class VicroadNavBar extends NavBar {
     constructor(conf?){
         super(Util.deepExtend({style:{
             bottom:null,
             height:"3rem"
-        },class:"vicroadnavbar"},conf))
+        }},conf))
+        this.addClass("vicroadnavbar")
         this.dropSelector=new DropListView()
-       
+         this.title.setTitle("Intelligent Traffic Management - Simulator")
         this.dropSelector.appendAt(this.rootView.getNode$())
     }
+    
     dropSelector:DropListView
     initDropDown(c){
          this.dropSelector.setDate(c)
     }
 }
+

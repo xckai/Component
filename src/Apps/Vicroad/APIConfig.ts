@@ -49,12 +49,23 @@ export namespace API{
         let r=new JRequest()
         r.url="/services/vicroad/localtasks/simulation"
         r.method="POST"
+        r.params={
+            user:null
+        }
         r.data={
             controls:[],
             from:null
         }
-        r.send({controls,from})
+        r.send({controls,from,user:_.uniqueId("user")})
         return r
+    }
+    export function getReTimeRouter(latlngs:any[]){
+         let r=new JRequest()
+         setTimeout(()=>{
+              r.doDone([{id:1, data:[{x:0,y:0},{x:3,y:2},{x:5,y:8},{x:7,y:32}], type:"line"},
+                        {id:2, data:[{x:1,y:32},{x:3,y:8},{x:5,y:2},{x:8,y:1}], type:"line"}])
+         },2000)
+         return r
     }
 }
 

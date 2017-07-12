@@ -7,7 +7,6 @@ export interface IViewConfig {
     className: string | null | undefined,
     el: HTMLElement | SVGAElement,
     $el: JQuery | undefined
-    class: string | null | undefined
     style: IViewStyle
 }
 export interface IViewStyle {
@@ -24,7 +23,6 @@ const defaultConfig: IViewConfig ={
             el: undefined,
             $el: undefined,
             className:undefined,
-            class: "",
             style: {
                 position: "absolute",
                 left: "0px",
@@ -38,8 +36,7 @@ const defaultConfig: IViewConfig ={
 export class View extends Backbone.View<Backbone.Model>{
     constructor(conf?) {
         super(_.extend({},defaultConfig,conf))
-        this.style(_.extend({},defaultConfig.style,(conf||{}).style))
-        this.addClass(_.extend({},defaultConfig,conf).class)         
+        this.style(_.extend({},defaultConfig.style,(conf||{}).style))      
     }
 getNode$() {
     return this.$el

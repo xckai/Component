@@ -11,7 +11,7 @@
                 Backbone:"../vendor/backbone/backbone",
                 timepicker:"../vendor/air-datepicker/dist/js/i18n/datepicker.en",
                 timepicker_main:"../vendor/air-datepicker/dist/js/datepicker",
-                "VicroadChart":'../dist/Apps/Vicroad/Chart/VicroadChart'
+                "CustomizedChart/Vicroad/VicroadChart":'../dist/Apps/Vicroad/Chart/Vendor/VicroadChart'
         },
         shim:{
                 leaflet:{
