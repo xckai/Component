@@ -60,8 +60,14 @@ export class JRequest extends JPromise{
     }
     buildUrl(ctx?){
         let us=[]
-        _.each(_.extend({},this.params,_.pick.apply(null,[this.context].concat(_.keys(this.params))),_.pick.apply(null,[ctx].concat(_.keys(this.params)))),(v,k)=>{
-            us.push(`${k}=${JSON.stringify(v)}`)
+        _.each(_.extend({},this.params,_.pick.apply(null,[this.context].concat(_.keys(this.params))),_.pick.apply(null,[ctx].concat(_.keys(this.params)))),(v:any,k)=>{
+            if(_.isArray(this.params[k])){
+                _.each(v,(vv)=>{
+                      us.push(`${k}=${vv}`)
+                })
+            }else{
+                 us.push(`${k}=${v}`)
+            }
         })
         let base=us.length>0?this.url+"?":this.url
         

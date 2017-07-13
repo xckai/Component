@@ -59,13 +59,32 @@ export namespace API{
         r.send({controls,from,user:_.uniqueId("user")})
         return r
     }
-    export function getReTimeRouter(latlngs:any[]){
+    export function getReTimeRouter(latlngs:any[],time:Date){
          let r=new JRequest()
+         r.url="services/vicroad/tiers/routingSimulate/extent/15/144.92022514343265%2C-37.83263257682617%2C145.00185012817386%2C-37.79750922077998/4326.w2"
+         r.params={
+             l:[],
+             timeFrom:""
+         }
          setTimeout(()=>{
               r.doDone([{id:1, data:[{x:0,y:0},{x:3,y:2},{x:5,y:8},{x:7,y:32}], type:"line"},
                         {id:2, data:[{x:1,y:32},{x:3,y:8},{x:5,y:2},{x:8,y:1}], type:"line"}])
          },2000)
-         return r
+          let ls=latlngs.map((l)=>{
+              return l.lng+","+l.lat
+          })
+          r.send({l:ls,timeFrom:"2017-05-08T08:30:00"})
+          return r
+    }
+    export function getSimulationResult(time:Date){
+        let r= new JRequest
+        r.url="/services/vicroad/tiers/ctmEdgeSpeedMap/4326.w2"
+        r.params={
+            category:1,
+            timeTo:"2017-05-08T16:45:00%2B08:00"
+        }
+        r.send()
+        return r
     }
 }
 

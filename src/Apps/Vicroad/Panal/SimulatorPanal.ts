@@ -85,6 +85,7 @@ export class SimulatorPanal extends Side{
                 eb.registerHandler("client.CTMComplete",function(){
                     console.log("Calculation done")
                     self.send("calculation_done")
+                    self.send("simulation:done")
                 })
                 };
             eb.onclose = function (e) {

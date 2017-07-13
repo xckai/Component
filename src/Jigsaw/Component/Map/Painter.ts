@@ -11,13 +11,44 @@ interface IBrushMovement{
     moveTo:(x:number,y:number)=>void
     lineTo:(x:number,y:number)=>void
 }
+  function _move(path, offset, movement) {
+        var self = this;
+        var r = [];
+        _.reduce(path, function (memo, element, ix, list) {
+            var pos;
+            if (ix + 1 < list.length) {
+                memo = W.offsetting(element, list[ix + 1], offset, memo);
+                pos = memo[0];
+            } else {
+                pos = memo[1];
+            }
+            if (ix === 0) {
+                r.push([pos[0], pos[1]]);
+                movement.moveTo(pos[0], pos[1]);
+            } else {
+                r.push([pos[0], pos[1]]);
+                movement.lineTo(pos[0], pos[1]);
+            }
+            return memo;
+        }, []);
+        return r;
+    };
 export namespace Painter{
     export function buildPath(path,closed,offset,inners,movement:IBrushMovement){
         if(!path ||path.lenth<2){
             return path
         }else{
             movement.begin()
-
+            var np = [];
+            np.push(_move(path, offset, movement));
+            if (closed)
+                movement.close();
+            _.each(inners, function (p) {
+                //np.push(_move(p.reverse(), offset, movement));
+                if (closed)
+                    movement.close();
+            });
+            return np
         }
     }
     export function buildRect(p,s,d,alignment,valign){
@@ -62,11 +93,11 @@ export namespace Painter{
     export function paint(brush:IBrush,f:W2.feature,style:W.Wrapper<Style,IStyleResult>){
             let s=style.value("symbolizer")
             if(s=="polygon"){
-                brush.polygon(f,s)
+                brush.polygon(f,style)
             }else if(s=="line"){
-                brush.line(f,s)
+                brush.line(f,style)
             }else if(s=="marker"){
-                brush.marker(f,s)
+                brush.marker(f,style)
             }
     }
    
@@ -83,16 +114,16 @@ export class CanvasBrush implements IBrush
         this._ctx=ctx
         this.pathMovement={
             close(){
-                this._ctx.closePath()
+                ctx.closePath()
             },
             begin(){
-                this._ctx.beginPath()
+                ctx.beginPath()
             },
             moveTo(x,y){
-                this._ctx.moveTo(x,y)
+                ctx.moveTo(x,y)
             },
             lineTo(x,y){
-                this._ctx.lineTo(x,y)
+                ctx.lineTo(x,y)
             }
         }
     }

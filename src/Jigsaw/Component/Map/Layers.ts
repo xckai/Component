@@ -57,8 +57,13 @@ export class Layer {
     }
     hide(){
         if (this.visible()) {
-                 this._leafletLayer.remove();
+             this._leafletLayer.remove();
         }
+    }
+    redraw(){
+        this._leafletLayer.remove()
+        this._leafletLayer=this.createLeafletLayer()
+        this.show()
     }
     // features(){
     //     return this._data
@@ -174,8 +179,10 @@ export class CanvasTileLayer extends Layer {
                      var canvasTile = L.DomUtil.create('canvas', 'leaflet-tile');
                      // setup tile width and height according to the options
                      var tileSize = this.getTileSize();
-                     canvasTile.style.width = tileSize.x+"px";
-                     canvasTile.style.height = tileSize.y+"px";
+                    canvasTile.setAttribute("width",tileSize.x.toString())
+                     canvasTile.setAttribute("height",tileSize.y.toString())
+    
+                      
                      var zoom = tilePoint.z;
                      // draw something asynchronously and pass the tile to the done() callback
 
@@ -189,6 +196,7 @@ export class CanvasTileLayer extends Layer {
                          },10)
                      }else{
                          W.doGet(l._config.url,l.getContext(ctx)).done((data)=>{
+                             data=JSON.parse(data)
                            let fs= W.toGeometries(data,ext,zoom)
                            l.render(fs,l.getContext(ctx),l.getBrush(canvasTile))
                            done(false,canvasTile)
@@ -215,7 +223,7 @@ export class CanvasLayer extends CanvasTileLayer{
                         pane.appendChild(this.canvas)
                         this.canvas.style.width=map.getSize().x+"px"
                         this.canvas.style.height=map.getSize().y+"px"
-
+                        this.update()
                         this.map.on("update",this.update,this)
                         return this
                   }
@@ -228,8 +236,13 @@ export class CanvasLayer extends CanvasTileLayer{
                          },10)
                         }else{
                             W.doGet(l._config.url,l.getContext(ctx)).done((data)=>{
-                            let fs= W.toGeometries(data,ctx.extent,ctx.zoom)
-                            l.render(fs,l.getContext(ctx),l.getBrush(this.canvas))
+                            if(data){
+                                 data=JSON.parse(data)
+                                 let fs= data
+                                // W.toGeometries(data,ctx.extent,ctx.zoom)
+                            l.render(fs,l.getContext(ctx),l.getBrush(this.canvas))   
+                            }
+                            
                           
                             })
                         }
@@ -250,6 +263,6 @@ export function layerFactor(map,id,options){
     }else if(options.renderer=="png"){
         return new PngLayer(map,id,options)
     }else if(options.renderer=="canvas"){
-        return new CanvasLayer(map,id,options)
+          return new CanvasTileLayer(map,id,options)
     }
 }

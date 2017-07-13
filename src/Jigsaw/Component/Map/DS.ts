@@ -133,7 +133,18 @@ export namespace W{
             return _.defaults(r,this.defalut)   
         }
         value(k:string,defalutVale?){
-            return _evaluate(this.obj[k],this.args,defalutVale||this.defalut[k])
+            return _evaluate(this.obj[k],this.args,this.getDefault(k,defalutVale))
+        }
+        getDefault(k,def?){
+            if(def!=undefined){
+                return def
+            }else{
+                if(this.defalut){
+                    return this.defalut[k]
+                }else{
+                    return undefined
+                }
+            }
         }
     }
     export function values<T>(obj:T,...args){

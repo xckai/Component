@@ -5,6 +5,7 @@ import { Util } from "../../../Jigsaw/Utils/Util";
 export class DatePanal extends View {
     constructor(conf?){
         super(Util.deepExtend({style:{bottom:null}},conf))
+        this.addClass("datapanal")
         this.setTime(new Date())
     }
     dataTime:{

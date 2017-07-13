@@ -106,7 +106,7 @@ export class VicroadMap extends G2Map{
     reTimeRouterLayerGroup:L.LayerGroup
     simulateRouterLayerGroup:L.LayerGroup
     init(){
-        this.datePanal=new DatePanal({class:"datapanal"})
+        this.datePanal=new DatePanal()
         this.datePanal.appendAt(this.rootView.$el)
         this.datePanal.style({
             "z-index":2000,
@@ -129,6 +129,7 @@ export class VicroadMap extends G2Map{
         this.adjusterLayerGroup=L.layerGroup([]).addTo(this.map.leaflet)
         this.reTimeRouterLayerGroup=L.layerGroup([]).addTo(this.map.leaflet)
         this.simulateRouterLayerGroup=L.layerGroup([]).addTo(this.map.leaflet)
+        this.on("simulation:done",this.showSimulationResult,this)
     }
     doReTimeRouter(){
         this.roadPicker.off("*")
@@ -146,7 +147,7 @@ export class VicroadMap extends G2Map{
         this.routerPicker.on("drawend",(e)=>{
             mPath.setLatLngs(e.latlngs)
             this.send("retime-router-done",{latlngs:e.latlngs})
-            API.getReTimeRouter(e.latlngs).done((d)=>{
+            API.getReTimeRouter(e.latlngs,null).done((d)=>{
                 let linechart=new VicroadLineChart({style:{width:"30rem",height:"20rem"}})
                 linechart.loadMeasures(d)
                 mEnd.bindPopup(linechart.toElement())
@@ -292,6 +293,34 @@ export class VicroadMap extends G2Map{
         //     this.adjusterLayer=null
         // }
     }
+    initSimulationResult(){
+            let l=this.layer("simulationResult",{renderer:"canvas",
+                                                url:"/services/vicroad/tiers/ctmEdgeSpeedMap/extent/:zoom/:extent/canvas.w2?category=1&:timeTo",
+                                                 selectable:false})
+            l.setContext({timeTo:":2017-05-08T16:45:00%2B08:00"})
+            l.style("*").line({width:(c)=>{
+                    
+                    if(c("zoom")){
+                        return Math.floor(c("zoom")/5)
+                    }else{
+                        return 2
+                    }
+                },color:(c)=>{
+                 if(c("SIM_SPEED")>60)
+                    return "yellow";
+                 else
+                    return "red";
+            }})
+    }
+    showSimulationResult(){
+        this.layer("simulationResult").show()
+    }
+    hiddenSimulationResult(){
+        this.layer("simulationResult").hide()
+    }
+    updateSimulationResult(){
+        this.layer("simulationResult").redraw()
+    }
     showArea(){
         if(!this.pickableArea){
             API.getMainArea().done((d)=>{
@@ -304,6 +333,10 @@ export class VicroadMap extends G2Map{
             }).fail(()=>{
                 alert("error ")
             })
+           
+
+
+       
             // $.get("/service/apps/tcm/maps/tpi/query/area_search.json").done(
             //     (fc)=>{
             //         let f=new FeatureCollection(fc)
@@ -324,6 +357,7 @@ export class VicroadMap extends G2Map{
              this.routerPicker.setInteractiveLayer(this.pickableArea)
             // this.doRoadPick()
         }
+        this.initSimulationResult()
     }
     pickableArea:L.Polygon
 

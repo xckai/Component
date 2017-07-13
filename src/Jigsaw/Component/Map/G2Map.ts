@@ -63,21 +63,21 @@ export class Style{
              }
              return this;
         }
-    line(opt, options2) {
+    line(opt, options2?) {
              return this.add("line", opt, options2);
 
          }
-    circle (opt, options2) {
+    circle (opt, options2?) {
              return this.add("circle", opt, options2);
          }
-    polygon (opt, options2) {
+    polygon (opt, options2?) {
              return this.add("polygon", opt, options2);
 
          }
-    text (opt, options2) {
+    text (opt, options2?) {
              return this.add("text", opt, options2);
          }
-    marker (opt, options2) {
+    marker (opt, options2?) {
              return this.add("marker", opt, options2);
          }
 }
@@ -112,6 +112,7 @@ export class G2Map  extends Component implements IMap{
     getContext(){
         return {}
     }
+  
     getLeafletControl(){
         return this.map.control
     }
