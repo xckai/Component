@@ -18,8 +18,28 @@ export class Component extends EventBus  {
     parent:Component
     children:Component []=[]
     id:string
+    private context={}
     deepExtend(...args){
         return Util.deepExtend.apply(null,args)
+    }
+    getContext(k?){
+        if(this.parent){
+            if(k!=undefined){
+                return _.extend(this.parent.getContext(k),this.context[k])
+            }else{
+                return _.extend(this.parent.getContext(),this.context)
+            }
+        }else{
+             if(k!=undefined){
+                return this.context[k]
+            }else{
+                return this.context
+            }
+        }
+       
+    }
+    setContext(k,v){
+        this.context[k]=v
     }
     setStyle(s){
         this.rootView.style(s)

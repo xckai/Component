@@ -71,7 +71,7 @@ export class JRequest extends JPromise{
         })
         let base=us.length>0?this.url+"?":this.url
         
-        return base+us.join("&&")
+        return base+us.join("&")
     }
     buildData(ctx?){
        return   _.extend({},this.data,_.pick.apply(null,[this.context].concat(_.keys(this.data))),_.pick.apply(null,[ctx].concat(_.keys(this.data))))

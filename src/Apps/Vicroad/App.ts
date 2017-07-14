@@ -19,18 +19,19 @@ export class MainApp extends App {
         this.addRule("reRouter","router",this.proxy("reRouter"))
         //this.addRule("Adjuster","adjuster",this.proxy("Adjuster"))
         this.addRule("reTime","retime",this.proxy("reTime"))
+        ///add bar
         this.bar=new VicroadNavBar()
         this.bar.initDropDown({curValue:"reRouter",items:["reTime","reRouter"]})
-        
         this.bar.addTo(this)
-
-
-
-
+        ///add map
         this.mapComponent=new VicroadMap({style:{
             top:"3rem"
         }})
         this.mapComponent.addTo(this)
+        requestAnimationFrame(()=>{
+            doInitMap(this.mapComponent)
+        })
+        ///add timeslider
         this.timeSlider=new TimeSlider()
         this.timeSlider.setStyle({
             top:null,
@@ -38,25 +39,32 @@ export class MainApp extends App {
             left:"calc(50% - 15rem)"
         })
         this.timeSlider.addTo(this)
-    
-         this.on("begin_calculation",this.showProgressBar,this)
-         this.on("calculation_done",this.hiddenProgressBar,this)
-         requestAnimationFrame(()=>{
-            doInitMap(this.mapComponent)
-        })
+        ///add progressbar
         this.progressBar=new CircleLoader(200,300,5)
         this.progressBar.toElement()
+        this.on("time-change",(d)=>{
+            this.setContext("currentTime",d.dateTime)
+        })
+        this.initReRouter()
+        this.initReTime()
             
     }   
+    initReRouter(){  
+         this.on("simulation:begin-calculation",this.showProgressBar,this)
+         this.on("simulation:calculation-done",this.hiddenProgressBar,this)
+    }
+    initReTime(){
+
+    }
     timeSlider:TimeSlider
     mapComponent:VicroadMap
     bar:VicroadNavBar
     simulatorPanal:SimulatorPanal
     reTimePanal:ReTimePanal
-   // rightSide:Side
+    // rightSide:Side
     reTime(){
         this.router.navigate("reTime/",{trigger: false, replace: true})
-        this.initAll()
+        this.resetAll()
         this.reTimePanal=new ReTimePanal
         this.reTimePanal.addTo(this)
         this.reTimePanal.show()
@@ -64,13 +72,13 @@ export class MainApp extends App {
     }
     reRouter(){
         this.router.navigate("reRouter/",{trigger: false, replace: true})
-        this.initAll()
+        this.resetAll()
         this.simulatorPanal=new SimulatorPanal()
         this.simulatorPanal.addTo(this)
         this.simulatorPanal.show()
        
     }
-    initAll(){
+    resetAll(){
          this.mapComponent.initAll()
          if(this.simulatorPanal){
              this.simulatorPanal.remove()
@@ -86,7 +94,7 @@ export class MainApp extends App {
             let progressBar=this.progressBar
             progressBar.addTo(this.rootView.getNode())
             progressBar.show()
-            this.on("calculation_progress",(d)=>{progressBar.setProgress(d.value)},this) 
+            this.on("simulation:calculation-progress",(d)=>{progressBar.setProgress(d.value)},this) 
         }
        
     }

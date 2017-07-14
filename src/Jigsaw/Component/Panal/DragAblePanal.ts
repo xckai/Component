@@ -4,7 +4,7 @@ import { View } from '../../Core/View';
 export class DragAblePanal extends Component{
     constructor(conf?){
         super(conf)
-        this.rootView=new DragComponentView()
+        this.initRootView(conf)
         this.rootView.doRender()
     }
     rootView:DragComponentView

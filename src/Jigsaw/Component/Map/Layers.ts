@@ -61,9 +61,12 @@ export class Layer {
         }
     }
     redraw(){
-        this._leafletLayer.remove()
-        this._leafletLayer=this.createLeafletLayer()
-        this.show()
+        if(this.visible()){
+            this._leafletLayer.remove()
+            this._leafletLayer=this.createLeafletLayer()
+            this.show()
+        }
+      
     }
     // features(){
     //     return this._data

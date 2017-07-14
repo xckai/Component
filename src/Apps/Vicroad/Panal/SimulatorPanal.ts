@@ -22,12 +22,12 @@ export class SimulatorPanal extends Side{
         this.simulatorView=new SimulatorView()
         this.simulatorView.appendAt(this.getContentContainer())
         this.roads=[]
-       this.initSimulatorView()
-       this.applyButtonInit()
-       this.simulatorView.on("simulator-apply",this.beginSimulator,this)
+        this.initSimulatorView()
+        this.applyButtonInit()
+        this.simulatorView.on("simulator-apply",this.beginSimulator,this)
     }
     dateTime:Date
-    duration:number
+    duration:number=1
     roads:RoadPickerMessage[]
     addRoads(road:RoadPickerMessage){
        let i= _.findIndex(this.roads,{id:road.id})
@@ -39,7 +39,7 @@ export class SimulatorPanal extends Side{
     }
    simulatorView:SimulatorView
    applyButtonInit(){
-        let dateTime,duration,road,from,to
+        let duration,road,from,to
         let isButtonEnable=()=>{
             if(this.dateTime!=undefined &&!_.isEmpty(this.roads)){
               this.simulatorView.setApplyButtonIsEnable(true)
@@ -52,7 +52,7 @@ export class SimulatorPanal extends Side{
             isButtonEnable()
         })
         this.on("simulate-duration-change",(e)=>{
-            duration=e.duration
+            this.duration=e.duration
             isButtonEnable()
         })
         this.on("simulate-road-change",(e)=>{
@@ -60,7 +60,7 @@ export class SimulatorPanal extends Side{
             this.simulatorView.setAdjusterEnable(false) 
             isButtonEnable()            
         })
-        this.on("calculation_done",()=>{
+        this.on("simulation:calculation-done",()=>{
             this.simulatorView.setRouterEnable(true)
         })  
    }
@@ -69,7 +69,7 @@ export class SimulatorPanal extends Side{
     //        controls:,
     //        from:this.dateTime.toUTCString()
     //    }
-      let controls=_.map(this.roads,(r)=>{
+       let controls=_.map(this.roads,(r)=>{
                return {id:r.id,kj:r.capacity,f:r.capacity,duration:"360m"}
            })
      
@@ -80,12 +80,12 @@ export class SimulatorPanal extends Side{
                 console.log('open');
                 eb.registerHandler("client.CTMProgress", function(err, msg){
                     console.log('received  '+msg.body);
-                    self.send("calculation_progress",{value:msg.body})
+                    self.send("simulation:calculation-progress",{value:msg.body})
                 });
                 eb.registerHandler("client.CTMComplete",function(){
                     console.log("Calculation done")
-                    self.send("calculation_done")
-                    self.send("simulation:done")
+                    self.send("simulation:calculation-done")
+                    eb.close()
                 })
                 };
             eb.onclose = function (e) {
@@ -94,8 +94,8 @@ export class SimulatorPanal extends Side{
             };
        }
       
-    API.beginSimulation(controls,this.dateTime.toUTCString()).done(()=>{
-            this.send("begin_calculation")
+    API.beginSimulation(controls,this.dateTime).done(()=>{
+            this.send("simulation:begin-calculation",{dateTime:this.dateTime,duration:this.duration})
             enableEventBus()
         })
    }
@@ -134,7 +134,7 @@ class SimulatorView extends View{
         }
     }
     onApply(){
-        this.trigger("simulator-apply",{date:new Date(this.$(".datetimeinput").val()),duration:this.$(".durationinput").val()})
+        this.trigger("simulator-apply",{dateTime:new Date(this.$(".datetimeinput").val()),duration:this.$(".durationinput").val()})
     }
     onAdjuster(e:JQueryMouseEventObject){
         if($(e.currentTarget).hasClass("btn-active")){
@@ -201,7 +201,7 @@ class SimulatorView extends View{
             <label>Simulation DateTime:</label>
             <input type="datetime" readonly="readonly" placeholder="Date Time" class='datetimeinput notreadonly'>
             <label>Simulation Duration:</label>
-            <input type="number" placeholder="Number of hours" value=2 readonly="readonly" class="durationinput"><span>Hour</span>  
+            <input type="number" placeholder="Number of hours" value=1 readonly="readonly" class="durationinput"><span>Hour</span>  
         </section>
         <section>
             <button class="btn btn-default operation adjuster-btn fa fa-times"></button>

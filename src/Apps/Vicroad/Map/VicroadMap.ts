@@ -1,98 +1,14 @@
 
 import {G2Map} from "../../../Jigsaw/Component/Map/G2Map"
 import _ = require('underscore');
-import {BaseDrawer,PointDrawer}from '../../../Jigsaw/Component/Map/MapDrawer'
 import L=require('leaflet')
 import { Adjuster } from './Adjuster';
 import {DatePanal}from "./DatePanal";
 import { API } from "../APIConfig";
 import { Util } from "../../../Jigsaw/Utils/Util";
 import { VicroadLineChart } from "../Chart/LineChart";
-class RouterPicker extends PointDrawer {
-    begin(){
-        if(this.interactiveLayer){
-            this.drawing=true;
-            this.interactiveLayer.on("click",this.onClick,this);
-            this.interactiveLayer.on("dblclick",this.onDbclick,this);
-            this.interactiveLayer.on("mousemove",this.onMouseMove,this);
-            //this.map.dragging.disable();
-            this.map.doubleClickZoom.disable(); 
-        }
-    }
-    onClick(e:L.MouseEvent){
-
-        if(this.latlngs && this.latlngs.length>0){
-            this.latlngs.push(e.latlng);
-            this.fire("to",{latlngs:this.latlngs});
-            this.endDraw()
-        }else{
-            this.latlngs=[];
-            this.latlngs.push(e.latlng);
-            this.fire("from",{latlngs:this.latlngs});
-            this.fire("drawbegin",{latlngs:this.latlngs});
-        }
-    }
-}
-class RoadPicker extends BaseDrawer{
-    baseUrl:string
-    oldLatlng:any
-    latlng:any
-    marker:L.Marker
-    path:L.Polyline
-    begin(){
-       if(this.interactiveLayer){
-            this.interactiveLayer.on("click",this.onclick,this)
-       }
-    }
-    end(){
-        if(this.interactiveLayer){
-            this.interactiveLayer.off("click",this.onclick,this)
-        }
-    }
-    cancel(){
-        if(this.interactiveLayer){
-            this.interactiveLayer.off("click",this.onclick,this)
-        }
-    }
-    private onclick(e:L.MouseEvent){
-        this.drawing=true
-        this.fire("drawing",e)
-        this.oldLatlng=e.latlng
-        this.fetch()
-    }
-    fetch(){
-        this.fire("fetching")
-        API.getRoad(this.oldLatlng.lat,this.oldLatlng.lng).done((d)=>{
-            if(!d.point||!d.path){
-                this.fire("fail")
-            }else{
-                this.fire("drawend",d)
-            }
-        }).fail(()=>{
-            this.fire("fail")
-        })
-        // $.get(this.baseUrl+`lng=${this.oldLatlng.lng}&lat=${this.oldLatlng.lat}`)
-        // .done((d)=>{
-        //     let f=new FeatureCollection(d)
-        //     if(_.isEmpty(f.getPoint())||_.isEmpty(f.getPolyline())){
-        //         this.fire("fail")
-        //     }else{
-        //         this.fire("drawend",{
-        //             point:_.first(f.getPoint()).getleafletCoorinates(),
-        //             path:_.first(f.getPolyline()).getleafletCoorinates(),
-        //             roadNum:_.first(f.getPolyline()).getProperty("properties/AVGLANES"),
-        //             name:_.first(f.getPolyline()).getProperty("properties/NAME"),
-        //             id:_.first(f.getPolyline()).getProperty("properties/ID"),
-        //         })
-        //     }
-           
-        // })
-        // .fail((d)=>{
-        //     this.fire("fail",null)
-        // })
-    }
-}
-
+import {RoadPicker,RouterPicker} from "./Picker"
+import * as moment from '../../../../vendor/moment/moment';
 export class VicroadMap extends G2Map{
     constructor(conf?){
         super(Util.deepExtend({zoomControl:false,class:"map"},conf))
@@ -113,7 +29,7 @@ export class VicroadMap extends G2Map{
             position:"absolute",
             width:"100%"
         })
-        this.on("simulator-apply timeslider-change",(d)=>{
+        this.on("simulator-apply time-change",(d)=>{
             this.datePanal.setTime(d.date)
         })
         this.on("adjuster-btn-on",this.doSelectAdjuster,this)
@@ -295,9 +211,9 @@ export class VicroadMap extends G2Map{
     }
     initSimulationResult(){
             let l=this.layer("simulationResult",{renderer:"canvas",
-                                                url:"/services/vicroad/tiers/ctmEdgeSpeedMap/extent/:zoom/:extent/canvas.w2?category=1&:timeTo",
-                                                 selectable:false})
-            l.setContext({timeTo:":2017-05-08T16:45:00%2B08:00"})
+                                                    url:API.getSimulationResultUrl(),
+                                                    selectable:true})
+
             l.style("*").line({width:(c)=>{
                     
                     if(c("zoom")){
@@ -311,14 +227,25 @@ export class VicroadMap extends G2Map{
                  else
                     return "red";
             }})
+            this.on("time-change",this.updateSimulationResult,this)
+            this.on("simulation:calculation-done",this.showSimulationResult,this)
+           
     }
     showSimulationResult(){
+        let time=this.getContext("currentTime")
+        if(time){
+            this.layer("simulationResult").setContext({timeTo:moment(time).format("YYYY-MM-DDTHH:mm:00Z")})
+        }
         this.layer("simulationResult").show()
     }
     hiddenSimulationResult(){
         this.layer("simulationResult").hide()
     }
     updateSimulationResult(){
+        let time=this.getContext("currentTime")
+        if(time){
+            this.layer("simulationResult").setContext({timeTo:moment(time).format("YYYY-MM-DDTHH:mm:00Z")})
+        }
         this.layer("simulationResult").redraw()
     }
     showArea(){

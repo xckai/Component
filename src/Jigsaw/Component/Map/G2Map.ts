@@ -109,10 +109,7 @@ export class G2Map  extends Component implements IMap{
     getLeaflet(){
         return this.map.leaflet
     }
-    getContext(){
-        return {}
-    }
-  
+
     getLeafletControl(){
         return this.map.control
     }
@@ -120,10 +117,11 @@ export class G2Map  extends Component implements IMap{
         let l=_.find(this.layers,(l)=>l._id==id)
         if(!l){
            l=layerFactor(this,id,options)
+           this.layers.push(l)
         }
         return l
     }
-    private layers:Layer []
+    private layers:Layer []=[]
     addToLeafletControl(layer,id){
         this.map.control.addOverlay(layer,id)
         this.map.control.addTo(this.map.leaflet)

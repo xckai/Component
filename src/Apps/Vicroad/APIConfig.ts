@@ -1,6 +1,7 @@
 import { GeoJSON } from '../../Jigsaw/Data/DataDefine';
 import { JPromise, JRequest } from '../../Jigsaw/Core/JRequest';
 import _=require("underscore")
+import * as moment from '../../../vendor/moment/moment';
 export let mainArea=new JRequest()
 export namespace API{
     export function getMainArea(ctx?):JPromise{
@@ -45,18 +46,22 @@ export namespace API{
         r.send({lat,lng})
         return r
     }
-    export function beginSimulation(controls,from){
+    export function beginSimulation(controls,timeFrom:Date){
         let r=new JRequest()
         r.url="/services/vicroad/localtasks/simulation"
         r.method="POST"
         r.params={
-            user:null
+            user:null,
+            project:null
         }
         r.data={
-            controls:[],
-            from:null
+            features:[],
+            srid:4326,
+            decimals:0
         }
-        r.send({controls,from,user:_.uniqueId("user")})
+        let features=[{controls,timeFrom:moment(timeFrom).format("YYYY-MM-DDTHH:mm:00Z")}]
+        r.send({features,user:Math.random(),project:"user1"})
+    
         return r
     }
     export function getReTimeRouter(latlngs:any[],time:Date){
@@ -86,5 +91,16 @@ export namespace API{
         r.send()
         return r
     }
+    export function getSimulationResultUrl(){
+        let r=new JRequest
+        r.url="/services/vicroad/tiers/ctmEdgeSpeedMap/extent/:zoom/:extent/canvas.w2"
+        r.params={
+            category:1,
+            project:"user1",
+            timeTo:":timeTo"
+        }
+         return  r.buildUrl()
+    }
+   
 }
 
