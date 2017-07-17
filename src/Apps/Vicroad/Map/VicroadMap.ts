@@ -9,7 +9,8 @@ import { Util } from "../../../Jigsaw/Utils/Util";
 import { VicroadLineChart } from "../Chart/LineChart";
 import {RoadPicker,RouterPicker} from "./Picker"
 import * as moment from '../../../../vendor/moment/moment';
-export class VicroadMap extends G2Map{
+import { W } from "../../../Jigsaw/Component/Map/DS";
+export class VicroadMap extends G2Map {
     constructor(conf?){
         super(Util.deepExtend({zoomControl:false,class:"map"},conf))
         this.init()
@@ -30,11 +31,11 @@ export class VicroadMap extends G2Map{
             width:"100%"
         })
         this.on("simulator-apply time-change",(d)=>{
-            this.datePanal.setTime(d.date)
+            this.datePanal.setTime(d.dateTime)
         })
         this.on("adjuster-btn-on",this.doSelectAdjuster,this)
         //this.on("adjuster-btn-off router-btn-off",this.doRoadPick,this)
-        this.on("begin-retime",this.doReTimeRouter,this)
+        this.on("retime-apply",this.doReTimeRouter,this)
         this.on("simulate-router-btn-on",this.doRouter,this)
         this.roadPicker=new RoadPicker()
         this.roadPicker.baseUrl="/service/apps/itm/maps/itm/query/point2edge.json?"
@@ -46,6 +47,7 @@ export class VicroadMap extends G2Map{
         this.reTimeRouterLayerGroup=L.layerGroup([]).addTo(this.map.leaflet)
         this.simulateRouterLayerGroup=L.layerGroup([]).addTo(this.map.leaflet)
         this.on("simulation:done",this.showSimulationResult,this)
+        this.initLayers()
     }
     doReTimeRouter(){
         this.roadPicker.off("*")
@@ -60,14 +62,43 @@ export class VicroadMap extends G2Map{
         this.routerPicker.on("to",(e)=>{
             mEnd.setLatLng(e.latlngs[1])
         })
+        let chartTimeChangeHandler=(latlngs)=>{
+                 API.getReTimeRouter(latlngs,this.getContext("currentTime")).done((d)=>{
+             
+                this.layer("retimeRouter").setData(d)
+                this.layer("retimeRouter").redraw()
+                mPath.setLatLngs([])
+            
+                //
+                })
+        }
         this.routerPicker.on("drawend",(e)=>{
             mPath.setLatLngs(e.latlngs)
             this.send("retime-router-done",{latlngs:e.latlngs})
-            API.getReTimeRouter(e.latlngs,null).done((d)=>{
-                let linechart=new VicroadLineChart({style:{width:"30rem",height:"20rem"}})
-                linechart.loadMeasures(d)
-                mEnd.bindPopup(linechart.toElement())
-                mEnd.openPopup()
+            API.getReTimeRouter(e.latlngs,this.getContext("currentTime")).done((d)=>{
+             
+                this.layer("retimeRouter").setData(d)
+                this.layer("retimeRouter").redraw()
+                mPath.setLatLngs([])
+            
+                //
+            })
+            let latlngs=e.latlngs
+            this.on("time-change",()=>{
+                API.getReTimeRouter(e.latlngs,this.getContext("currentTime")).done((d)=>{
+             
+                this.layer("retimeRouter").setData(d)
+                this.layer("retimeRouter").redraw()
+                mPath.setLatLngs([])
+            
+                //
+                })
+            })
+            API.getReTimeDatas(e.latlngs,this.getContext("currentTime")).done((d)=>{
+                   let linechart=new VicroadLineChart({style:{width:"30rem",height:"20rem"}})
+                    linechart.loadMeasures(d)
+                    mEnd.bindPopup(linechart.toElement())
+                    mEnd.openPopup()
             })
             setTimeout(()=>{
                     this.routerPicker.begin()
@@ -79,6 +110,17 @@ export class VicroadMap extends G2Map{
         })
         this.routerPicker.on("drawbegin",(e)=>{
              this.send("retime-router-drawing",{latlngs:e.latlngs})
+             this.off("time-change",()=>{
+                API.getReTimeRouter(e.latlngs,this.getContext("currentTime")).done((d)=>{
+             
+                this.layer("retimeRouter").setData(d)
+                this.layer("retimeRouter").redraw()
+                mPath.setLatLngs([])
+            
+                //
+                })
+            })
+            this.layer("retimeRouter").hide()
         })
         this.routerPicker.begin()
     }
@@ -186,6 +228,7 @@ export class VicroadMap extends G2Map{
         this.adjusterLayerGroup.clearLayers()
         this.simulateRouterLayerGroup.clearLayers()
         this.reTimeRouterLayerGroup.clearLayers()
+        this.layer("retimeRouter").hide()
         // if(this.routerLayer){
         //     this.routerLayer.remove()
            
@@ -209,7 +252,7 @@ export class VicroadMap extends G2Map{
         //     this.adjusterLayer=null
         // }
     }
-    initSimulationResult(){
+    initLayers(){
             let l=this.layer("simulationResult",{renderer:"canvas",
                                                     url:API.getSimulationResultUrl(),
                                                     selectable:true})
@@ -227,7 +270,16 @@ export class VicroadMap extends G2Map{
                  else
                     return "red";
             }})
-            this.on("time-change",this.updateSimulationResult,this)
+            this.layer("retimeRouter",{renderer:"canvasOnMap"}).style("*").line({
+                width:3,color:"red",marker: {
+            end: {
+                path: "M2,2 L2,11 L10,6 L2,2",
+                viewBox: [13, 13],
+                size: [5, 5]
+            }
+        }
+            })
+            
             this.on("simulation:calculation-done",this.showSimulationResult,this)
            
     }
@@ -237,9 +289,11 @@ export class VicroadMap extends G2Map{
             this.layer("simulationResult").setContext({timeTo:moment(time).format("YYYY-MM-DDTHH:mm:00Z")})
         }
         this.layer("simulationResult").show()
+        this.on("time-change",this.updateSimulationResult,this)
     }
     hiddenSimulationResult(){
         this.layer("simulationResult").hide()
+        this.off("time-change",this.updateSimulationResult,this)
     }
     updateSimulationResult(){
         let time=this.getContext("currentTime")
@@ -284,7 +338,6 @@ export class VicroadMap extends G2Map{
              this.routerPicker.setInteractiveLayer(this.pickableArea)
             // this.doRoadPick()
         }
-        this.initSimulationResult()
     }
     pickableArea:L.Polygon
 

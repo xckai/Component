@@ -1,5 +1,6 @@
 import _=require("underscore")
-let getProperty=function(obj,paths:string){
+import { W2 } from "./DataDefine";
+let getProperty = function (obj, paths: string) {
     let spliter="/"
     let path=paths.split("/")
     let r=obj
@@ -17,4 +18,9 @@ export namespace GeoJSONParser{
       return getProperty(obj,key)
     }
     
+}
+export namespace W2Parser{
+    export function toFeatures(data:W2.collection){
+        
+    }
 }

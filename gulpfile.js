@@ -90,15 +90,15 @@ gulp.task("vicroad",["vicroadinit"],()=>{
             //target:"http://10.59.176.34:8080"
         })
     var middleware2=proxy(['/eventbus','/socket.io'], {
-            target: 'http://10.59.176.34:8080',
-           // target: 'http://10.58.75.98:8089',
+           // target: 'http://10.59.176.34:8080',
+           target: 'http://10.58.75.98:8089',
             ws: true,
         
            
         })
     var m3=proxy(['/services/vicroad','/eventbus/info'],{
-       //target: 'http://10.58.75.98:8089',
-       target:"http://10.59.176.34:8080"
+       target: 'http://10.58.75.98:8089',
+     //  target:"http://10.59.176.34:8080"
       
     })
     server.init({

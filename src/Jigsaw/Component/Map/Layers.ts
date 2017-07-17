@@ -34,6 +34,7 @@ export class Layer {
     _config:ILayerConfig
     _cxt:any={}
     map:IMap
+    _features={}
     _leafletLayer:L.Layer
     _leaflet:L.Map
     _data:any
@@ -41,7 +42,7 @@ export class Layer {
         this._data=d
     }
     getData(){
-        return this._data
+        return JSON.parse(JSON.stringify(this._data))
     }
     visible(){
         if (this.map.getLeaflet()) {
@@ -65,32 +66,50 @@ export class Layer {
             this._leafletLayer.remove()
             this._leafletLayer=this.createLeafletLayer()
             this.show()
+        }else{
+            this._leafletLayer=this.createLeafletLayer()
+            this.show()
         }
       
     }
     // features(){
     //     return this._data
     // }
+    getFeatures(){
+
+    }
+    features(tag?){
+        if(tag!=undefined){
+            if(this._features[tag]==undefined){
+                this._features[tag]=[]
+            }
+            return this._features[tag]
+        }else{
+            return this._features
+        }
+    }
     render(data,cxt:{extent:any [],zoom:any},brush:IBrush){
              var mercator = W.mercator(256);
              var transform = function (pt) {
                  return mercator.lonLat2Pixel(pt,cxt.extent, cxt.zoom);
 
              };
-             var splitted = W.splitByTags(data.features);
-             splitted = _.reduce(this.getData(), function (memo, fc:any) {
-                 var mapped = fc.map(function (feature) {
-                     return feature.clone()
-                         .paths(_.map(feature.paths(), function (i) {
-                             return _.map(i, transform);
-                         })).value();
-                 });
-                 memo.push({
-                     tag: fc.tag(),
-                     items: mapped
-                 });
-                 return memo;
-             }, splitted);
+             let pd=W.toGeometries(data,cxt.extent,cxt.zoom)
+             var splitted = W.splitByTags(pd.features);
+             
+            //  splitted = _.reduce(this.features(), function (memo, fc:any) {
+            //      var mapped = fc.map(function (feature) {
+            //          return feature.clone()
+            //              .paths(_.map(feature.paths(), function (i) {
+            //                  return _.map(i, transform);
+            //              })).value();
+            //      });
+            //      memo.push({
+            //          tag: fc.tag(),
+            //          items: mapped
+            //      });
+            //      return memo;
+            //  }, splitted);
              var self = this;
         
 
@@ -212,13 +231,19 @@ export class CanvasTileLayer extends Layer {
         }          
 }
 export class CanvasLayer extends CanvasTileLayer{
-
+          
           createLeafletLayer():L.Layer {
               let l=this
               let leafletCanvasLayer=class LeafletCanvasLayerL extends L.Layer{
                   canvas:any
                   options:any
                   map:L.Map
+                  getExtent(){
+                    if(this.map){
+                        let  b = this.map.getBounds();
+                        return [b.getSouthWest().lng, b.getSouthWest().lat, b.getNorthEast().lng, b.getNorthEast().lat];
+                    }
+                  }
                   onAdd(map:L.Map){
                         this.map=map
                         let pane=map.getPane(this.options.pane)
@@ -226,34 +251,42 @@ export class CanvasLayer extends CanvasTileLayer{
                         pane.appendChild(this.canvas)
                         this.canvas.style.width=map.getSize().x+"px"
                         this.canvas.style.height=map.getSize().y+"px"
+                        this.canvas.setAttribute("width",map.getSize().x)
+                        this.canvas.setAttribute("height",map.getSize().y)
                         this.update()
-                        this.map.on("update",this.update,this)
+                        this.map.on("move",this.update,this)
+                        this.map.on("zoom",this.update,this)
                         return this
                   }
                   update(){
-                        let ctx={zoom:this.map.getZoom(),extent:this.map.getBounds()}
+
+                        var pos = L.DomUtil.getPosition(this.map.getPane("mapPane"));
+                        L.DomUtil.setTransform(this.canvas, pos.multiplyBy(-1), 0);
+                        let ctx={zoom:this.map.getZoom(),extent:this.getExtent()}
+                        this.canvas.getContext("2d").clearRect(0,0,this.canvas.width,this.canvas.height)
                          if(!l._config.url){
                          setTimeout(()=>{
-                             l.render({},l.getContext(ctx),l.getBrush(this.canvas))
+                             l.render(l.getData(),l.getContext(ctx),l.getBrush(this.canvas))
                            
                          },10)
                         }else{
-                            W.doGet(l._config.url,l.getContext(ctx)).done((data)=>{
+                            W.doGet(l._config.url,l.getContext(ctx)).done((data)=>{ 
                             if(data){
                                  data=JSON.parse(data)
                                  let fs= data
+                                fs=  W.toPixelFeatureCollection(W.decompressFeatureCollection(fs),this.getExtent(),this.map.getZoom())
+                                console.log(fs)
                                 // W.toGeometries(data,ctx.extent,ctx.zoom)
-                            l.render(fs,l.getContext(ctx),l.getBrush(this.canvas))   
-                            }
-                            
-                          
+                                l.render(fs,l.getContext(ctx),l.getBrush(this.canvas))   
+                                }
                             })
                         }
 
                   }
                   onRemove(map:L.Map){
                       L.DomUtil.remove(this.canvas)
-                      map.off("update",this.update,this)
+                       this.map.off("move",this.update,this)
+                        this.map.off("zoom",this.update,this)
                       return this
                   }
               }
@@ -266,6 +299,8 @@ export function layerFactor(map,id,options){
     }else if(options.renderer=="png"){
         return new PngLayer(map,id,options)
     }else if(options.renderer=="canvas"){
-          return new CanvasTileLayer(map,id,options)
+        return new CanvasTileLayer(map,id,options)
+    }else if(options.renderer=="canvasOnMap"){
+        return new CanvasLayer(map,id,options)
     }
 }

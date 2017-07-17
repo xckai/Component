@@ -63,7 +63,7 @@ export class EventBus {
                 return this._offAllKey(t)
             }else{
                 let newEvents=[]
-                newEvents=_.reject(this.events[t],(e)=>e.callback==callback && e.callback==ctx)
+                newEvents=_.reject(this.events[t],(e)=>e.callback.toString()==callback.toString() && e.ctx==ctx)
                 this.events[t]=newEvents
                 return this
             }
@@ -191,14 +191,10 @@ export class Evented {
         st.forEach(s => this._off(s, fn))
         return this;
     }
-    fire(t: string, obj ? : any) {
-        if (this.events[t]) {
-            this.events[t].forEach((o) => o.fn.call(o.ctx, obj));
-        }
-        let p = this.event_parent
-        if(p){
-              p.fire(t, obj)
-        }
+    fire(t: string, ...args) {
+         _.each(this.events[t],(e:any)=>{
+            e.fn.apply(e.ctx,args)
+        })
         return this
     }
     listenTo(e: Evented) {

@@ -19,8 +19,38 @@ export class JPromise extends Evented {
         }
         return this
     }
+    doDone(...args){
+        this.fire.apply(this,["done"].concat(args))
+    }
+    doFail(...args){
+        this.fire.apply(this,["fail"].concat(args))
+    }
+}
+export function JWhenAll(...args){
+    let promise=new JPromise()
+    let acc=args.length
+    let counter=0
+    let rs=[]
+    _.each(args,(jr:JRequest,i)=>{
+        jr.on("done",(d)=>{
+            rs[i]=d
+            counter++
+            if(counter==acc){
+                promise.doDone.apply(promise,rs)
+            }
+        })
+        jr.on("fail",(d)=>{
+            promise.doFail(d)
+        })
+        jr.send()
+    })
+    return promise
 }
 export class JRequest extends JPromise{
+    constructor(conf?){
+        super()
+        _.extend(this,conf)
+    }
      url:string
      params:any
      method:string="GET"
@@ -52,12 +82,7 @@ export class JRequest extends JPromise{
             data:JSON.stringify(this.buildData(ctx))
         })
     }
-    doDone(...args){
-        this.fire.apply(this,["done"].concat(args))
-    }
-    doFail(...args){
-        this.fire.apply(this,["fail"].concat(args))
-    }
+    
     buildUrl(ctx?){
         let us=[]
         _.each(_.extend({},this.params,_.pick.apply(null,[this.context].concat(_.keys(this.params))),_.pick.apply(null,[ctx].concat(_.keys(this.params)))),(v:any,k)=>{
@@ -76,7 +101,10 @@ export class JRequest extends JPromise{
     buildData(ctx?){
        return   _.extend({},this.data,_.pick.apply(null,[this.context].concat(_.keys(this.data))),_.pick.apply(null,[ctx].concat(_.keys(this.data))))
     }
-
+    setContext(c){
+        this.context=_.extend({},this.context,c)
+        return this
+    }
 
 
 }

@@ -15,12 +15,17 @@ export class ReTimePanal extends Side{
         this.rootView.render()
         this.reTimeView=new ReTimeView
         this.reTimeView.appendAt(this.getContentContainer())
-        this.on("retime-router-drawing",()=>{
-            this.reTimeView.setApplyButtonIsEnable(false)
+        this.proxyEvents(this.reTimeView,"retime-apply")
+        this.reTimeView.on("retime-apply",(d)=>{
+            this.send("retime-apply",d)
+            this.send("time-change",d)
         })
-        this.on("retime-router-done",()=>{
-            this.reTimeView.setApplyButtonIsEnable(true)
-        })
+        // this.on("retime-router-drawing",()=>{
+        //     this.reTimeView.setApplyButtonIsEnable(false)
+        // })
+        // this.on("retime-router-done",()=>{
+        //     this.reTimeView.setApplyButtonIsEnable(true)
+        // })
     }
     reTimeView:ReTimeView
 }
@@ -37,7 +42,7 @@ class ReTimeView extends View{
         }
     }
     onApply(){
-         this.trigger("retime-apply",{date:new Date(this.$(".datetimeinput").val()),duration:this.$(".durationinput").val()})
+         this.trigger("retime-apply",{dateTime:new Date(this.$(".datetimeinput").val()),duration:this.$(".durationinput").val()})
     }
    setApplyButtonIsEnable(isable){
         if(isable){
@@ -64,7 +69,7 @@ class ReTimeView extends View{
                         <input type="number" placeholder="Number of hours" value=2 readonly="readonly" class="durationinput"><span>Hour</span>  
                     </section>
                 <section class="applypanal">
-                    <button class="btn btn-default btn-disable applybtn">Apply</button>
+                    <button class="btn btn-default  applybtn">Apply</button>
                 </section>`)
         return this
     }

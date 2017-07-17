@@ -1,5 +1,6 @@
 import {W2} from "../../Data/DataDefine"
-import _= require("underscore")
+import * as leaflet from 'leaflet';
+import _ = require('underscore');
 function _evaluate(v, args?, std?) {
         if (_.isFunction(v)) {
             var v2 = v.apply(null, args);
@@ -123,7 +124,12 @@ export namespace W{
         args:any
         defalut:T1
         setDefalut(defalut:T1){
-            this.defalut=defalut
+            if(this.defalut){
+                this.defalut=_.defaults(this.defalut,defalut)
+            }else{
+                this.defalut=_.extend({},defalut)
+            }
+            
             return this
         }
         values():T1{
@@ -270,6 +276,43 @@ export namespace W{
             });
             return vs;
         }
+    export function decompressFeatureCollection(vs){
+            if(vs.features!=undefined && vs.decimals!=undefined){
+                let newVs=JSON.parse(JSON.stringify(vs))
+                newVs.features=_.map(vs.features,(g)=>{
+                    return _.mapObject(g,(v,k)=>{
+                        v.p=_.map(v.p,(p)=>{
+                            return toPath(p,vs.decimals)
+                        })
+                    })
+                })
+                return newVs
+            }
+            return vs
+    }
+    export function to4326FeatureCollection(vs,extent,zoom){
+           
+    }
+    export function toPixelFeatureCollection(vs,extent,zoom){
+             if(vs.srid=="4326" &&vs.features!=undefined)
+                {
+                    let mercator = W.mercator(256);
+                    let newVs=JSON.parse(JSON.stringify(vs))
+                        newVs.features=_.map(vs.features,(g)=>{
+                            return _.mapObject(g,(v,k)=>{
+                                v.p = _.map(v.p, function (path:any[]) {
+                                    return _.map(path, function (p) {
+                                        return mercator.lonLat2Pixel(p, extent, zoom);
+                                    });
+                            });
+                            })
+                        })
+
+                }
+    }
+    export function toW2FeatureCollection(vs){
+        
+    }
     export function toPath(vs, decimals) {
             var prevX = 0,
                 prevY = 0,

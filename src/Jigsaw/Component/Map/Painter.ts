@@ -170,9 +170,23 @@ export class CanvasBrush implements IBrush
             }else{
                 this._ctx.stroke()
                 if(s.marker){
-                    _.each(s.marker,(m,k)=>{
-                        
+                _.each(s.marker,  (m:any, k:any)=> {
+                    let st=new W.Wrapper<any,any>(m)
+                    st.setDefalut({
+                        placement: k,
+                        fill: s.color
                     })
+                     
+                    if (k == "mid") {
+                        _.each(np[0], function (pt, ix) {
+                            if (ix > 0 && ix < np[0].length - 1) {
+                                this.marker(f, st, np[0], ix);
+                            }
+                        });
+                    } else {
+                        this.marker(f, st, np[0]);
+                    }
+                 });
                 }
             }
         }
@@ -209,10 +223,10 @@ export class CanvasBrush implements IBrush
         if (s.fill) {
             this._ctx.fillStyle = s.fill;
             this._ctx.save();
-            var p2d = this.place(f, s, np, ix);
+            let p2d:any = this.place(f, s, np, ix);
             if (_.isObject(p2d)) {
                 // this._ctx.fill(p2d);
-                this._ctx.fill();
+                this._ctx.fill(p2d);
             } else {
                 this._ctx.fill();
             }
@@ -229,6 +243,9 @@ export class CanvasBrush implements IBrush
             pt = _.first(path);
         } else if (s.placement === "end") {
             p = _.last(path, 2);
+            if(p.length<2){
+                return
+            }
             pt = p[1];
             pt2 = p[0];
             rotate = (W.angle2X(pt2, pt)) * Math.PI / 180;
