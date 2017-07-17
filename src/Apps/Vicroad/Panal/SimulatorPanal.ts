@@ -219,7 +219,7 @@ class SimulatorView extends View{
             timeFormat: "hh:ii",
             onSelect: function(formattedDate, date:Date, inst) {
                     $(inst.el).trigger('change');
-                    console.log(arguments)
+                  
                     let newDate=new Date(date.toUTCString())
                     newDate.setMinutes(Math.floor(date.getMinutes()/15)*15)
                     if(newDate.toTimeString()!=date.toTimeString()){
