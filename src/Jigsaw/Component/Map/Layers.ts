@@ -38,6 +38,7 @@ export class Layer {
     _leafletLayer:L.Layer
     _leaflet:L.Map
     _data:any
+    _controlLayersNum=0
     setData(d){
         this._data=d
     }
@@ -61,13 +62,21 @@ export class Layer {
              this._leafletLayer.remove();
         }
     }
-    redraw(){
+    removeFromControl(){
+        this.map.removeFromLeafletControl(this._leafletLayer)
+        return this
+    }
+    addToControl(layerType?){
+        this.map.addToLeafletControl(this._leafletLayer,this._id,layerType)
+        return this
+    }
+    redraw(isShow?:boolean){
         if(this.visible()){
             this._leafletLayer.remove()
-            this._leafletLayer=this.createLeafletLayer()
+          
             this.show()
-        }else{
-            this._leafletLayer=this.createLeafletLayer()
+        }
+        if(isShow){
             this.show()
         }
       
@@ -94,7 +103,8 @@ export class Layer {
                  return mercator.lonLat2Pixel(pt,cxt.extent, cxt.zoom);
 
              };
-             let pd=W.toGeometries(data,cxt.extent,cxt.zoom)
+             let pd = W.projectToPixel(W.decompressFeatureCollection(data),W.mercator(256),cxt)
+             //let pd=W.toGeometries(data,cxt.extent,cxt.zoom)
              var splitted = W.splitByTags(pd.features);
              
             //  splitted = _.reduce(this.features(), function (memo, fc:any) {
@@ -174,7 +184,7 @@ export class Layer {
             this._leafletLayer.addTo(this._leaflet)
         }
         if(this._config.selectable){
-           this.map.addToLeafletControl(this._leafletLayer,this._id)
+            this.addToControl(this._config.layerType)
           
         }
     }
@@ -219,8 +229,8 @@ export class CanvasTileLayer extends Layer {
                      }else{
                          W.doGet(l._config.url,l.getContext(ctx)).done((data)=>{
                              data=JSON.parse(data)
-                           let fs= W.toGeometries(data,ext,zoom)
-                           l.render(fs,l.getContext(ctx),l.getBrush(canvasTile))
+                          
+                           l.render(data,l.getContext(ctx),l.getBrush(canvasTile))
                            done(false,canvasTile)
                          })
                      }

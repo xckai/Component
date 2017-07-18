@@ -1,6 +1,6 @@
 import _ = require('underscore');
 import * as moment from '../../../vendor/moment/moment';
-import { JPromise, JRequest, JWhenAll } from '../../Jigsaw/Core/JRequest';
+import { JMultiRequest, JPromise, JRequest, JWhenAll } from '../../Jigsaw/Core/JRequest';
 import { GeoJSON } from '../../Jigsaw/Data/DataDefine';
 import { Util } from '../../Jigsaw/Utils/Util';
 export let mainArea = new JRequest()
@@ -71,84 +71,102 @@ export namespace API{
         let ls=latlngs.map((l)=>{
               return l.lng+","+l.lat
           })
-        let r0=new JRequest({
-             url,params:{
-                 l:ls,timeFrom:""
+         let rs=JMultiRequest(5,(r,i)=>{
+             r.url=url;
+             r.params={
+                 l:ls,timeFrom:"",catagory:0
              }
-         }).changeDoneHandler((d)=>{
-              let featureCollection=JSON.parse(d)
-              let t=0
-               _.each(featureCollection.features,(f)=>{
-                   if(Util.getProperty(f,"time")){
-                       t+=+Util.getProperty(f,"time")
-                   }
-               })
-               console.log(r0.context["timeFrom"],t)
-              r0.doDone({y:t,x:r0.context["timeFrom"]})
-          }).setContext({timeFrom:moment(time).format("YYYY-MM-DDTHH:mm:00Z")})
-         let r1=new JRequest({
-             url,params:{
-                 l:ls,timeFrom:""
-             }
-         }).changeDoneHandler((d)=>{
-              let featureCollection=JSON.parse(d)
-              let t=0
-               _.each(featureCollection.features,(f)=>{
-                   if(Util.getProperty(f,"time")){
-                       t+=+Util.getProperty(f,"time")
-                   }
-               })
-               console.log(r1.context["timeFrom"],t)
-              r1.doDone({y:t,x:r1.context["timeFrom"]})
-          }).setContext({timeFrom:moment(time).add(15,"m").format("YYYY-MM-DDTHH:mm:00Z")})
+             r.setContext({timeFrom:moment(time).add(15*i,'m').format("YYYY-MM-DDTHH:mm:00Z")})
+             r.changeDoneHandler((d)=>{
+                let featureCollection=JSON.parse(d)
+                let t=0
+                _.each(featureCollection.features,(f)=>{
+                    if(Util.getProperty(f,"time")){
+                        t+=+Util.getProperty(f,"time")
+                    }
+                })
+                console.log(r.context["timeFrom"],t)
+                r.doDone({y:t,x:r.context["timeFrom"]})
+            })
+         })
+        // let r0=new JRequest({
+        //      url,params:{
+        //          l:ls,timeFrom:""
+        //      }
+        //  }).changeDoneHandler((d)=>{
+        //       let featureCollection=JSON.parse(d)
+        //       let t=0
+        //        _.each(featureCollection.features,(f)=>{
+        //            if(Util.getProperty(f,"time")){
+        //                t+=+Util.getProperty(f,"time")
+        //            }
+        //        })
+        //        console.log(r0.context["timeFrom"],t)
+        //       r0.doDone({y:t,x:r0.context["timeFrom"]})
+        //   }).setContext({timeFrom:moment(time).format("YYYY-MM-DDTHH:mm:00Z")})
+        //  let r1=new JRequest({
+        //      url,params:{
+        //          l:ls,timeFrom:""
+        //      }
+        //  }).changeDoneHandler((d)=>{
+        //       let featureCollection=JSON.parse(d)
+        //       let t=0
+        //        _.each(featureCollection.features,(f)=>{
+        //            if(Util.getProperty(f,"time")){
+        //                t+=+Util.getProperty(f,"time")
+        //            }
+        //        })
+        //        console.log(r1.context["timeFrom"],t)
+        //       r1.doDone({y:t,x:r1.context["timeFrom"]})
+        //   }).setContext({timeFrom:moment(time).add(15,"m").format("YYYY-MM-DDTHH:mm:00Z")})
 
-            let r2=new JRequest({
-             url,params:{
-                 l:ls,timeFrom:""
-             }
-         }).changeDoneHandler((d)=>{
-              let featureCollection=JSON.parse(d)
-              let t=0
-               _.each(featureCollection.features,(f)=>{
-                   if(Util.getProperty(f,"time")){
-                       t+=+Util.getProperty(f,"time")
-                   }
-               })
-               console.log(r2.context["timeFrom"],t)
-              r2.doDone({y:t,x:r2.context["timeFrom"]})
-          }).setContext({timeFrom:moment(time).add(30,"m").format("YYYY-MM-DDTHH:mm:00Z")})
+        //     let r2=new JRequest({
+        //      url,params:{
+        //          l:ls,timeFrom:""
+        //      }
+        //  }).changeDoneHandler((d)=>{
+        //       let featureCollection=JSON.parse(d)
+        //       let t=0
+        //        _.each(featureCollection.features,(f)=>{
+        //            if(Util.getProperty(f,"time")){
+        //                t+=+Util.getProperty(f,"time")
+        //            }
+        //        })
+        //        console.log(r2.context["timeFrom"],t)
+        //       r2.doDone({y:t,x:r2.context["timeFrom"]})
+        //   }).setContext({timeFrom:moment(time).add(30,"m").format("YYYY-MM-DDTHH:mm:00Z")})
 
-              let r3=new JRequest({
-             url,params:{
-                 l:ls,timeFrom:""
-             }
-         }).changeDoneHandler((d)=>{
-              let featureCollection=JSON.parse(d)
-              let t=0
-               _.each(featureCollection.features,(f)=>{
-                   if(Util.getProperty(f,"time")){
-                       t+=+Util.getProperty(f,"time")
-                   }
-               })
-               console.log(r3.context["timeFrom"],t)
-              r3.doDone({y:t,x:r3.context["timeFrom"]})
-          }).setContext({timeFrom:moment(time).add(45,"m").format("YYYY-MM-DDTHH:mm:00Z")})
-               let r4=new JRequest({
-             url,params:{
-                 l:ls,timeFrom:""
-             }
-         }).changeDoneHandler((d)=>{
-              let featureCollection=JSON.parse(d)
-              let t=0
-               _.each(featureCollection.features,(f)=>{
-                   if(Util.getProperty(f,"time")){
-                       t+=+Util.getProperty(f,"time")
-                   }
-               })
-               console.log(r4.context["timeFrom"],t)
-              r4.doDone({y:t,x:r4.context["timeFrom"]})
-          }).setContext({timeFrom:moment(time).add(60,"m").format("YYYY-MM-DDTHH:mm:00Z")})
-        JWhenAll(r0,r1,r2,r3,r4).done(
+        //       let r3=new JRequest({
+        //      url,params:{
+        //          l:ls,timeFrom:""
+        //      }
+        //  }).changeDoneHandler((d)=>{
+        //       let featureCollection=JSON.parse(d)
+        //       let t=0
+        //        _.each(featureCollection.features,(f)=>{
+        //            if(Util.getProperty(f,"time")){
+        //                t+=+Util.getProperty(f,"time")
+        //            }
+        //        })
+        //        console.log(r3.context["timeFrom"],t)
+        //       r3.doDone({y:t,x:r3.context["timeFrom"]})
+        //   }).setContext({timeFrom:moment(time).add(45,"m").format("YYYY-MM-DDTHH:mm:00Z")})
+        //        let r4=new JRequest({
+        //      url,params:{
+        //          l:ls,timeFrom:""
+        //      }
+        //  }).changeDoneHandler((d)=>{
+        //       let featureCollection=JSON.parse(d)
+        //       let t=0
+        //        _.each(featureCollection.features,(f)=>{
+        //            if(Util.getProperty(f,"time")){
+        //                t+=+Util.getProperty(f,"time")
+        //            }
+        //        })
+        //        console.log(r4.context["timeFrom"],t)
+        //       r4.doDone({y:t,x:r4.context["timeFrom"]})
+        //   }).setContext({timeFrom:moment(time).add(60,"m").format("YYYY-MM-DDTHH:mm:00Z")})
+        JWhenAll(rs).done(
             (d0,d1,d2,d3,d4)=>{
                  
                 p.doDone([{id:1, data:[d0,d1,d2,d3,d4], type:"line"}])
@@ -192,7 +210,7 @@ export namespace API{
         r.send()
         return r
     }
-    export function getSimulationResultUrl(){
+    export function getSimulationResultURL(){
         let r=new JRequest
         r.url="/services/vicroad/tiers/ctmEdgeSpeedMap/extent/:zoom/:extent/canvas.w2"
         r.params={
@@ -201,6 +219,102 @@ export namespace API{
             timeTo:":timeTo"
         }
          return  r.buildUrl()
+    }
+    export function getSimulationResultWithoutAdjusterURL(){
+        let r=new JRequest
+        r.url="/services/vicroad/tiers/ctmEdgeSpeedMap/extent/:zoom/:extent/canvas.w2"
+        r.params={
+            category:0,
+            project:"user1",
+            timeTo:":timeTo"
+        }
+         return  r.buildUrl()
+    }
+    export function getSimulationRoadDetail(id,time){
+        let r=new JRequest({
+            url:"/services/vicroad/tiers/ctmEdgeSpeedCompare/4326.w2"
+        })
+        r.params={
+            id:0, timeFrom:null, project:"user1"
+        }
+        r.changeDoneHandler((d)=>{
+            let fc
+            let origion=[]
+            let change=[]
+            if(_.isString(d)){
+               
+                 fc=JSON.parse(d)
+                
+            }else{
+                fc=d
+            }
+            _.each(fc.features,(f)=>{
+                        origion.push({x:f["TIMESLOT"],y:f["ORIGION_SPEED"]})
+                        change.push({x:f["TIMESLOT"],y:f["CHANGE_SPEED"]})
+                    })
+            r.doDone([{id:1, data:origion, type:"line"},{id:2, data:change, type:"line"}])
+        })
+        r.send({id,timeFrom:moment(time).format("YYYY-MM-DDTHH:mm:00Z")})
+        return r
+    }
+    export function getSimulationRouterChartData(latlngs,time){
+     let p=new JPromise()
+        let url= "services/vicroad/tiers/routingSimulate/extent/15/144.92022514343265%2C-37.83263257682617%2C145.00185012817386%2C-37.79750922077998/4326.w2"
+        let ls=latlngs.map((l)=>{
+              return l.lng+","+l.lat
+          })
+         let rs1=JMultiRequest(4,(r,i)=>{
+             r.url=url;
+             r.params={
+                 l:ls,timeFrom:"",catagory:0
+             }
+             r.setContext({timeFrom:moment(time).add(15*i,'m').format("YYYY-MM-DDTHH:mm:00Z")})
+             r.changeDoneHandler((d)=>{
+                let featureCollection=JSON.parse(d)
+                let t=0
+                _.each(featureCollection.features,(f)=>{
+                    if(Util.getProperty(f,"time")){
+                        t+=+Util.getProperty(f,"time")
+                    }
+                })
+                console.log(r.context["timeFrom"],t)
+                r.doDone({y:t,x:r.context["timeFrom"]})
+            })
+         })
+         let rs2=JMultiRequest(4,(r,i)=>{
+             r.url=url;
+             r.params={
+                 l:ls,timeFrom:"",catagory:1
+             }
+             r.setContext({timeFrom:moment(time).add(15*i,'m').format("YYYY-MM-DDTHH:mm:00Z")})
+             r.changeDoneHandler((d)=>{
+                let featureCollection=JSON.parse(d)
+                let t=0
+                _.each(featureCollection.features,(f)=>{
+                    if(Util.getProperty(f,"time")){
+                        t+=+Util.getProperty(f,"time")
+                    }
+                })
+                console.log(r.context["timeFrom"],t)
+                r.doDone({y:t,x:r.context["timeFrom"]})
+            })
+         })
+        JWhenAll(rs1.concat(rs2)).done(
+            (d0,d1,d2,d3,d4,d5,d6,d7)=>{
+                p.doDone([{id:1, data:[d0,d1,d2,d3], type:"line"},{id:2, data:[d4,d5,d6,d7], type:"line"}])
+            }
+        ).fail((d)=>{
+            p.doFail(d)
+        })
+        
+        //  setTimeout(()=>{
+        //       r.doDone([{id:1, data:[{x:0,y:0},{x:3,y:2},{x:5,y:8},{x:7,y:32}], type:"line"},
+        //                 {id:2, data:[{x:1,y:32},{x:3,y:8},{x:5,y:2},{x:8,y:1}], type:"line"}])
+        //  },2000)
+
+       
+        
+          return p
     }
    
 }

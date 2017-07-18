@@ -57,7 +57,7 @@ export class SimulatorPanal extends Side{
         })
         this.on("simulate-road-change",(e)=>{
             this.addRoads(e)
-            this.simulatorView.setAdjusterEnable(false) 
+            this.simulatorView.setAdjusterActive(false) 
             isButtonEnable()            
         })
         this.on("simulation:calculation-done",()=>{
@@ -135,6 +135,8 @@ class SimulatorView extends View{
     }
     onApply(){
         this.trigger("simulator-apply",{dateTime:new Date(this.$(".datetimeinput").val()),duration:this.$(".durationinput").val()})
+        this.setAdjusterEnable(false)
+        this.setApplyButtonIsEnable(false)
     }
     onAdjuster(e:JQueryMouseEventObject){
         if($(e.currentTarget).hasClass("btn-active")){
@@ -148,14 +150,21 @@ class SimulatorView extends View{
         }
        
     }
-    setAdjusterEnable(b:boolean){
-        if(b){
+    setAdjusterActive(b:boolean){
+         if(b){
             $(".operation").removeClass("btn-active")
             this.$(".adjuster-btn").addClass("btn-active")
             this.trigger("adjuster-btn-on")
         }else{
             this.trigger("adjuster-btn-off")
             this.$(".adjuster-btn").removeClass("btn-active")
+        }
+    }
+    setAdjusterEnable(b:boolean){
+        if(b){
+             this.$('.adjuster-btn').removeClass('btn-disable')
+        }else{
+             this.$('.adjuster-btn').addClass('btn-disable')              
         }
     }
     setRouterEnable(isable){

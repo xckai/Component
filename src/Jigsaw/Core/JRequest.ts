@@ -26,11 +26,23 @@ export class JPromise extends Evented {
         this.fire.apply(this,["fail"].concat(args))
     }
 }
+export function  JMultiRequest(requestNum:number,requestIteral:(r:JRequest,i:number)=>any){
+    let rs=[]
+    for(let i=0;i<requestNum;++i){
+        rs.push(new JRequest)
+    }
+    _.each(rs,requestIteral)
+    return rs
+}
 export function JWhenAll(...args){
     let promise=new JPromise()
+     if(_.isArray(args[0])){
+        args=args[0]
+    }
     let acc=args.length
     let counter=0
     let rs=[]
+   
     _.each(args,(jr:JRequest,i)=>{
         jr.on("done",(d)=>{
             rs[i]=d

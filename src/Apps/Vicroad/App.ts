@@ -76,6 +76,7 @@ export class MainApp extends App {
         this.simulatorPanal=new SimulatorPanal()
         this.simulatorPanal.addTo(this)
         this.simulatorPanal.show()
+        this.mapComponent.doReRouter()
        
     }
     resetAll(){

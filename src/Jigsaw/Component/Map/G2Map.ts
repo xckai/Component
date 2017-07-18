@@ -87,13 +87,14 @@ export interface ILayerConfig{
     name:string
     leafletLayerOption:L.LayerOptions
     visible:boolean
+    layerType:string
 }
 export interface IMap{
     getLeaflet():L.Map
     getContext():any
-    getLeafletControl():L.Control.Layers
-    addToLeafletControl(layer,id):any
-  
+   // getLeafletControl():L.Control.Layers
+    addToLeafletControl(layer,id,type?):any
+    removeFromLeafletControl(layer):any
 }
 export class G2Map  extends Component implements IMap{
      constructor(conf?){
@@ -110,9 +111,9 @@ export class G2Map  extends Component implements IMap{
         return this.map.leaflet
     }
 
-    getLeafletControl(){
-        return this.map.control
-    }
+    // getLeafletControl(){
+    //     return this.map.control
+    // }
     layer(id,options?){
         let l=_.find(this.layers,(l)=>l._id==id)
         if(!l){
@@ -122,9 +123,18 @@ export class G2Map  extends Component implements IMap{
         return l
     }
     private layers:Layer []=[]
-    addToLeafletControl(layer,id){
-        this.map.control.addOverlay(layer,id)
-        this.map.control.addTo(this.map.leaflet)
+    addToLeafletControl(layer,id,layertype){
+        if(layertype=="baselayer"){
+            this.map.control.addBaseLayer(layer,id)
+        }else{
+             this.map.control.addOverlay(layer,id)
+        }
+        this.map.control.updataStyle()
+       
+    }
+    removeFromLeafletControl(layer){
+        this.map.control.removeLayer(layer)
+        this.map.control.updataStyle()
     }
     setMapSetting(s){
         this.map.setMapSetting(s)
@@ -151,10 +161,12 @@ export class G2Map  extends Component implements IMap{
     }
     mapSetting: IMapSetting
     leaflet: L.Map
-    control:L.Control.Layers
+    control:AutoHideLayerControl
     onAfterRender() {
         this.leaflet=L.map(this.el,_.pick(this.mapSetting,"scrollWheelZoom","zoomControl"))
-        this.control=L.control.layers()
+        this.control=new AutoHideLayerControl
+        this.control.addTo(this.leaflet)
+        this.control.updataStyle()
         this.leaflet.setView(this.mapSetting.center,this.mapSetting.zoom)
     }
     setMapSetting(s){
@@ -171,4 +183,14 @@ interface IMapSetting {
     center: { lat: number, lng: number },
     zoom: number,
     scrollWheelZoom:boolean
+}
+class AutoHideLayerControl extends L.Control.Layers{
+    updataStyle(){
+        if(this._layers&&this._layers.length<=0){
+            this.getContainer().style.display="none"
+        }else{
+            this.getContainer().style.display="initial"
+        }
+    }
+    _layers:any []
 }

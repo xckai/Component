@@ -46,6 +46,7 @@ export namespace W{
             this.initialResolution = 2 * Math.PI * 6378137 / this.tileSize;
             this.scale = 20037508.34; //Math.PI * 6378137
         }
+        projectName="mercator"
         tileSize:number
         initialResolution:number
         scale:number
@@ -277,18 +278,68 @@ export namespace W{
             return vs;
         }
     export function decompressFeatureCollection(vs){
-            if(vs.features!=undefined && vs.decimals!=undefined){
+            if(!isDeCompress(vs)){
                 let newVs=JSON.parse(JSON.stringify(vs))
-                newVs.features=_.map(vs.features,(g)=>{
-                    return _.mapObject(g,(v,k)=>{
-                        v.p=_.map(v.p,(p)=>{
-                            return toPath(p,vs.decimals)
-                        })
-                    })
+                newVs.features=_.map(vs.features,(f:any)=>{
+                    if(f.g!=undefined&&f.g.t!=undefined){
+                        f.g.p=_.map(f.g.p,(p)=>toPath(p,vs.decimals))
+                    }
+                    return f
                 })
                 return newVs
             }
+            vs._decompress=true
             return vs
+    }
+    export function isDeCompress(fs){
+        if(fs._decompress){
+            return true
+        }else{
+            if(fs.decimals==0||fs.decimals==undefined){
+                return true
+            }else{
+                if(fs.features&&fs.features.length>0){
+                    let hasGPath=_.filter(fs.features,(f:any)=>f.g!=undefined &&f.g.p!=undefined&&(f.g.t==1||f.g.t==2)&&f.g.p.length>0&&f.g.p[0].length>0)
+                    if(hasGPath.length>0){
+                        let p=hasGPath[0]
+                        let path=p.g.p[0]
+                        return path[0].toString().includes('.')
+                    }
+                    let hasGPoint=_.filter(fs.features,(f:any)=>f.g!=undefined &&f.g.p!=undefined&&f.g.t==0&&f.g.p.length>0)
+                    if(hasGPoint.length>0){
+                        let path=hasGPath[0].g.p
+                        return path[0].toString().includes('.')
+                    }
+                }else{
+                    return true
+                }
+            }
+        }
+    }
+    export function isProject(fs){
+        if(fs._project||fs.srid=="canvas"){
+            return true
+        }else{
+            return false
+        }
+    }
+    export function projectToPixel(fs,Project,ctx){
+        if(!isProject(fs)){
+            let newFs=JSON.parse(JSON.stringify(fs))
+            _.each(newFs.features,(f:any)=>{
+                if(f.g&&f.g.p&&f.g.p.length>0){
+                    f.g.p = _.map(f.g.p, function (path:any[]) {
+                                return _.map(path, function (p) {
+                                    return Project.lonLat2Pixel(p, ctx.extent, ctx.zoom);
+                                });
+                            });
+                }
+                
+            })
+            newFs._project=Project.name
+            return newFs
+        }
+        return  fs
     }
     export function to4326FeatureCollection(vs,extent,zoom){
            
