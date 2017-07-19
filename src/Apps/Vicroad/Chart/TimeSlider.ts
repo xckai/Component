@@ -18,9 +18,11 @@ export class TimeSlider extends DragAblePanal{
             this.send("time-change",{dateTime:d.dateTime})
         })
         this.on("retime-apply",(d)=>{
-             this.show()
             this.setTime(d.dateTime,d.duration)
             this.send("time-change",{dateTime:d.dateTime})
+        })
+        this.on("retime-router-done",()=>{
+            this.show()
         })
         this.timeAdjuster.on("dragend",(o)=>{
             this.send("time-change",{dateTime:o.dateTime})

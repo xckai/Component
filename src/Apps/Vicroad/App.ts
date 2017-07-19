@@ -83,6 +83,7 @@ export class MainApp extends App {
     }
     resetAll(){
          this.mapComponent.initAll()
+         this.timeSlider.hidden()
          if(this.simulatorPanal){
              this.simulatorPanal.remove()
              this.simulatorPanal=null;

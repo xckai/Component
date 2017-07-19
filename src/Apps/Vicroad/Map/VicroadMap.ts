@@ -1,7 +1,7 @@
 import { G2Map } from "../../../Jigsaw/Component/Map/G2Map"
 import _ = require('underscore');
 import L = require('leaflet')
-import moment =require("moment")
+import moment = require("moment")
 import { Adjuster } from './Adjuster';
 import { DatePanal } from "./DatePanal";
 import { API } from "../APIConfig";
@@ -15,7 +15,7 @@ export class VicroadMap extends G2Map {
         super(Util.deepExtend({ zoomControl: false, class: "map" }, conf))
         this.init()
     }
- 
+
     roadPicker: RoadPicker
     adjuster: Adjuster
     routerPicker: RouterPicker
@@ -66,10 +66,12 @@ export class VicroadMap extends G2Map {
         this.on("retime-apply", () => {
             this.roadPicker.off("*")
             let latlngs
-            let chart= new VicroadLineChart({ style: { width: "30rem", height: "20rem" },line:{
-                defaultTimeAdjust:this.getContext("currentTime")
-            } })
-            let layers=L.layerGroup([])
+            let chart = new VicroadLineChart({
+                style: { width: "30rem", height: "20rem" }, line: {
+                    defaultTimeAdjust: this.getContext("currentTime")
+                }
+            })
+            let layers = L.layerGroup([])
             this.vicroadlayers.addLayer(layers)
             let mBegin = L.marker([0, 0]), mEnd = L.marker([0, 0]), mPath = L.polyline([], { interactive: false })
             layers.addLayer(mBegin).addLayer(mEnd).addLayer(mPath)
@@ -104,10 +106,10 @@ export class VicroadMap extends G2Map {
                 API.getReTimeDatas(e.latlngs, this.getContext("currentTime")).done((d) => {
                     chart.clearMeasure()
                     chart.loadMeasures(d)
-                    this.on("time-change",(d)=>{
-                       setTimeout(()=>{
+                    this.on("time-change", (d) => {
+                        setTimeout(() => {
                             chart.setTimeAdjust(this.getContext("currentTime"))
-                       },50)
+                        }, 50)
                     })
                     mEnd.bindPopup(chart.toElement())
                     mEnd.openPopup()
@@ -121,7 +123,7 @@ export class VicroadMap extends G2Map {
 
             })
             this.routerPicker.on("drawbegin", (e) => {
-               // this.send("retime-router-drawing", { latlngs: e.latlngs })
+                // this.send("retime-router-drawing", { latlngs: e.latlngs })
                 this.off("time-change", retimeHandler)
                 this.layer("router").hide()
             })
@@ -260,7 +262,7 @@ export class VicroadMap extends G2Map {
             this.layer("simulationResultWithoutAdjuster").addToControl("baselayer")
             this.layer("simulationResult").addToControl("baselayer")
             this.layer("simulationResult").show()
-           
+
             this.on("time-change", this.updateSimulationResult, this)
         }
         let doRoadPick = () => {
@@ -291,10 +293,10 @@ export class VicroadMap extends G2Map {
                         roadChart.clearMeasure()
                         roadChart.loadMeasures(d)
                         roadMark.bindPopup(roadChart.toElement())
-                        this.on("time-change",()=>{
-                            setTimeout(()=>{
+                        this.on("time-change", () => {
+                            setTimeout(() => {
                                 roadChart.setTimeAdjust(this.getContext("currentTime"))
-                            },10)
+                            }, 10)
                         })
                     })
                 }
@@ -328,13 +330,11 @@ export class VicroadMap extends G2Map {
             }
             this.routerPicker.on("drawend", (e) => {
                 mPath.setLatLngs(e.latlngs)
-                this.send("retime-router-done", { latlngs: e.latlngs })
                 API.getReTimeRouter(e.latlngs, this.getContext("currentTime")).done((d) => {
 
                     this.layer("router").setData(d)
                     this.layer("router").redraw(true)
                     mPath.setLatLngs([])
-
                 })
                 let latlngs = e.latlngs
                 this.on("time-change", () => {
@@ -349,24 +349,27 @@ export class VicroadMap extends G2Map {
                 API.getSimulationRouterChartData(e.latlngs, this.getContext("currentTime")).done((d) => {
                     let linechart = new VicroadLineChart({ style: { width: "30rem", height: "20rem" } })
                     linechart.loadMeasures(d)
-                     this.on("time-change",()=>{
-                            setTimeout(()=>{
-                                linechart.setTimeAdjust(this.getContext("currentTime"))
-                            },10)
-                        })
+                    this.on("time-change", () => {
+                        setTimeout(() => {
+                            linechart.setTimeAdjust(this.getContext("currentTime"))
+                        }, 10)
+                    })
                     mEnd.bindPopup(linechart.toElement())
                     mEnd.openPopup()
                 })
+                setTimeout(() => {
+                    this.routerPicker.begin()
+                }, 200)
             })
             this.routerPicker.on("drawing", (e) => {
                 mPath.setLatLngs(e.latlngs)
-
             })
             this.routerPicker.on("drawbegin", (e) => {
                 this.send("retime-router-drawing", { latlngs: e.latlngs })
+                this.layer("router").hide()
+                
                 this.off("time-change", () => {
                     API.getReTimeRouter(e.latlngs, this.getContext("currentTime")).done((d) => {
-
                         this.layer("router").setData(d)
                         this.layer("router").redraw()
                         mPath.setLatLngs([])

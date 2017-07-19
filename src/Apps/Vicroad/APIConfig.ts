@@ -263,12 +263,12 @@ export namespace API{
         let ls=latlngs.map((l)=>{
               return l.lng+","+l.lat
           })
-         let rs1=JMultiRequest(4,(r,i)=>{
+         let rs1=JMultiRequest(5,(r,i)=>{
              r.url=url;
              r.params={
                  l:ls,timeFrom:"",catagory:0
              }
-             r.setContext({timeFrom:moment(time).add(15*i,'m').format("YYYY-MM-DDTHH:mm:00Z")})
+             r.setContext({timeFrom:moment(time).add(15*(i+1),'m').format("YYYY-MM-DDTHH:mm:00Z")})
              r.changeDoneHandler((d)=>{
                 let featureCollection=JSON.parse(d)
                 let t=0
@@ -281,12 +281,12 @@ export namespace API{
                 r.doDone({y:t,x:r.context["timeFrom"]})
             })
          })
-         let rs2=JMultiRequest(4,(r,i)=>{
+         let rs2=JMultiRequest(5,(r,i)=>{
              r.url=url;
              r.params={
                  l:ls,timeFrom:"",catagory:1
              }
-             r.setContext({timeFrom:moment(time).add(15*i,'m').format("YYYY-MM-DDTHH:mm:00Z")})
+             r.setContext({timeFrom:moment(time).add(15*(i+1),'m').format("YYYY-MM-DDTHH:mm:00Z")})
              r.changeDoneHandler((d)=>{
                 let featureCollection=JSON.parse(d)
                 let t=0
@@ -300,8 +300,8 @@ export namespace API{
             })
          })
         JWhenAll(rs1.concat(rs2)).done(
-            (d0,d1,d2,d3,d4,d5,d6,d7)=>{
-                p.doDone([{id:1, data:[d0,d1,d2,d3], type:"line"},{id:2, data:[d4,d5,d6,d7], type:"line"}])
+            (d0,d1,d2,d3,d4,d5,d6,d7,d8,d9)=>{
+                p.doDone([{id:1, data:[d0,d1,d2,d3,d4], type:"line"},{id:2, data:[d5,d6,d7,d8,d9], type:"line"}])
             }
         ).fail((d)=>{
             p.doFail(d)
