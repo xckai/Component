@@ -14,7 +14,7 @@ export class TimeSlider extends DragAblePanal{
         this.hidden()
         this.on("simulation:begin-calculation",(d)=>{
             this.show()
-            this.setTime(d.dateTime,d.duration)
+            this.setTime(moment(d.dateTime).add(15,"m").toDate(),d.duration)
             this.send("time-change",{dateTime:d.dateTime})
         })
         this.on("retime-apply",(d)=>{

@@ -7,7 +7,7 @@ import { SimulatorPanal } from './Panal/SimulatorPanal';
 import { G2Map } from '.../../Jigsaw/Component/Map/G2Map';
 import { CircleLoader } from '../../Jigsaw/Component/Loader/CircleLoader';
 import { IProgressLoader } from '../../Jigsaw/Component/Loader/ILoader';
-
+import moment=require("moment")
 
 export class MainApp extends App {
     constructor(conf?){
@@ -43,7 +43,8 @@ export class MainApp extends App {
         this.progressBar=new CircleLoader(200,300,5)
         this.progressBar.toElement()
         this.on("time-change",(d)=>{
-            this.setContext("currentTime",d.dateTime)
+           
+            this.setContext("currentTime", moment(d.dateTime).seconds(0).milliseconds(0).toDate())
         })
         this.initReRouter()
         this.initReTime()
@@ -68,7 +69,8 @@ export class MainApp extends App {
         this.reTimePanal=new ReTimePanal
         this.reTimePanal.addTo(this)
         this.reTimePanal.show()
-        this.send("begin-retime")
+        this.mapComponent.doReTime()
+        //this.send("begin-retime")
     }
     reRouter(){
         this.router.navigate("reRouter/",{trigger: false, replace: true})

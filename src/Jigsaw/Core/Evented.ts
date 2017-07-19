@@ -56,7 +56,10 @@ export class EventBus {
         return this
     }
     _off(t:string ,callback?:Function,ctx?){
-        if(this.events[t]==undefined){
+        if(t=="*"){
+            this.events={}
+        }
+        else if(this.events[t]==undefined){
             return this
         }else{
             if(callback==undefined){

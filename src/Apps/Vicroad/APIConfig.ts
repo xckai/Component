@@ -169,7 +169,7 @@ export namespace API{
         JWhenAll(rs).done(
             (d0,d1,d2,d3,d4)=>{
                  
-                p.doDone([{id:1, data:[d0,d1,d2,d3,d4], type:"line"}])
+                p.doDone([{id:"Travel Time", data:[d0,d1,d2,d3,d4], type:"line"}])
             }
         ).fail((d)=>{
             p.doFail(d)

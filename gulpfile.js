@@ -3,6 +3,7 @@ const browserSync = require('browser-sync')
 var proxy = require('http-proxy-middleware')
 var less = require('gulp-less');
 var ts = require('gulp-typescript');
+var merge = require('merge2')
 gulp.task("start",()=>{
     browserSync.create().init({server:{
         baseDir:"./",
@@ -69,6 +70,12 @@ gulp.task("vicroad",["vicroadinit"],()=>{
             .pipe(ts({
                 "target": "es5",
                 "module": "amd",
+                "baseUrl": "./",
+                "paths": {
+                    "moment": [
+                        "vendor/moment/moment"
+                    ]
+                }
         })).pipe(gulp.dest('./dist'))
     })
     
@@ -119,7 +126,14 @@ gulp.task("vicroadinit",()=>{
     gulp.src(['./src/Jigsaw/**/*.ts','./src/Apps/Vicroad/**/*.ts'],{base:"src"})
                 .pipe(ts({
                 "target": "es5",
-                "module": "amd"
+                "module": "amd",
+                "baseUrl": "./",
+                "paths": {
+                    "moment": [
+                        "vendor/moment/moment"
+                    ]
+                }
+
             })).pipe(gulp.dest('./dist'))
     gulp.src(["./src/**/*.js","./src/**/*.json","./src/**/*.html","src/**/*.css"],{base:"src"})
         .pipe(gulp.dest("./dist"))
@@ -128,4 +142,17 @@ gulp.task("vicroadinit",()=>{
     gulp.src('./src/Vicroad/main.less',{base:"src"})
             .pipe(less())
             .pipe(gulp.dest("./dist/"))
+})
+gulp.task("bundle",()=>{
+    var tsResult = gulp.src('src/Apps/Vicroad/main.ts')
+        .pipe(ts({
+            declaration: true,
+            outFile: "main.js",
+            module: "AMD"
+        }));
+        var css = gulp.src('src/Apps/Vicroad/main.less');
+        return merge([
+        tsResult.js.pipe(gulp.dest('release/Vicroad')),
+        css.pipe(less()).pipe(gulp.dest('release/Vicroad'))
+    ]);
 })

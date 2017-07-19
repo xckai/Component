@@ -15,7 +15,7 @@ export class ReTimePanal extends Side{
         this.rootView.render()
         this.reTimeView=new ReTimeView
         this.reTimeView.appendAt(this.getContentContainer())
-        this.proxyEvents(this.reTimeView,"retime-apply")
+      
         this.reTimeView.on("retime-apply",(d)=>{
             this.send("retime-apply",d)
             this.send("time-change",d)
@@ -43,7 +43,8 @@ class ReTimeView extends View{
     }
     onApply(){
          this.trigger("retime-apply",{dateTime:new Date(this.$(".datetimeinput").val()),duration:this.$(".durationinput").val()})
-    }
+         this.$(".applybtn").addClass("btn-disable")
+        }
    setApplyButtonIsEnable(isable){
         if(isable){
              this.$('.applybtn').removeClass('btn-disable')
@@ -66,7 +67,7 @@ class ReTimeView extends View{
                 <label>Departure Time:</label>
                 <input type="datetime" readonly="readonly" placeholder="Date Time" class='datetimeinput notreadonly'>
                 <label>Simulation Duration:</label>
-                        <input type="number" placeholder="Number of hours" value=2 readonly="readonly" class="durationinput"><span>Hour</span>  
+                        <input type="number" placeholder="Number of hours" value=1 readonly="readonly" class="durationinput"><span>Hour</span>  
                     </section>
                 <section class="applypanal">
                     <button class="btn btn-default  applybtn">Apply</button>
