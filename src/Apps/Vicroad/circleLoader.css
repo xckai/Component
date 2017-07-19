@@ -1,0 +1,52 @@
+.loaderContainer{
+     background: linear-gradient(220deg,#0b7ca8,#103444,#001533);
+     background-position:0% 44%;
+     z-index: 1000;
+     background-size:300%;
+     transition: transform .5s ease-in-out;
+     -webkit-animation:sharkbackground 10s ease 1s infinite ; /* Safari 4.0 - 8.0 */
+     animation: sharkbackground 10s ease 1s infinite ;
+}
+@keyframes sharkbackground{
+    0%{background-position:0% 44%}
+    50%{background-position:100% 57%}
+    100%{background-position:0% 44%}
+}
+
+.loaderContainer svg {
+    transform: translate3d(-50%, -50%, 0);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
+
+.loaderContainer g {
+    fill: none;
+    fill-rule: evenodd;
+}
+
+.loaderContainer circle {
+    stroke-width: 5;
+    stroke: black;
+    stroke-opacity: 0.2;
+}
+
+.loaderContainer path {
+    stroke-width: 5;
+}
+
+.loaderContainer #path1 {
+    stroke: aqua;
+}
+
+.loaderContainer #path2 {
+    stroke: greenyellow;
+}
+
+.loaderContainer text {
+    font-size: 20px;
+    font-family: "Times New Roman";
+    text-anchor: middle;
+    fill: aqua;
+    stroke-width: 0;
+}

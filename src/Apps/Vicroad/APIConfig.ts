@@ -1,5 +1,5 @@
 import _ = require('underscore');
-import * as moment from '../../../vendor/moment/moment';
+import moment=require("moment");
 import { JMultiRequest, JPromise, JRequest, JWhenAll } from '../../Jigsaw/Core/JRequest';
 import { GeoJSON } from '../../Jigsaw/Data/DataDefine';
 import { Util } from '../../Jigsaw/Utils/Util';
@@ -67,7 +67,7 @@ export namespace API{
     }
     export function getReTimeDatas(latlngs:any[],time:Date){
         let p=new JPromise()
-        let url= "services/vicroad/tiers/routingSimulate/extent/15/144.92022514343265%2C-37.83263257682617%2C145.00185012817386%2C-37.79750922077998/4326.w2"
+        let url= "/services/vicroad/tiers/routingSimulate/extent/15/144.92022514343265%2C-37.83263257682617%2C145.00185012817386%2C-37.79750922077998/4326.w2"
         let ls=latlngs.map((l)=>{
               return l.lng+","+l.lat
           })
@@ -86,7 +86,7 @@ export namespace API{
                     }
                 })
                 console.log(r.context["timeFrom"],t)
-                r.doDone({y:t,x:r.context["timeFrom"]})
+                r.doDone({y:t,x:new Date(r.context["timeFrom"])})
             })
          })
         // let r0=new JRequest({
@@ -185,7 +185,7 @@ export namespace API{
           return p
     }
     export function getReTimeRouter(latlngs:any[],time:Date){
-        let url= "services/vicroad/tiers/routingSimulate/extent/15/144.92022514343265%2C-37.83263257682617%2C145.00185012817386%2C-37.79750922077998/4326.w2"
+        let url= "/services/vicroad/tiers/routingSimulate/extent/15/144.92022514343265%2C-37.83263257682617%2C145.00185012817386%2C-37.79750922077998/4326.w2"
         let ls=latlngs.map((l)=>{
               return l.lng+","+l.lat
           })
@@ -200,16 +200,16 @@ export namespace API{
 
         return r0
     }
-    export function getSimulationResult(time:Date){
-        let r= new JRequest
-        r.url="/services/vicroad/tiers/ctmEdgeSpeedMap/4326.w2"
-        r.params={
-            category:1,
-            timeTo:"2017-05-08T16:45:00%2B08:00"
-        }
-        r.send()
-        return r
-    }
+    // export function getSimulationResult(time:Date){
+    //     let r= new JRequest
+    //     r.url="/services/vicroad/tiers/ctmEdgeSpeedMap/4326.w2"
+    //     r.params={
+    //         category:1,
+    //         timeTo:"2017-05-08T16:45:00%2B08:00"
+    //     }
+    //     r.send()
+    //     return r
+    // }
     export function getSimulationResultURL(){
         let r=new JRequest
         r.url="/services/vicroad/tiers/ctmEdgeSpeedMap/extent/:zoom/:extent/canvas.w2"
@@ -259,7 +259,7 @@ export namespace API{
     }
     export function getSimulationRouterChartData(latlngs,time){
      let p=new JPromise()
-        let url= "services/vicroad/tiers/routingSimulate/extent/15/144.92022514343265%2C-37.83263257682617%2C145.00185012817386%2C-37.79750922077998/4326.w2"
+        let url= "/services/vicroad/tiers/routingSimulate/extent/15/144.92022514343265%2C-37.83263257682617%2C145.00185012817386%2C-37.79750922077998/4326.w2"
         let ls=latlngs.map((l)=>{
               return l.lng+","+l.lat
           })

@@ -52,6 +52,7 @@ export class VicroadMap extends G2Map {
         // this.simulateRouterLayerGroup=L.layerGroup([]).addTo(this.map.leaflet)
         // this.on("simulation:done",this.showSimulationResult,this)
         this.initLayers()
+        this.initArea()
         this.linechart = new VicroadLineChart()
         this.routerChart = new VicroadLineChart({ style: { width: "30rem", height: "20rem" } })
         this.initAll()
@@ -73,7 +74,7 @@ export class VicroadMap extends G2Map {
             })
             let layers = L.layerGroup([])
             this.vicroadlayers.addLayer(layers)
-            let mBegin = L.marker([0, 0]), mEnd = L.marker([0, 0]), mPath = L.polyline([], { interactive: false })
+            let mBegin = L.marker([0, 0]), mEnd = L.marker([0, 0],{ icon: L.divIcon({ className: 'routerTo' }) }), mPath = L.polyline([], { interactive: false })
             layers.addLayer(mBegin).addLayer(mEnd).addLayer(mPath)
             let retimeHandler = () => {
                 API.getReTimeRouter(latlngs, this.getContext("currentTime")).done((d) => {
@@ -126,6 +127,7 @@ export class VicroadMap extends G2Map {
                 // this.send("retime-router-drawing", { latlngs: e.latlngs })
                 this.off("time-change", retimeHandler)
                 this.layer("router").hide()
+                this.send("reTime:reRouter")
             })
             this.routerPicker.begin()
         })
@@ -277,6 +279,7 @@ export class VicroadMap extends G2Map {
             this.roadPicker.on("drawing", (e) => {
                 roadMark.setOpacity(1)
                 roadMark.setLatLng(e.latlng)
+                this.send("reRouter:rePickRoad")
             })
             this.roadPicker.on("fail", (e) => {
                 roadMark.setOpacity(.5)
@@ -365,9 +368,10 @@ export class VicroadMap extends G2Map {
                 mPath.setLatLngs(e.latlngs)
             })
             this.routerPicker.on("drawbegin", (e) => {
-                this.send("retime-router-drawing", { latlngs: e.latlngs })
+                this.send("reRouter:reRoute")
                 this.layer("router").hide()
-                
+
+
                 this.off("time-change", () => {
                     API.getReTimeRouter(e.latlngs, this.getContext("currentTime")).done((d) => {
                         this.layer("router").setData(d)
@@ -566,7 +570,7 @@ export class VicroadMap extends G2Map {
         this.vicroadlayers.clearLayers()
         this.layer("router").hide()
         this.addHooks()
-        this.showArea()
+       // this.showArea()
     }
     initLayers() {
         let l = this.layer("simulationResult", {
@@ -610,7 +614,7 @@ export class VicroadMap extends G2Map {
             }
         })
         this.layer("router", { renderer: "canvasOnMap" }).style("*").line({
-            width: 3, color: "red", marker: {
+            width: 3, color: "#2b82cb", marker: {
                 end: {
                     path: "M2,2 L2,11 L10,6 L2,2",
                     viewBox: [13, 13],
@@ -650,16 +654,7 @@ export class VicroadMap extends G2Map {
     }
     showArea() {
         if (!this.pickableArea) {
-            API.getMainArea().done((d) => {
-                if (d) {
-                    this.pickableArea = L.polygon(d.latlngs)
-                    this.pickableArea.addTo(this.map.leaflet)
-                    this.map.leaflet.fitBounds(this.pickableArea.getBounds())
-                    this.initArea()
-                }
-            }).fail(() => {
-                alert("error ")
-            })
+            
 
 
 
@@ -679,9 +674,19 @@ export class VicroadMap extends G2Map {
         }
     }
     initArea() {
-        if (this.pickableArea) {
-            this.roadPicker.setInteractiveLayer(this.pickableArea)
-            this.routerPicker.setInteractiveLayer(this.pickableArea)
+
+        if (!this.pickableArea) {
+            API.getMainArea().done((d) => {
+                if (d) {
+                    this.pickableArea = L.polygon(d.latlngs)
+                    this.pickableArea.addTo(this.map.leaflet)
+                    this.map.leaflet.fitBounds(this.pickableArea.getBounds())
+                    this.roadPicker.setInteractiveLayer(this.pickableArea)
+                    this.routerPicker.setInteractiveLayer(this.pickableArea)
+                }
+            }).fail(() => {
+                alert("error ")
+            })
             // this.doRoadPick()
         }
     }

@@ -36,6 +36,7 @@ export class MainApp extends App {
         this.timeSlider.setStyle({
             top:null,
             bottom:"1rem",
+            height:"5.2rem",
             left:"calc(50% - 15rem)"
         })
         this.timeSlider.addTo(this)
@@ -70,6 +71,9 @@ export class MainApp extends App {
         this.reTimePanal.addTo(this)
         this.reTimePanal.show()
         this.mapComponent.doReTime()
+        this.on("reTime:reRouter",()=>{
+            this.timeSlider.reset()
+        })
         //this.send("begin-retime")
     }
     reRouter(){
@@ -79,6 +83,9 @@ export class MainApp extends App {
         this.simulatorPanal.addTo(this)
         this.simulatorPanal.show()
         this.mapComponent.doReRouter()
+        this.on("reRouter:rePickRoad reRouter:reRoute",()=>{
+            this.timeSlider.reset()
+        })
        
     }
     resetAll(){

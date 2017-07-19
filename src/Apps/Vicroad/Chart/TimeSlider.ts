@@ -1,6 +1,6 @@
 /// <reference path="./Vendor/VicroadChart.d.ts" />
 import { DragAblePanal } from '../../../Jigsaw/Component/Panal/DragAblePanal';
-import * as moment from '../../../../vendor/moment/moment';
+import moment=require("moment");
 import { TimeAdjust } from 'CustomizedChart/Vicroad/VicroadChart';
 export class TimeSlider extends DragAblePanal{
     constructor(conf?){
@@ -15,11 +15,10 @@ export class TimeSlider extends DragAblePanal{
         this.on("simulation:begin-calculation",(d)=>{
             this.show()
             this.setTime(moment(d.dateTime).add(15,"m").toDate(),d.duration)
-            this.send("time-change",{dateTime:d.dateTime})
+            
         })
         this.on("retime-apply",(d)=>{
             this.setTime(d.dateTime,d.duration)
-            this.send("time-change",{dateTime:d.dateTime})
         })
         this.on("retime-router-done",()=>{
             this.show()
@@ -32,6 +31,8 @@ export class TimeSlider extends DragAblePanal{
         })
       
     }
+    beginTime:Date
+    duration:number
     timeAdjuster:TimeAdjust
     show(){
         this.rootView.style({
@@ -43,7 +44,13 @@ export class TimeSlider extends DragAblePanal{
             display:"none"
         })
     }
+    reset(){
+        this.setTime(this.beginTime,this.duration)
+        return this
+    }
     setTime(from:Date,duration:number){
+        this.beginTime=from
+        this.duration=duration
         let fromTime=moment(from).format("YYYY-MM-DD HH:mm")
         let toTime=moment(from).add(duration,"h").format("YYYY-MM-DD HH:mm")
         this.timeAdjuster.setData({
@@ -52,5 +59,6 @@ export class TimeSlider extends DragAblePanal{
               rangeMax: toTime,
               focusTime:fromTime,
         })
+        this.send("time-change",{dateTime:from})
     }
 }

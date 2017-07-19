@@ -144,11 +144,17 @@ gulp.task("vicroadinit",()=>{
             .pipe(gulp.dest("./dist/"))
 })
 gulp.task("bundle",()=>{
-    var tsResult = gulp.src('src/Apps/Vicroad/main.ts')
+    var tsResult = gulp.src('src/Apps/Vicroad/App.ts')
         .pipe(ts({
             declaration: true,
             outFile: "main.js",
-            module: "AMD"
+            module: "AMD",
+            "baseUrl": "./",
+                "paths": {
+                    "moment": [
+                        "vendor/moment/moment"
+                    ]
+                }
         }));
         var css = gulp.src('src/Apps/Vicroad/main.less');
         return merge([

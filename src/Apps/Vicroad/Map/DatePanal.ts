@@ -1,5 +1,5 @@
 import { View } from '../../../Jigsaw/Core/View';
-import * as moment from '../../../../vendor/moment/moment'
+import moment=require("moment");
 import _ = require('underscore');
 import { Util } from "../../../Jigsaw/Utils/Util";
 export class DatePanal extends View {

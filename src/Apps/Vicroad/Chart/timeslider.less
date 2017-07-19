@@ -1,12 +1,17 @@
 @import "../../../Jigsaw/Component/Panal/dragpanal.less";
+@maincolor:darken(@darkcolor,5%);
 .timeSlider{
-   background: darken(@lightcolor,10%);
+   background: @maincolor;
    aside{
-        background: @darkcolor;
+        background:@maincolor;
    }
    .content{
-          border-top:#103444  .5rem solid;
-         background:  darken(@lightcolor,10%);
+          border-top:darken(@darkcolor,5%) .5rem solid;
+         background: linear-gradient(220deg,lighten(@darkcolor,10%),lighten(@darkcolor,0%),lighten(@darkcolor,5%));
+         border-bottom: @maincolor .2rem solid;
+         animation: sharkbackground 10s ease 1s infinite ;
+        background-position:0% 44%;
+        background-size:300%;
       }
    .focusText {
         font-size: 1.2rem;
@@ -16,6 +21,17 @@
        fill:contrast(@darkcolor)
    }
    .axisBackground{
-       fill:  @darkcolor;
+       fill:  @maincolor
+   }
+   .timeAdjuster{
+       .focusLine{
+        stroke:contrast(@darkcolor);
+       }
+       .focusRect{
+           fill: @maincolor;
+       }
+       .focusRectLine{
+            stroke: contrast(@darkcolor);
+        }
    } 
 }

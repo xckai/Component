@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+
+<head>
+        <meta charset="utf-8">
+        <title>Chart Test</title>
+        <link rel="stylesheet" href="./circleLoader.css">
+</head>
+<!--<script  src="../lib/bootstrap/dist/js/bootstrap.js"></script>-->
+
+<body>
+        <div id="app"></div>
+</body>
+<script src="./circleLoader.js"></script>
+<link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css">
+<!--<link rel="stylesheet" href="../lib/bootstrap/dist/css/bootstrap.css"></link>-->
+<link href="./vendor/air-datepicker/dist/css/datepicker.min.css" rel="stylesheet" type="text/css">
+<script src="https://cdn.jsdelivr.net/sockjs/1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vertx/3.4.2/vertx-eventbus.js"></script>
+<script src="./vendor/requirejs/require.js"></script>
+<script src="./main.js"></script>
+<link rel="stylesheet" href="./vendor/leaflet/dist/leaflet.css"></link>
+<link rel="stylesheet" href="./main.css">
+<script>
+        window.onload = function () {
+                requirejs.config({
+                        //By default load any module IDs from js/lib
+                        baseUrl: './',
+                        paths: {
+                                leaflet: "./vendor/leaflet/dist/leaflet-src",
+                                underscore: "./vendor/underscore/underscore",
+                                jquery: "./vendor/jquery/dist/jquery",
+                                bootstrap: "./vendor/bootstrap/dist/js/bootstrap",
+                                d3: "./vendor/d3/d3",
+                                text: "./vendor/text/text",
+                                Backbone: "./vendor/backbone/backbone",
+                                timepicker: "./vendor/air-datepicker/dist/js/i18n/datepicker.en",
+                                timepicker_main: "./vendor/air-datepicker/dist/js/datepicker",
+                                "CustomizedChart/Vicroad/VicroadChart": './vendor/VicroadChart',
+                                "moment": "./vendor/moment/moment"
+                        },
+                        shim: {
+                                leaflet: {
+                                        exports: "L"
+                                },
+                                "underscore": {
+                                        exports: "_"
+                                },
+                                bootstrap: {
+                                        deps: ["jquery"]
+                                },
+                                timepicker: {
+                                        deps: ["jquery", "timepicker_main"]
+                                },
+                                timepicker_main: {
+                                        deps: ["jquery"]
+                                }
+                        }
+                });
+
+                requirejs(["Apps/Vicroad/App"], function (App_1) {
+                        var a = new App_1.MainApp({
+                                el: "#app"
+                        });
+                        a.start();
+                        if (window.initLoader) {
+                                window.initLoader.removeLoader()
+                        }
+                })
+        }
+</script>
+
+</html>

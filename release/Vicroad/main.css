@@ -1,0 +1,585 @@
+* {
+  box-sizing: content-box;
+}
+.app {
+  overflow: hidden;
+  z-index: 1;
+}
+.btn {
+  display: inline-block;
+  padding: .1rem .3rem;
+  margin-bottom: 0;
+  font-weight: 400;
+  line-height: 1.5rem;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+.btn-default {
+  background: #3b5c78;
+  color: #ffffff;
+  border-color: gray;
+}
+.btn-default:hover {
+  background: #3f92db;
+}
+.btn-disable {
+  opacity: .6;
+  pointer-events: none;
+  background: rgba(90, 90, 90, 0.8);
+}
+.btn-active {
+  background: #3f92db;
+}
+.busyContainer {
+  background: rgba(255, 255, 255, 0.7);
+}
+.busyContainer .ball {
+  background: #3f92db;
+}
+.porgressLoaderContainer {
+  background: rgba(0, 0, 0, 0.9);
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  transition: transform 1s linear;
+}
+.porgressLoaderContainer svg {
+  transform: translate3d(-50%, -50%, 0);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+.porgressLoaderContainer svg g {
+  fill: none;
+  fill-rule: evenodd;
+}
+.porgressLoaderContainer svg g circle {
+  stroke-width: 5;
+  stroke: black;
+  stroke-opacity: 0.2;
+}
+.porgressLoaderContainer svg g path {
+  stroke-width: 5;
+}
+.porgressLoaderContainer svg g .path1 {
+  stroke: aqua;
+}
+.porgressLoaderContainer svg g .path2 {
+  stroke: greenyellow;
+}
+.porgressLoaderContainer svg g text {
+  font-family: "Times New Roman";
+  text-anchor: middle;
+  fill: aqua;
+  stroke-width: 0;
+}
+.porgressLoaderContainer svg g .loaderRatio {
+  alignment-baseline: middle;
+  font-size: 40px;
+}
+.porgressLoaderContainer svg g .loaderText {
+  font-size: 20px;
+}
+.navbar {
+  justify-content: center;
+  background: #3b5c78;
+}
+.navbar .title {
+  color: #ffffff;
+  font-size: 1.5rem;
+  align-items: center;
+  margin: .5rem;
+  display: flex;
+  font-family: 'Times New Roman', Times, serif;
+  text-shadow: 0 1px 0 #cccccc, 0 2px 2px rgba(255, 255, 255, 0.5);
+}
+.vicroadnavbar {
+  display: flex;
+  background: #3b5c78;
+}
+.vicroadnavbar .nav-dropdown .btn {
+  height: 3rem;
+  padding: 0rem .2rem;
+  font-size: 1.2rem;
+  border-top: 0px;
+  border-bottom: 0px;
+  border-radius: 0px;
+}
+.droplist .dropdown {
+  background: #001533;
+  position: absolute;
+}
+.droplist button span {
+  padding: 0 .3rem;
+}
+.droplist .dropdown-menu {
+  min-width: 6rem;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  display: none;
+  float: left;
+  padding: 0 0;
+  margin: -0.1rem 0;
+  font-size: 1rem;
+  text-align: left;
+  list-style: none;
+  background: #001533;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+}
+.droplist .dropdown-menu li {
+  padding: .4rem;
+}
+.droplist .dropdown-menu li a {
+  display: block;
+  padding: .4rem 0rem;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  color: #fff;
+  text-decoration: none;
+}
+.droplist .dropdown-menu li:hover {
+  background: #0b7ca8;
+}
+.droplist .dropdown-show {
+  display: block;
+  margin-bottom: 5px;
+  clear: left;
+}
+.side {
+  background: radial-gradient(50% 50%, #103444, #001533 400%);
+  padding: .2rem;
+  transition: transform 0.3s ease-in-out;
+}
+.side header {
+  height: 2rem;
+  width: 100%;
+  text-align: center;
+  margin: 0.2rem auto;
+  color: #ffffff;
+}
+.side .toggle {
+  background: #436989;
+  color: #ffffff;
+  font-size: 1.5rem;
+  padding: 0rem .1rem 0rem .1rem;
+  line-height: 10rem;
+  top: calc(40%);
+}
+.side .toggle.left {
+  border-top-right-radius: .8rem;
+  border-bottom-right-radius: .8rem;
+  position: absolute;
+  left: 100%;
+}
+.side .toggle.left span {
+  position: relative;
+  left: -0.1rem;
+}
+.side .toggle.right {
+  background: #436989;
+  position: absolute;
+  right: 100%;
+  top: calc(40%);
+  border-top-left-radius: .8rem;
+  border-bottom-left-radius: .8rem;
+}
+.side .toggle.right span {
+  position: relative;
+  left: .1rem;
+}
+.side .toggle:hover,
+.side .toggle:focus {
+  background: #3f92db;
+  opacity: 1;
+}
+.toggle-hidden .toggle {
+  opacity: .3;
+}
+.side {
+  background: #426686;
+  color: #ffffff;
+}
+.side .toggle {
+  top: 0 ;
+  display: flex;
+  line-height: initial;
+  align-items: center;
+  height: 100%;
+  font-size: 1rem;
+  background: #426686;
+  color: #ffffff;
+}
+.side section {
+  display: flex;
+  flex-wrap: wrap;
+  width: 12rem;
+  padding: .2rem .5rem;
+}
+.side label {
+  width: 12rem;
+  font-size: .8rem;
+  margin: .3rem 0rem;
+}
+.side input {
+  height: 1.1rem;
+  padding: .1rem;
+  font-size: .8rem;
+  border: transparent 2px solid;
+}
+.side input:focus {
+  border: #3f92db 2px solid;
+}
+.side input + span {
+  font-size: .8rem;
+  padding: .1rem;
+}
+.side input:read-only {
+  opacity: 0.7;
+}
+.side .notreadonly:read-only {
+  opacity: 1;
+}
+.side .durationinput {
+  width: 8rem;
+}
+.side .datetimeinput {
+  width: 12rem;
+}
+.side .adjuster-btn::before {
+  width: 1.2rem;
+  display: block;
+  font-size: 1.3rem;
+}
+.side .operation + .operation {
+  margin: 0rem 0.5rem;
+}
+.side .router-btn:before {
+  font-size: 1rem;
+  width: 1.2rem;
+  display: block;
+}
+.side .applypanal {
+  display: flex;
+  justify-content: center;
+}
+.side .applypanal button {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+.adjusterIcon::before {
+  border: red solid 1px;
+  border-radius: 50%;
+  color: red;
+  height: 1.2rem;
+  width: 1.2rem;
+  padding: .2rem;
+  display: block;
+  font-size: 1.3rem;
+  text-align: center;
+  position: relative;
+  left: -0.5rem;
+  top: -0.4rem;
+}
+.adjuster table {
+  border-collapse: collapse;
+}
+.adjuster table th {
+  font-size: .8rem;
+  font-weight: bold;
+  border-bottom: grey 1px solid;
+}
+.adjuster table td {
+  padding: .3rem;
+  font-size: .7rem;
+}
+.adjuster table td button {
+  background: transparent;
+  font-size: .9rem;
+  line-height: 1rem;
+  width: 1rem;
+}
+.adjuster table td button:hover {
+  opacity: 1;
+}
+.adjuster table td button:hover .fa {
+  color: #fff;
+}
+.adjuster table td span.fa::before {
+  text-align: center;
+}
+.adjuster table .name {
+  min-width: 5rem;
+}
+.adjuster table .open .fa {
+  color: red;
+}
+.adjuster table .open .fa:before {
+  content: "\f00d";
+}
+.adjuster table .open .name {
+  opacity: .6;
+  text-decoration: line-through;
+}
+.adjuster table .close .fa {
+  color: green;
+}
+.adjuster table .close .fa:before {
+  content: "\f00c";
+}
+.adjuster table .operation {
+  text-align: center;
+  opacity: 1 ;
+}
+.adjuster header {
+  font-size: 1rem;
+  text-align: center;
+}
+.datapanal {
+  font-size: 1rem;
+  display: flex;
+  justify-content: center;
+  color: #333333;
+  pointer-events: none;
+}
+.datapanal section {
+  padding: .2rem 1rem .5rem;
+  background: rgba(255, 255, 255, 0.7);
+  border-bottom-left-radius: .6rem;
+  border-bottom-right-radius: 0.6rem;
+}
+.datapanal .time {
+  display: flex;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+.datapanal .time .spliter {
+  margin-left: .3rem;
+  margin-right: .3rem;
+  line-height: 1.7rem;
+}
+@keyframes timeshark {
+  from {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+.leaflet-popup-content {
+  width: initial !important;
+}
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: #fff;
+  color: #333333;
+}
+.timeAdjuster .panel {
+  fill: transparent;
+}
+.timeAdjuster .focusText {
+  font-size: 15px;
+  alignment-baseline: middle;
+}
+.timeAdjuster .rightSide {
+  text-anchor: start;
+}
+.timeAdjuster .leftSide {
+  text-anchor: end;
+}
+.timeAdjuster .focusLine {
+  stroke: yellowgreen;
+  stroke-width: 2;
+}
+.timeAdjuster .focusRect {
+  fill: #e6e6e6;
+}
+.timeAdjuster .focusRectLine {
+  stroke: #555;
+  stroke-width: 1;
+}
+.timeAdjuster .axisBackground {
+  fill: red;
+}
+/* axisLayer */
+.grid-line path {
+  stroke-width: 0;
+}
+.grid-line line {
+  fill: none;
+  stroke: #d6d6d6;
+  shape-rendering: crispEdges;
+}
+/* TooltipLayer */
+.tooltipContainer {
+  pointer-events: none;
+}
+.tooltipContainer .tooltipBox {
+  z-index: 10;
+  pointer-events: none;
+  display: none;
+}
+.tooltipContainer .tooltip {
+  border-collapse: collapse;
+  border-spacing: 0;
+  background-color: #fff;
+  opacity: 0.8;
+  empty-cells: show;
+  box-shadow: 7px 7px 12px -9px;
+  border: 1px solid #ddd;
+}
+.tooltipContainer .tooltip tr {
+  border: 1px solid #ccc;
+}
+.tooltipContainer .tooltip th {
+  background-color: #aaa;
+  font-size: 14px;
+  padding: 2px 5px;
+  text-align: left;
+  color: #fff;
+}
+.tooltipContainer .tooltip td {
+  font-size: 13px;
+  padding: 3px 6px;
+  background-color: #fff;
+  border-left: 1px dotted #999;
+}
+.tooltipContainer .tooltip td > span {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+}
+/* LegendLayer */
+.legendGroup {
+  margin: 5px 20px 5px 20px;
+  display: -webkit-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.legendUnit {
+  opacity: 1;
+  display: inline-block;
+}
+.legendUnit span {
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+  margin-right: 5px;
+  vertical-align: middle;
+  line-height: 15px;
+}
+.lineChart .lineSeries {
+  stroke-width: 2px;
+  fill: none;
+}
+.lineChart .lineArea {
+  stroke-width: 0px;
+  opacity: 0.3;
+}
+.lineChart .focusLine {
+  stroke: yellowgreen;
+  stroke-width: 1.5px;
+}
+.lineChart .overlay {
+  fill: none;
+  pointer-events: all;
+}
+.lineChart .adjustLine {
+  stroke: red;
+  stroke-width: 1.5px;
+}
+.dragablepanal aside {
+  background: rgba(59, 92, 120, 0.9);
+  cursor: move;
+  width: 1rem;
+}
+.dragablepanal .left {
+  position: absolute;
+  right: 100%;
+  height: 100%;
+  border-top-left-radius: .7rem;
+  border-bottom-left-radius: .7rem;
+}
+.dragablepanal .right {
+  position: absolute;
+  left: 100%;
+  height: 100%;
+  border-top-right-radius: .7rem;
+  border-bottom-right-radius: .7rem;
+}
+.dragablepanal .content {
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  top: 0px;
+}
+.timeSlider {
+  background: #2479c3;
+}
+.timeSlider aside {
+  background: #3b5c78;
+}
+.timeSlider .content {
+  border-top: #103444  .5rem solid;
+  background: #2479c3;
+}
+.timeSlider .focusText {
+  font-size: 1.2rem;
+  fill: #ffffff;
+}
+.timeSlider .axis text {
+  fill: #ffffff;
+}
+.timeSlider .axisBackground {
+  fill: #3b5c78;
+}
+.progressContainer {
+  background: rgba(59, 92, 120, 0.7);
+}
+.progressContainer .linecolor {
+  stroke: green;
+}
+.progressContainer .texts {
+  fill: #Fff;
+}
+.vicroadnavbar {
+  z-index: 11;
+}
+.side {
+  z-index: 10;
+}
+.map {
+  z-index: 9;
+}
+.timeSlider {
+  z-index: 12;
+}
+.porgressLoaderContainer {
+  z-index: 13;
+}
