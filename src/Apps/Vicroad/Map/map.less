@@ -1,11 +1,11 @@
-.routerTo{
+.routerFrom{
    margin:0 !important
 }
-.routerTo::before{
-    background-color: #af1919;
-     -webkit-mask:url('to.svg');
+.routerFrom::before{
+    background-color: #2c84cb;
+     -webkit-mask:url('router.svg');
      -webkit-mask-size: 2.4rem 2.5rem;
-    mask-image:url('to.svg');;
+    mask-image:url('router.svg');;
     width:2.4rem;
     height:2.4rem;
     display: block;
@@ -14,20 +14,38 @@
     top: -2.4rem;
     content: " "
 }
-.adjusterIcon::before{
-    border: red solid 1px;
-    border-radius: 50%;
-    color:red;
-    height: 1.2rem;
+.routerTo{
+   margin:0 !important
+}
+.routerTo::before{
+    background-color: #af1919;
+     -webkit-mask:url('router.svg');
+     -webkit-mask-size: 2.4rem 2.5rem;
+    mask-image:url('router.svg');;
+    width:2.4rem;
+    height:2.4rem;
     display: block;
-    width: 1.2rem;
-    padding: .2rem;
-    display: block;
-    font-size: 1.3rem;
-    text-align: center;
     position: relative;
-    left: -.5rem;
-    top:-.4rem;
+    left: -1.2rem;
+    top: -2.4rem;
+    content: " ";
+}
+.adjusterIcon{
+    margin:0 !important
+}
+.adjusterIcon::before{
+      background-color: #af1919;
+     -webkit-mask:url('adjuster.svg');
+     -webkit-mask-size: 1.7rem;
+    mask-image:url('adjuster.svg');
+    width:1.7rem;
+    height:1.7rem;
+    display: block;
+    position: relative;
+    left: -.85rem;
+    top: -.85rem;
+    content: " ";
+ 
 }
 .adjuster {
     table {

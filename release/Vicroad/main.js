@@ -1201,11 +1201,9 @@ define("Apps/Vicroad/Chart/TimeSlider", ["require", "exports", "Jigsaw/Component
             _this.on("simulation:begin-calculation", function (d) {
                 _this.show();
                 _this.setTime(moment(d.dateTime).add(15, "m").toDate(), d.duration);
-                _this.send("time-change", { dateTime: d.dateTime });
             });
             _this.on("retime-apply", function (d) {
                 _this.setTime(d.dateTime, d.duration);
-                _this.send("time-change", { dateTime: d.dateTime });
             });
             _this.on("retime-router-done", function () {
                 _this.show();
@@ -1228,7 +1226,13 @@ define("Apps/Vicroad/Chart/TimeSlider", ["require", "exports", "Jigsaw/Component
                 display: "none"
             });
         };
+        TimeSlider.prototype.reset = function () {
+            this.setTime(this.beginTime, this.duration);
+            return this;
+        };
         TimeSlider.prototype.setTime = function (from, duration) {
+            this.beginTime = from;
+            this.duration = duration;
             var fromTime = moment(from).format("YYYY-MM-DD HH:mm");
             var toTime = moment(from).add(duration, "h").format("YYYY-MM-DD HH:mm");
             this.timeAdjuster.setData({
@@ -1237,6 +1241,7 @@ define("Apps/Vicroad/Chart/TimeSlider", ["require", "exports", "Jigsaw/Component
                 rangeMax: toTime,
                 focusTime: fromTime
             });
+            this.send("time-change", { dateTime: from });
         };
         return TimeSlider;
     }(DragAblePanal_1.DragAblePanal));
@@ -3096,7 +3101,7 @@ define("Apps/Vicroad/APIConfig", ["require", "exports", "underscore", "moment", 
                         }
                     });
                     console.log(r.context["timeFrom"], t);
-                    r.doDone({ y: t, x: r.context["timeFrom"] });
+                    r.doDone({ y: t, x: new Date(r.context["timeFrom"]) });
                 });
             });
             // let r0=new JRequest({
@@ -3202,17 +3207,16 @@ define("Apps/Vicroad/APIConfig", ["require", "exports", "underscore", "moment", 
             return r0;
         }
         API.getReTimeRouter = getReTimeRouter;
-        function getSimulationResult(time) {
-            var r = new JRequest_1.JRequest;
-            r.url = "/services/vicroad/tiers/ctmEdgeSpeedMap/4326.w2";
-            r.params = {
-                category: 1,
-                timeTo: "2017-05-08T16:45:00%2B08:00"
-            };
-            r.send();
-            return r;
-        }
-        API.getSimulationResult = getSimulationResult;
+        // export function getSimulationResult(time:Date){
+        //     let r= new JRequest
+        //     r.url="/services/vicroad/tiers/ctmEdgeSpeedMap/4326.w2"
+        //     r.params={
+        //         category:1,
+        //         timeTo:"2017-05-08T16:45:00%2B08:00"
+        //     }
+        //     r.send()
+        //     return r
+        // }
         function getSimulationResultURL() {
             var r = new JRequest_1.JRequest;
             r.url = "/services/vicroad/tiers/ctmEdgeSpeedMap/extent/:zoom/:extent/canvas.w2";
@@ -3273,7 +3277,7 @@ define("Apps/Vicroad/APIConfig", ["require", "exports", "underscore", "moment", 
                 r.params = {
                     l: ls, timeFrom: "", catagory: 0
                 };
-                r.setContext({ timeFrom: moment(time).add(15 * (i + 1), 'm').format("YYYY-MM-DDTHH:mm:00Z") });
+                r.setContext({ timeFrom: moment(time).add(15 * i, 'm').format("YYYY-MM-DDTHH:mm:00Z") });
                 r.changeDoneHandler(function (d) {
                     var featureCollection = JSON.parse(d);
                     var t = 0;
@@ -3291,7 +3295,7 @@ define("Apps/Vicroad/APIConfig", ["require", "exports", "underscore", "moment", 
                 r.params = {
                     l: ls, timeFrom: "", catagory: 1
                 };
-                r.setContext({ timeFrom: moment(time).add(15 * (i + 1), 'm').format("YYYY-MM-DDTHH:mm:00Z") });
+                r.setContext({ timeFrom: moment(time).add(15 * i, 'm').format("YYYY-MM-DDTHH:mm:00Z") });
                 r.changeDoneHandler(function (d) {
                     var featureCollection = JSON.parse(d);
                     var t = 0;
@@ -3590,8 +3594,6 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
             // this.on("simulation:done",this.showSimulationResult,this)
             this.initLayers();
             this.initArea();
-            this.linechart = new LineChart_1.VicroadLineChart();
-            this.routerChart = new LineChart_1.VicroadLineChart({ style: { width: "30rem", height: "20rem" } });
             this.initAll();
         };
         VicroadMap.prototype.addHooks = function () {
@@ -3607,13 +3609,16 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
                 _this.roadPicker.off("*");
                 var latlngs;
                 var chart = new LineChart_1.VicroadLineChart({
+                    chartTitle: {
+                        value: "Travel Time Chart"
+                    },
                     style: { width: "30rem", height: "20rem" }, line: {
                         defaultTimeAdjust: _this.getContext("currentTime")
                     }
                 });
                 var layers = L.layerGroup([]);
                 _this.vicroadlayers.addLayer(layers);
-                var mBegin = L.marker([0, 0]), mEnd = L.marker([0, 0]), mPath = L.polyline([], { interactive: false });
+                var mBegin = L.marker([0, 0], { icon: L.divIcon({ className: 'routerFrom' }) }), mEnd = L.marker([0, 0], { icon: L.divIcon({ className: 'routerTo' }) }), mPath = L.polyline([], { interactive: false });
                 layers.addLayer(mBegin).addLayer(mEnd).addLayer(mPath);
                 var retimeHandler = function () {
                     APIConfig_2.API.getReTimeRouter(latlngs, _this.getContext("currentTime")).done(function (d) {
@@ -3663,6 +3668,7 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
                     // this.send("retime-router-drawing", { latlngs: e.latlngs })
                     _this.off("time-change", retimeHandler);
                     _this.layer("router").hide();
+                    _this.send("reTime:reRouter");
                 });
                 _this.routerPicker.begin();
             });
@@ -3734,49 +3740,55 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
             };
             var doAdjuster = function () {
                 clearMap();
-                _this.roadPicker.off("*");
-                ////begin adjute road
-                var adjuster = new Adjuster_1.Adjuster();
-                _this.proxyEvents(adjuster, "simulate-road-change");
-                var roadMark = L.marker([0, 0], { icon: L.divIcon({ className: 'adjusterIcon fa fa-times' }) });
-                roadMark.bindPopup(adjuster.getNode());
-                adjusterLayers.addLayer(roadMark);
-                var road = L.polyline([], { color: "red" });
-                adjusterLayers.addLayer(road);
-                _this.roadPicker.on("drawing", function (e) {
-                    roadMark.setOpacity(1);
-                    roadMark.setLatLng(e.latlng);
-                    adjuster.setData({ id: null, name: null, roads: [] });
-                    adjuster.setBusy(true);
-                    roadMark.openPopup();
-                });
-                _this.roadPicker.on("fail", function (e) {
-                    roadMark.setOpacity(.5);
-                    adjuster.setData({ id: null, name: null, roads: [] });
-                    road.setLatLngs([]);
-                    roadMark.closePopup();
-                });
-                _this.roadPicker.on("drawend", function (e) {
-                    if (e.point) {
-                        roadMark.setLatLng(e.point);
-                        adjuster.setBusy(false);
-                    }
-                    if (e.path) {
-                        road.setLatLngs(e.path);
-                    }
-                    if (e.roadNum != undefined) {
-                        var roads = [];
-                        for (var i = 0; i < e.roadNum; ++i) {
-                            roads.push({ name: "Lane-" + (i + 1), isOpen: true });
-                        }
-                        adjuster.setData({ roads: roads, name: e.name, id: e.id });
-                        roadMark.bindPopup(adjuster.getNode());
-                    }
-                    roadMark.setOpacity(1);
-                });
-                _this.roadPicker.begin();
-                _this.on("simulate-road-change", function () {
+                var oneAdjuster = function () {
                     _this.roadPicker.off("*");
+                    ////begin adjute road
+                    var adjuster = new Adjuster_1.Adjuster();
+                    _this.proxyEvents(adjuster, "simulate-road-change");
+                    var road = L.polyline([], { color: "#af1919" });
+                    adjusterLayers.addLayer(road);
+                    var roadMark = L.marker([0, 0], { icon: L.divIcon({ className: 'adjusterIcon fa fa-times' }) });
+                    roadMark.bindPopup(adjuster.getNode());
+                    adjusterLayers.addLayer(roadMark);
+                    _this.roadPicker.on("drawing", function (e) {
+                        roadMark.setOpacity(1);
+                        roadMark.setLatLng(e.latlng);
+                        adjuster.setData({ id: null, name: null, roads: [] });
+                        adjuster.setBusy(true);
+                        roadMark.openPopup();
+                    });
+                    _this.roadPicker.on("fail", function (e) {
+                        roadMark.setOpacity(.5);
+                        adjuster.setData({ id: null, name: null, roads: [] });
+                        road.setLatLngs([]);
+                        roadMark.closePopup();
+                    });
+                    _this.roadPicker.on("drawend", function (e) {
+                        if (e.point) {
+                            roadMark.setLatLng(e.point);
+                            adjuster.setBusy(false);
+                        }
+                        if (e.path) {
+                            road.setLatLngs(e.path);
+                        }
+                        if (e.roadNum != undefined) {
+                            var roads = [];
+                            for (var i = 0; i < e.roadNum; ++i) {
+                                roads.push({ name: "Lane-" + (i + 1), isOpen: true });
+                            }
+                            adjuster.setData({ roads: roads, name: e.name, id: e.id });
+                            roadMark.bindPopup(adjuster.getNode());
+                        }
+                        roadMark.setOpacity(1);
+                    });
+                    _this.roadPicker.begin();
+                    _this.on("simulate-road-change", function () {
+                        _this.roadPicker.off("*");
+                    });
+                };
+                oneAdjuster();
+                _this.on("simulate-road-change", function () {
+                    oneAdjuster();
                 });
             };
             ////init roadpicker
@@ -3796,7 +3808,14 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
                 clearMap();
                 _this.roadPicker.off("*");
                 _this.routerPicker.off("*");
-                var roadChart = new LineChart_1.VicroadLineChart({ style: { width: "30rem", height: "20rem" } });
+                var roadChart = new LineChart_1.VicroadLineChart({
+                    axis: {
+                        yAxisTitleType: "speed"
+                    },
+                    chartTitle: {
+                        value: "Road Speed Chart"
+                    }, style: { width: "30rem", height: "20rem" }
+                });
                 var roadMark = L.marker([0, 0]);
                 roadPickLayers.addLayer(roadMark);
                 var road = L.polyline([]);
@@ -3804,6 +3823,7 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
                 _this.roadPicker.on("drawing", function (e) {
                     roadMark.setOpacity(1);
                     roadMark.setLatLng(e.latlng);
+                    _this.send("reRouter:rePickRoad");
                 });
                 _this.roadPicker.on("fail", function (e) {
                     roadMark.setOpacity(.5);
@@ -3835,7 +3855,7 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
                 _this.roadPicker.off("*");
                 _this.routerPicker.off("*");
                 clearMap();
-                var mBegin = L.marker([0, 0]), mEnd = L.marker([0, 0]), mPath = L.polyline([], { interactive: false });
+                var mBegin = L.marker([0, 0], { icon: L.divIcon({ className: 'routerFrom' }) }), mEnd = L.marker([0, 0], { icon: L.divIcon({ className: 'routerTo' }) }), mPath = L.polyline([], { interactive: false });
                 routerLayers.addLayer(mBegin).addLayer(mEnd).addLayer(mPath);
                 _this.routerPicker.on("from", function (e) {
                     mBegin.setLatLng(e.latlngs[0]);
@@ -3868,7 +3888,9 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
                         });
                     });
                     APIConfig_2.API.getSimulationRouterChartData(e.latlngs, _this.getContext("currentTime")).done(function (d) {
-                        var linechart = new LineChart_1.VicroadLineChart({ style: { width: "30rem", height: "20rem" } });
+                        var linechart = new LineChart_1.VicroadLineChart({ chartTitle: {
+                                value: "Travel Time Chart"
+                            }, style: { width: "30rem", height: "20rem" } });
                         linechart.loadMeasures(d);
                         _this.on("time-change", function () {
                             setTimeout(function () {
@@ -3886,7 +3908,7 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
                     mPath.setLatLngs(e.latlngs);
                 });
                 _this.routerPicker.on("drawbegin", function (e) {
-                    _this.send("retime-router-drawing", { latlngs: e.latlngs });
+                    _this.send("reRouter:reRoute");
                     _this.layer("router").hide();
                     _this.off("time-change", function () {
                         APIConfig_2.API.getReTimeRouter(e.latlngs, _this.getContext("currentTime")).done(function (d) {
@@ -3909,9 +3931,6 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
             };
             this.on("simulation:calculation-done", simulationDone, this);
             this.on("adjuster-btn-on", doAdjuster, this);
-            this.on("adjuster-btn-off", function () {
-                _this.off("adjuster-btn-on", doAdjuster, _this);
-            });
         };
         // doSimulationRoadPick() {
         //     this.roadPicker.off("*")
@@ -4113,7 +4132,7 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
                 }
             });
             this.layer("router", { renderer: "canvasOnMap" }).style("*").line({
-                width: 3, color: "red", marker: {
+                width: 3, color: "#2b82cb", marker: {
                     end: {
                         path: "M2,2 L2,11 L10,6 L2,2",
                         viewBox: [13, 13],
@@ -4556,7 +4575,7 @@ define("Apps/Vicroad/Panal/SimulatorPanal", ["require", "exports", "Jigsaw/Compo
             });
             this.on("simulate-road-change", function (e) {
                 _this.addRoads(e);
-                _this.simulatorView.setAdjusterActive(false);
+                // this.simulatorView.setAdjusterActive(false) 
                 isButtonEnable();
             });
             this.on("simulation:calculation-done", function () {
@@ -4584,6 +4603,7 @@ define("Apps/Vicroad/Panal/SimulatorPanal", ["require", "exports", "Jigsaw/Compo
                     eb.registerHandler("client.CTMComplete", function () {
                         console.log("Calculation done");
                         self.send("simulation:calculation-done");
+                        eb.onclose = function (e) { };
                         eb.close();
                     });
                 };
@@ -4898,6 +4918,7 @@ define("Apps/Vicroad/App", ["require", "exports", "Jigsaw/Core/App", "Apps/Vicro
             this.timeSlider.setStyle({
                 top: null,
                 bottom: "1rem",
+                height: "5.2rem",
                 left: "calc(50% - 15rem)"
             });
             this.timeSlider.addTo(this);
@@ -4918,21 +4939,29 @@ define("Apps/Vicroad/App", ["require", "exports", "Jigsaw/Core/App", "Apps/Vicro
         };
         // rightSide:Side
         MainApp.prototype.reTime = function () {
+            var _this = this;
             this.router.navigate("reTime/", { trigger: false, replace: true });
             this.resetAll();
             this.reTimePanal = new ReTimePanal_1.ReTimePanal;
             this.reTimePanal.addTo(this);
             this.reTimePanal.show();
             this.mapComponent.doReTime();
+            this.on("reTime:reRouter", function () {
+                _this.timeSlider.reset();
+            });
             //this.send("begin-retime")
         };
         MainApp.prototype.reRouter = function () {
+            var _this = this;
             this.router.navigate("reRouter/", { trigger: false, replace: true });
             this.resetAll();
             this.simulatorPanal = new SimulatorPanal_1.SimulatorPanal();
             this.simulatorPanal.addTo(this);
             this.simulatorPanal.show();
             this.mapComponent.doReRouter();
+            this.on("reRouter:rePickRoad reRouter:reRoute", function () {
+                _this.timeSlider.reset();
+            });
         };
         MainApp.prototype.resetAll = function () {
             this.mapComponent.initAll();

@@ -10,7 +10,7 @@ export class VicroadNavBar extends NavBar {
         }},conf))
         this.addClass("vicroadnavbar")
         this.dropSelector=new DropListView()
-         this.title.setTitle("Intelligent Traffic Management - Simulator")
+         this.title.setTitle("Intelligent Traffic Management - Simulation")
         this.dropSelector.appendAt(this.rootView.getNode$())
     }
     

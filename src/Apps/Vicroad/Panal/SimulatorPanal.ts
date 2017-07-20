@@ -57,7 +57,7 @@ export class SimulatorPanal extends Side{
         })
         this.on("simulate-road-change",(e)=>{
             this.addRoads(e)
-            this.simulatorView.setAdjusterActive(false) 
+           // this.simulatorView.setAdjusterActive(false) 
             isButtonEnable()            
         })
         this.on("simulation:calculation-done",()=>{

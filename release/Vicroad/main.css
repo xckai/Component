@@ -48,7 +48,10 @@
   background: #3f92db;
 }
 .porgressLoaderContainer {
-  background: rgba(0, 0, 0, 0.9);
+  background: linear-gradient(220deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.9), #000000);
+  animation: sharkbackground 20s ease 1s infinite ;
+  background-position: 0% 44%;
+  background-size: 300%;
   position: absolute;
   top: 0px;
   right: 0px;
@@ -288,19 +291,53 @@
   padding-left: 1rem;
   padding-right: 1rem;
 }
-.adjusterIcon::before {
-  border: red solid 1px;
-  border-radius: 50%;
-  color: red;
-  height: 1.2rem;
-  width: 1.2rem;
-  padding: .2rem;
+.routerFrom {
+  margin: 0 !important;
+}
+.routerFrom::before {
+  background-color: #2c84cb;
+  -webkit-mask: url('router.svg');
+  -webkit-mask-size: 2.4rem 2.5rem;
+  mask-image: url('router.svg');
+  width: 2.4rem;
+  height: 2.4rem;
   display: block;
-  font-size: 1.3rem;
-  text-align: center;
   position: relative;
-  left: -0.5rem;
-  top: -0.4rem;
+  left: -1.2rem;
+  top: -2.4rem;
+  content: " ";
+}
+.routerTo {
+  margin: 0 !important;
+}
+.routerTo::before {
+  background-color: #af1919;
+  -webkit-mask: url('router.svg');
+  -webkit-mask-size: 2.4rem 2.5rem;
+  mask-image: url('router.svg');
+  width: 2.4rem;
+  height: 2.4rem;
+  display: block;
+  position: relative;
+  left: -1.2rem;
+  top: -2.4rem;
+  content: " ";
+}
+.adjusterIcon {
+  margin: 0 !important;
+}
+.adjusterIcon::before {
+  background-color: #af1919;
+  -webkit-mask: url('adjuster.svg');
+  -webkit-mask-size: 1.7rem;
+  mask-image: url('adjuster.svg');
+  width: 1.7rem;
+  height: 1.7rem;
+  display: block;
+  position: relative;
+  left: -0.85rem;
+  top: -0.85rem;
+  content: " ";
 }
 .adjuster table {
   border-collapse: collapse;
@@ -426,13 +463,24 @@
   fill: red;
 }
 /* axisLayer */
-.grid-line path {
+.axis .grid-line path {
   stroke-width: 0;
 }
-.grid-line line {
+.axis .grid-line line {
   fill: none;
   stroke: #d6d6d6;
   shape-rendering: crispEdges;
+}
+.axis .yAxisTitle {
+  font-size: 0.8rem;
+}
+/* titleLayer */
+.chartTitle p {
+  font-size: 1rem;
+  font-weight: bold;
+  margin: 0 0;
+  line-height: 2rem;
+  text-align: center;
 }
 /* TooltipLayer */
 .tooltipContainer {
@@ -459,7 +507,7 @@
   background-color: #aaa;
   font-size: 14px;
   padding: 2px 5px;
-  text-align: left;
+  text-align: center;
   color: #fff;
 }
 .tooltipContainer .tooltip td {
@@ -485,8 +533,15 @@
   opacity: 1;
   display: inline-block;
 }
-.legendUnit span {
+.legendUnit .iconSpan {
   width: 15px;
+  height: 15px;
+  display: inline-block;
+  margin-right: 5px;
+  vertical-align: middle;
+  line-height: 15px;
+}
+.legendUnit .textSpan {
   height: 15px;
   display: inline-block;
   margin-right: 5px;
@@ -540,14 +595,18 @@
   top: 0px;
 }
 .timeSlider {
-  background: #2479c3;
+  background: #334f67;
 }
 .timeSlider aside {
-  background: #3b5c78;
+  background: #334f67;
 }
 .timeSlider .content {
-  border-top: #103444  .5rem solid;
-  background: #2479c3;
+  border-top: #334f67 0.5rem solid;
+  background: linear-gradient(220deg, #4c769a, #3b5c78, #436989);
+  border-bottom: #334f67 0.2rem solid;
+  animation: sharkbackground 10s ease 1s infinite ;
+  background-position: 0% 44%;
+  background-size: 300%;
 }
 .timeSlider .focusText {
   font-size: 1.2rem;
@@ -557,7 +616,25 @@
   fill: #ffffff;
 }
 .timeSlider .axisBackground {
-  fill: #3b5c78;
+  fill: #334f67;
+}
+.timeSlider .timeAdjuster .focusLine {
+  stroke: #ffffff;
+}
+.timeSlider .timeAdjuster .focusRect {
+  fill: #334f67;
+}
+.timeSlider .timeAdjuster .focusRectLine {
+  stroke: #ffffff;
+}
+.lineChart .adjustLine {
+  stroke: #3b5c78;
+  stroke-width: 2px;
+  stroke-dasharray: 3.3;
+}
+.lineChart .focusLine {
+  stroke: #9d9fa0;
+  stroke-dasharray: 5.5;
 }
 .progressContainer {
   background: rgba(59, 92, 120, 0.7);

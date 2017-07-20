@@ -268,7 +268,7 @@ export namespace API{
              r.params={
                  l:ls,timeFrom:"",catagory:0
              }
-             r.setContext({timeFrom:moment(time).add(15*(i+1),'m').format("YYYY-MM-DDTHH:mm:00Z")})
+             r.setContext({timeFrom:moment(time).add(15*i,'m').format("YYYY-MM-DDTHH:mm:00Z")})
              r.changeDoneHandler((d)=>{
                 let featureCollection=JSON.parse(d)
                 let t=0
@@ -286,7 +286,7 @@ export namespace API{
              r.params={
                  l:ls,timeFrom:"",catagory:1
              }
-             r.setContext({timeFrom:moment(time).add(15*(i+1),'m').format("YYYY-MM-DDTHH:mm:00Z")})
+             r.setContext({timeFrom:moment(time).add(15*i,'m').format("YYYY-MM-DDTHH:mm:00Z")})
              r.changeDoneHandler((d)=>{
                 let featureCollection=JSON.parse(d)
                 let t=0

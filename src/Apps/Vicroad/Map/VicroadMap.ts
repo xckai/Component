@@ -24,8 +24,7 @@ export class VicroadMap extends G2Map {
     reTimeRouterLayerGroup: L.LayerGroup
     simulateRouterLayerGroup: L.LayerGroup
     vicroadlayers: L.LayerGroup
-    linechart: VicroadLineChart
-    routerChart: VicroadLineChart
+
     init() {
         this.datePanal = new DatePanal()
         this.datePanal.appendAt(this.rootView.$el)
@@ -53,8 +52,7 @@ export class VicroadMap extends G2Map {
         // this.on("simulation:done",this.showSimulationResult,this)
         this.initLayers()
         this.initArea()
-        this.linechart = new VicroadLineChart()
-        this.routerChart = new VicroadLineChart({ style: { width: "30rem", height: "20rem" } })
+
         this.initAll()
     }
     addHooks() {
@@ -68,13 +66,16 @@ export class VicroadMap extends G2Map {
             this.roadPicker.off("*")
             let latlngs
             let chart = new VicroadLineChart({
+                chartTitle: {
+                    value: "Travel Time Chart"
+                },
                 style: { width: "30rem", height: "20rem" }, line: {
                     defaultTimeAdjust: this.getContext("currentTime")
                 }
             })
             let layers = L.layerGroup([])
             this.vicroadlayers.addLayer(layers)
-            let mBegin = L.marker([0, 0]), mEnd = L.marker([0, 0],{ icon: L.divIcon({ className: 'routerTo' }) }), mPath = L.polyline([], { interactive: false })
+            let mBegin = L.marker([0, 0], { icon: L.divIcon({ className: 'routerFrom' }) }), mEnd = L.marker([0, 0], { icon: L.divIcon({ className: 'routerTo' }) }), mPath = L.polyline([], { interactive: false })
             layers.addLayer(mBegin).addLayer(mEnd).addLayer(mPath)
             let retimeHandler = () => {
                 API.getReTimeRouter(latlngs, this.getContext("currentTime")).done((d) => {
@@ -203,54 +204,60 @@ export class VicroadMap extends G2Map {
         }
         let doAdjuster = () => {
             clearMap()
-            this.roadPicker.off("*")
-            ////begin adjute road
-            let adjuster = new Adjuster()
-            this.proxyEvents(adjuster, "simulate-road-change")
-            let roadMark = L.marker([0, 0], { icon: L.divIcon({ className: 'adjusterIcon fa fa-times' }) })
-            roadMark.bindPopup(adjuster.getNode())
-            adjusterLayers.addLayer(roadMark)
-            let road = L.polyline([], { color: "red" })
-            adjusterLayers.addLayer(road)
-            this.roadPicker.on("drawing", (e) => {
-                roadMark.setOpacity(1)
-                roadMark.setLatLng(e.latlng)
-                adjuster.setData({ id: null, name: null, roads: [] })
-
-                adjuster.setBusy(true)
-                roadMark.openPopup()
-            })
-
-            this.roadPicker.on("fail", (e) => {
-                roadMark.setOpacity(.5)
-                adjuster.setData({ id: null, name: null, roads: [] })
-                road.setLatLngs([])
-                roadMark.closePopup()
-            })
-            this.roadPicker.on("drawend", (e) => {
-                if (e.point) {
-                    roadMark.setLatLng(e.point)
-                    adjuster.setBusy(false)
-                }
-                if (e.path) {
-                    road.setLatLngs(e.path)
-
-                }
-                if (e.roadNum != undefined) {
-                    let roads = []
-                    for (let i = 0; i < e.roadNum; ++i) {
-                        roads.push({ name: `Lane-${i + 1}`, isOpen: true })
-                    }
-                    adjuster.setData({ roads: roads, name: e.name, id: e.id })
-                    roadMark.bindPopup(adjuster.getNode())
-                }
-                roadMark.setOpacity(1)
-            })
-            this.roadPicker.begin()
-            this.on("simulate-road-change", () => {
+            let oneAdjuster = () => {
                 this.roadPicker.off("*")
-            })
+                ////begin adjute road
+                let adjuster = new Adjuster()
+                this.proxyEvents(adjuster, "simulate-road-change")
+                let road = L.polyline([], { color: "#af1919" })
+                adjusterLayers.addLayer(road)
+                let roadMark = L.marker([0, 0], { icon: L.divIcon({ className: 'adjusterIcon fa fa-times' }) })
+                roadMark.bindPopup(adjuster.getNode())
+                adjusterLayers.addLayer(roadMark)
 
+                this.roadPicker.on("drawing", (e) => {
+                    roadMark.setOpacity(1)
+                    roadMark.setLatLng(e.latlng)
+                    adjuster.setData({ id: null, name: null, roads: [] })
+
+                    adjuster.setBusy(true)
+                    roadMark.openPopup()
+                })
+
+                this.roadPicker.on("fail", (e) => {
+                    roadMark.setOpacity(.5)
+                    adjuster.setData({ id: null, name: null, roads: [] })
+                    road.setLatLngs([])
+                    roadMark.closePopup()
+                })
+                this.roadPicker.on("drawend", (e) => {
+                    if (e.point) {
+                        roadMark.setLatLng(e.point)
+                        adjuster.setBusy(false)
+                    }
+                    if (e.path) {
+                        road.setLatLngs(e.path)
+
+                    }
+                    if (e.roadNum != undefined) {
+                        let roads = []
+                        for (let i = 0; i < e.roadNum; ++i) {
+                            roads.push({ name: `Lane-${i + 1}`, isOpen: true })
+                        }
+                        adjuster.setData({ roads: roads, name: e.name, id: e.id })
+                        roadMark.bindPopup(adjuster.getNode())
+                    }
+                    roadMark.setOpacity(1)
+                })
+                this.roadPicker.begin()
+                this.on("simulate-road-change", () => {
+                    this.roadPicker.off("*")
+                })
+            }
+            oneAdjuster()
+            this.on("simulate-road-change", () => {
+                oneAdjuster()
+            })
         }
         ////init roadpicker
 
@@ -271,7 +278,14 @@ export class VicroadMap extends G2Map {
             clearMap()
             this.roadPicker.off("*")
             this.routerPicker.off("*")
-            let roadChart = new VicroadLineChart({ style: { width: "30rem", height: "20rem" } })
+            let roadChart = new VicroadLineChart({
+                axis:{
+                    yAxisTitleType:"speed"
+                },
+                chartTitle: {
+                    value: "Road Speed Chart"
+                }, style: { width: "30rem", height: "20rem" } 
+            })
             let roadMark = L.marker([0, 0])
             roadPickLayers.addLayer(roadMark)
             let road = L.polyline([])
@@ -312,7 +326,7 @@ export class VicroadMap extends G2Map {
             this.roadPicker.off("*")
             this.routerPicker.off("*")
             clearMap()
-            let mBegin = L.marker([0, 0]), mEnd = L.marker([0, 0]), mPath = L.polyline([], { interactive: false })
+            let mBegin = L.marker([0, 0], { icon: L.divIcon({ className: 'routerFrom' }) }), mEnd = L.marker([0, 0], { icon: L.divIcon({ className: 'routerTo' }) }), mPath = L.polyline([], { interactive: false })
             routerLayers.addLayer(mBegin).addLayer(mEnd).addLayer(mPath)
 
             this.routerPicker.on("from", (e) => {
@@ -350,7 +364,9 @@ export class VicroadMap extends G2Map {
                     })
                 })
                 API.getSimulationRouterChartData(e.latlngs, this.getContext("currentTime")).done((d) => {
-                    let linechart = new VicroadLineChart({ style: { width: "30rem", height: "20rem" } })
+                    let linechart = new VicroadLineChart({chartTitle:{
+                    value:"Travel Time Chart"
+                }, style: { width: "30rem", height: "20rem" } })
                     linechart.loadMeasures(d)
                     this.on("time-change", () => {
                         setTimeout(() => {
@@ -397,9 +413,7 @@ export class VicroadMap extends G2Map {
         }
         this.on("simulation:calculation-done", simulationDone, this)
         this.on("adjuster-btn-on", doAdjuster, this)
-        this.on("adjuster-btn-off", () => {
-            this.off("adjuster-btn-on", doAdjuster, this)
-        })
+
     }
     // doSimulationRoadPick() {
     //     this.roadPicker.off("*")
@@ -570,7 +584,7 @@ export class VicroadMap extends G2Map {
         this.vicroadlayers.clearLayers()
         this.layer("router").hide()
         this.addHooks()
-       // this.showArea()
+        // this.showArea()
     }
     initLayers() {
         let l = this.layer("simulationResult", {
@@ -654,7 +668,7 @@ export class VicroadMap extends G2Map {
     }
     showArea() {
         if (!this.pickableArea) {
-            
+
 
 
 
