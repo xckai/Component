@@ -138,6 +138,8 @@ class SimulatorView extends View{
         this.trigger("simulator-apply",{dateTime:new Date(this.$(".datetimeinput").val()),duration:this.$(".durationinput").val()})
         this.setAdjusterEnable(false)
         this.setApplyButtonIsEnable(false)
+        
+        
     }
     onAdjuster(e:JQueryMouseEventObject){
         if($(e.currentTarget).hasClass("btn-active")){

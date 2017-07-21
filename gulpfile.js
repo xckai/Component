@@ -92,7 +92,7 @@ gulp.task("vicroad",["vicroadinit"],()=>{
  
     var middleware=proxy(['/service/apps',
     '/apps','/lib','/sap_logon.html','/j_spring_security_check','/resources'], {
-             target: 'http://10.58.75.98:8080',
+             target: 'http://10.58.75.98:8123',
         
             //target:"http://10.59.176.34:8080"
         })

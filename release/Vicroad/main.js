@@ -1198,14 +1198,14 @@ define("Apps/Vicroad/Chart/TimeSlider", ["require", "exports", "Jigsaw/Component
                 }, padding: 0 });
             _this.timeAdjuster.renderAt(_this.rootView.getContentNode());
             _this.hidden();
-            _this.on("simulation:begin-calculation", function (d) {
-                _this.show();
-                _this.setTime(moment(d.dateTime).add(15, "m").toDate(), d.duration);
-            });
-            _this.on("retime-apply", function (d) {
+            // this.on("simulation:begin-calculation",(d)=>{
+            //     this.show()
+            //     this.setTime(moment(d.dateTime).add(15,"m").toDate(),d.duration)
+            // })
+            _this.on("beginTimeChange", function (d) {
                 _this.setTime(d.dateTime, d.duration);
             });
-            _this.on("retime-router-done", function () {
+            _this.on("retime-router-done simulation:begin-calculation", function () {
                 _this.show();
             });
             _this.timeAdjuster.on("dragend", function (o) {
@@ -2310,11 +2310,13 @@ define("Jigsaw/Component/Map/Layers", ["require", "exports", "Jigsaw/Component/M
             if (!this.visible()) {
                 this._leafletLayer.addTo(this.map.getLeaflet());
             }
+            return this;
         };
         Layer.prototype.hide = function () {
             if (this.visible()) {
                 this._leafletLayer.remove();
             }
+            return this;
         };
         Layer.prototype.removeFromControl = function () {
             this.map.removeFromLeafletControl(this._leafletLayer);
@@ -3054,7 +3056,7 @@ define("Apps/Vicroad/APIConfig", ["require", "exports", "underscore", "moment", 
                         path: _.first(f.getPolyline()).getleafletCoorinates(),
                         roadNum: _.first(f.getPolyline()).getProperty("properties/AVGLANES"),
                         name: _.first(f.getPolyline()).getProperty("properties/NAME"),
-                        id: _.first(f.getPolyline()).getProperty("properties/ID")
+                        id: _.first(f.getPolyline()).getProperty("properties/OSM_ID")
                     });
                 }
             });
@@ -3089,7 +3091,9 @@ define("Apps/Vicroad/APIConfig", ["require", "exports", "underscore", "moment", 
             var rs = JRequest_1.JMultiRequest(5, function (r, i) {
                 r.url = url;
                 r.params = {
-                    l: ls, timeFrom: "", catagory: 0
+                    l: ls, timeFrom: "",
+                    category: 0,
+                    project: "user1"
                 };
                 r.setContext({ timeFrom: moment(time).add(15 * i, 'm').format("YYYY-MM-DDTHH:mm:00Z") });
                 r.changeDoneHandler(function (d) {
@@ -3198,7 +3202,9 @@ define("Apps/Vicroad/APIConfig", ["require", "exports", "underscore", "moment", 
             });
             var r0 = new JRequest_1.JRequest({
                 url: url, params: {
-                    l: ls, timeFrom: ""
+                    l: ls, timeFrom: "",
+                    category: 0,
+                    project: "user1"
                 }
             }).changeDoneHandler(function (d) {
                 r0.doDone(JSON.parse(d));
@@ -3275,7 +3281,7 @@ define("Apps/Vicroad/APIConfig", ["require", "exports", "underscore", "moment", 
             var rs1 = JRequest_1.JMultiRequest(5, function (r, i) {
                 r.url = url;
                 r.params = {
-                    l: ls, timeFrom: "", catagory: 0
+                    l: ls, timeFrom: "", catagory: 1, project: "user1"
                 };
                 r.setContext({ timeFrom: moment(time).add(15 * i, 'm').format("YYYY-MM-DDTHH:mm:00Z") });
                 r.changeDoneHandler(function (d) {
@@ -3646,7 +3652,7 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
                     });
                     latlngs = e.latlngs;
                     _this.on("time-change", retimeHandler);
-                    APIConfig_2.API.getReTimeDatas(e.latlngs, _this.getContext("currentTime")).done(function (d) {
+                    APIConfig_2.API.getReTimeDatas(e.latlngs, _this.getContext("beginTime")).done(function (d) {
                         chart.clearMeasure();
                         chart.loadMeasures(d);
                         _this.on("time-change", function (d) {
@@ -3656,6 +3662,7 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
                         });
                         mEnd.bindPopup(chart.toElement());
                         mEnd.openPopup();
+                        chart.setTimeAdjust(_this.getContext("currentTime"));
                     });
                     setTimeout(function () {
                         _this.routerPicker.begin();
@@ -3668,7 +3675,6 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
                     // this.send("retime-router-drawing", { latlngs: e.latlngs })
                     _this.off("time-change", retimeHandler);
                     _this.layer("router").hide();
-                    _this.send("reTime:reRouter");
                 });
                 _this.routerPicker.begin();
             });
@@ -3736,6 +3742,7 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
                 roadPickLayers.clearLayers();
                 routerLayers.clearLayers();
                 adjusterLayers.clearLayers();
+                _this.off("time-change");
                 _this.layer("router").hide();
             };
             var doAdjuster = function () {
@@ -3796,12 +3803,12 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
             var showSimultaionResult = function () {
                 var time = _this.getContext("currentTime");
                 if (time) {
-                    _this.layer("simulationResult").setContext({ timeTo: moment(time).format("YYYY-MM-DDTHH:mm:00Z") });
-                    _this.layer("simulationResultWithoutAdjuster").setContext({ timeTo: moment(time).format("YYYY-MM-DDTHH:mm:00Z") });
+                    _this.layer("Traffic Condition - After ReRoute").setContext({ timeTo: moment(time).format("YYYY-MM-DDTHH:mm:00Z") });
+                    _this.layer("Traffic Condition - Before ReRoute").setContext({ timeTo: moment(time).format("YYYY-MM-DDTHH:mm:00Z") });
                 }
-                _this.layer("simulationResultWithoutAdjuster").addToControl("baselayer");
-                _this.layer("simulationResult").addToControl("baselayer");
-                _this.layer("simulationResult").show();
+                _this.layer("Traffic Condition - Before ReRoute").addToControl("baselayer");
+                _this.layer("Traffic Condition - After ReRoute").addToControl("baselayer");
+                _this.layer("Traffic Condition - After ReRoute").show();
                 _this.on("time-change", _this.updateSimulationResult, _this);
             };
             var doRoadPick = function () {
@@ -3823,7 +3830,7 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
                 _this.roadPicker.on("drawing", function (e) {
                     roadMark.setOpacity(1);
                     roadMark.setLatLng(e.latlng);
-                    _this.send("reRouter:rePickRoad");
+                    //this.send("reRouter:rePickRoad")
                 });
                 _this.roadPicker.on("fail", function (e) {
                     roadMark.setOpacity(.5);
@@ -3836,10 +3843,11 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
                         road.setLatLngs(e.path);
                     }
                     if (e.id) {
-                        APIConfig_2.API.getSimulationRoadDetail(e.id, _this.getContext("currentTime")).done(function (d) {
+                        APIConfig_2.API.getSimulationRoadDetail(e.id, _this.getContext("beginTime")).done(function (d) {
                             roadChart.clearMeasure();
                             roadChart.loadMeasures(d);
                             roadMark.bindPopup(roadChart.toElement());
+                            roadChart.setTimeAdjust(_this.getContext("currentTime"));
                             _this.on("time-change", function () {
                                 setTimeout(function () {
                                     roadChart.setTimeAdjust(_this.getContext("currentTime"));
@@ -3887,7 +3895,7 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
                             mPath.setLatLngs([]);
                         });
                     });
-                    APIConfig_2.API.getSimulationRouterChartData(e.latlngs, _this.getContext("currentTime")).done(function (d) {
+                    APIConfig_2.API.getSimulationRouterChartData(e.latlngs, _this.getContext("beginTime")).done(function (d) {
                         var linechart = new LineChart_1.VicroadLineChart({ chartTitle: {
                                 value: "Travel Time Chart"
                             }, style: { width: "30rem", height: "20rem" } });
@@ -3899,6 +3907,7 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
                         });
                         mEnd.bindPopup(linechart.toElement());
                         mEnd.openPopup();
+                        linechart.setTimeAdjust(_this.getContext("currentTime"));
                     });
                     setTimeout(function () {
                         _this.routerPicker.begin();
@@ -3908,7 +3917,7 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
                     mPath.setLatLngs(e.latlngs);
                 });
                 _this.routerPicker.on("drawbegin", function (e) {
-                    _this.send("reRouter:reRoute");
+                    //this.send("reRouter:reRoute")
                     _this.layer("router").hide();
                     _this.off("time-change", function () {
                         APIConfig_2.API.getReTimeRouter(e.latlngs, _this.getContext("currentTime")).done(function (d) {
@@ -4084,24 +4093,19 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
             this.roadPicker.off("*");
             this.routerPicker.off("*");
             this.off("*");
-            this.layer("simulationResult").hide();
+            this.layer("Traffic Condition - After ReRoute").hide().removeFromControl();
+            this.layer("Traffic Condition - Before ReRoute").hide().removeFromControl();
             this.vicroadlayers.clearLayers();
             this.layer("router").hide();
             this.addHooks();
             // this.showArea()
         };
         VicroadMap.prototype.initLayers = function () {
-            var l = this.layer("simulationResult", {
-                renderer: "canvas",
-                url: APIConfig_2.API.getSimulationResultURL(),
-                selectable: false
-            });
-            var l0 = this.layer("simulationResultWithoutAdjuster", {
+            var l = this.layer("Traffic Condition - Before ReRoute", {
                 renderer: "canvas",
                 url: APIConfig_2.API.getSimulationResultWithoutAdjusterURL(),
                 selectable: false
-            });
-            l0.style("*").line({
+            }).style("*").line({
                 width: function (c) {
                     if (c("zoom")) {
                         return Math.floor(c("zoom") / 5);
@@ -4110,13 +4114,22 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
                         return 2;
                     }
                 }, color: function (c) {
-                    if (c("SIM_SPEED") > 60)
-                        return "yellow";
-                    else
-                        return "red";
+                    var k = c('SIM_DENSITY');
+                    if (k < 18)
+                        return "#84CA50"; //free
+                    if (k >= 18 && k <= 42)
+                        return "#F07D02";
+                    if (k > 42 && k <= 115)
+                        return "#E60000";
+                    if (k > 115)
+                        return "#9E1313";
                 }
             });
-            l.style("*").line({
+            var l0 = this.layer("Traffic Condition - After ReRoute", {
+                renderer: "canvas",
+                url: APIConfig_2.API.getSimulationResultURL(),
+                selectable: false
+            }).style("*").line({
                 width: function (c) {
                     if (c("zoom")) {
                         return Math.floor(c("zoom") / 5);
@@ -4125,10 +4138,15 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
                         return 2;
                     }
                 }, color: function (c) {
-                    if (c("SIM_SPEED") > 60)
-                        return "yellow";
-                    else
-                        return "red";
+                    var k = c('SIM_DENSITY');
+                    if (k < 18)
+                        return "#84CA50"; //free
+                    if (k >= 18 && k <= 42)
+                        return "#F07D02";
+                    if (k > 42 && k <= 115)
+                        return "#E60000";
+                    if (k > 115)
+                        return "#9E1313";
                 }
             });
             this.layer("router", { renderer: "canvasOnMap" }).style("*").line({
@@ -4155,18 +4173,14 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
         //     this.layer("simulationResultWithoutAdjuster").addToControl("baselayer")
         //     this.on("time-change", this.updateSimulationResult, this)
         // }
-        VicroadMap.prototype.hiddenSimulationResult = function () {
-            this.layer("simulationResult").hide();
-            this.off("time-change", this.updateSimulationResult, this);
-        };
         VicroadMap.prototype.updateSimulationResult = function () {
             var time = this.getContext("currentTime");
             if (time) {
-                this.layer("simulationResult").setContext({ timeTo: moment(time).format("YYYY-MM-DDTHH:mm:00Z") });
-                this.layer("simulationResultWithoutAdjuster").setContext({ timeTo: moment(time).format("YYYY-MM-DDTHH:mm:00Z") });
+                this.layer("Traffic Condition - After ReRoute").setContext({ timeTo: moment(time).format("YYYY-MM-DDTHH:mm:00Z") });
+                this.layer("Traffic Condition - Before ReRoute").setContext({ timeTo: moment(time).format("YYYY-MM-DDTHH:mm:00Z") });
             }
-            this.layer("simulationResult").redraw();
-            this.layer("simulationResultWithoutAdjuster").redraw();
+            this.layer("Traffic Condition - Before ReRoute").redraw();
+            this.layer("Traffic Condition - After ReRoute").redraw();
         };
         VicroadMap.prototype.showArea = function () {
             if (!this.pickableArea) {
@@ -4334,7 +4348,7 @@ define("Apps/Vicroad/NavBar/VicroadNavBar", ["require", "exports", "Jigsaw/Compo
                 } }, conf)) || this;
             _this.addClass("vicroadnavbar");
             _this.dropSelector = new DropList_1.DropListView();
-            _this.title.setTitle("Intelligent Traffic Management - Simulator");
+            _this.title.setTitle("Intelligent Traffic Management - Simulation");
             _this.dropSelector.appendAt(_this.rootView.getNode$());
             return _this;
         }
@@ -4897,13 +4911,13 @@ define("Apps/Vicroad/App", ["require", "exports", "Jigsaw/Core/App", "Apps/Vicro
         }
         MainApp.prototype.initApp = function () {
             var _this = this;
-            this.addRule("*path", "router", this.proxy("reRouter"));
-            this.addRule("reRouter", "router", this.proxy("reRouter"));
+            this.addRule("*path", "router", this.proxy("reRoute"));
+            this.addRule("ReRoute", "router", this.proxy("reRoute"));
             //this.addRule("Adjuster","adjuster",this.proxy("Adjuster"))
-            this.addRule("reTime", "retime", this.proxy("reTime"));
+            this.addRule("ReTime", "retime", this.proxy("reTime"));
             ///add bar
             this.bar = new VicroadNavBar_1.VicroadNavBar();
-            this.bar.initDropDown({ curValue: "reRouter", items: ["reTime", "reRouter"] });
+            this.bar.initDropDown({ curValue: "ReRoute", items: ["ReTime", "ReRoute"] });
             this.bar.addTo(this);
             ///add map
             this.mapComponent = new VicroadMap_1.VicroadMap({ style: {
@@ -4928,6 +4942,16 @@ define("Apps/Vicroad/App", ["require", "exports", "Jigsaw/Core/App", "Apps/Vicro
             this.on("time-change", function (d) {
                 _this.setContext("currentTime", moment(d.dateTime).seconds(0).milliseconds(0).toDate());
             });
+            this.on("simulation:begin-calculation", function (d) {
+                _this.setContext("beginTime", moment(d.dateTime).add(15, "m").seconds(0).milliseconds(0).toDate());
+                _this.setContext("duration", d.duration);
+                _this.send("beginTimeChange", { dateTime: _this.getContext("beginTime"), duration: d.duration });
+            });
+            this.on("retime-apply", function (d) {
+                _this.setContext("beginTime", moment(d.dateTime).seconds(0).milliseconds(0).toDate());
+                _this.setContext("duration", d.duration);
+                _this.send("beginTimeChange", { dateTime: _this.getContext("beginTime"), duration: d.duration });
+            });
             this.initReRouter();
             this.initReTime();
         };
@@ -4939,29 +4963,27 @@ define("Apps/Vicroad/App", ["require", "exports", "Jigsaw/Core/App", "Apps/Vicro
         };
         // rightSide:Side
         MainApp.prototype.reTime = function () {
-            var _this = this;
-            this.router.navigate("reTime/", { trigger: false, replace: true });
+            this.router.navigate("ReTime/", { trigger: false, replace: true });
             this.resetAll();
             this.reTimePanal = new ReTimePanal_1.ReTimePanal;
             this.reTimePanal.addTo(this);
             this.reTimePanal.show();
             this.mapComponent.doReTime();
-            this.on("reTime:reRouter", function () {
-                _this.timeSlider.reset();
-            });
+            // this.on("reTime:reRouter",()=>{
+            //     this.timeSlider.reset()
+            // })
             //this.send("begin-retime")
         };
-        MainApp.prototype.reRouter = function () {
-            var _this = this;
-            this.router.navigate("reRouter/", { trigger: false, replace: true });
+        MainApp.prototype.reRoute = function () {
+            this.router.navigate("ReRoute/", { trigger: false, replace: true });
             this.resetAll();
             this.simulatorPanal = new SimulatorPanal_1.SimulatorPanal();
             this.simulatorPanal.addTo(this);
             this.simulatorPanal.show();
             this.mapComponent.doReRouter();
-            this.on("reRouter:rePickRoad reRouter:reRoute", function () {
-                _this.timeSlider.reset();
-            });
+            // this.on("reRouter:rePickRoad reRouter:reRoute",()=>{
+            //     this.timeSlider.reset()
+            // })
         };
         MainApp.prototype.resetAll = function () {
             this.mapComponent.initAll();

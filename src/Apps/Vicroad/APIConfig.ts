@@ -40,7 +40,7 @@ export namespace API{
                     path:_.first(f.getPolyline()).getleafletCoorinates(),
                     roadNum:_.first(f.getPolyline()).getProperty("properties/AVGLANES"),
                     name:_.first(f.getPolyline()).getProperty("properties/NAME"),
-                    id:_.first(f.getPolyline()).getProperty("properties/ID"),
+                    id:_.first(f.getPolyline()).getProperty("properties/OSM_ID"),
                 })
             }
         })
@@ -74,7 +74,9 @@ export namespace API{
          let rs=JMultiRequest(5,(r,i)=>{
              r.url=url;
              r.params={
-                 l:ls,timeFrom:"",catagory:0
+                 l:ls,timeFrom:"",
+                 category:0,
+                project:"user1"
              }
              r.setContext({timeFrom:moment(time).add(15*i,'m').format("YYYY-MM-DDTHH:mm:00Z")})
              r.changeDoneHandler((d)=>{
@@ -191,7 +193,9 @@ export namespace API{
           })
         let r0=new JRequest({
              url,params:{
-                 l:ls,timeFrom:""
+                 l:ls,timeFrom:"",
+                 category:0,
+                project:"user1"
              }
          }).changeDoneHandler((d)=>{
               r0.doDone(JSON.parse(d))
@@ -266,7 +270,7 @@ export namespace API{
          let rs1=JMultiRequest(5,(r,i)=>{
              r.url=url;
              r.params={
-                 l:ls,timeFrom:"",catagory:0
+                 l:ls,timeFrom:"",catagory:1, project:"user1"
              }
              r.setContext({timeFrom:moment(time).add(15*i,'m').format("YYYY-MM-DDTHH:mm:00Z")})
              r.changeDoneHandler((d)=>{

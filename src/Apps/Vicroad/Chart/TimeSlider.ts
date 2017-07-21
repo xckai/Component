@@ -12,15 +12,15 @@ export class TimeSlider extends DragAblePanal{
         },padding:0})
         this.timeAdjuster.renderAt(this.rootView.getContentNode())
         this.hidden()
-        this.on("simulation:begin-calculation",(d)=>{
-            this.show()
-            this.setTime(moment(d.dateTime).add(15,"m").toDate(),d.duration)
+        // this.on("simulation:begin-calculation",(d)=>{
+        //     this.show()
+        //     this.setTime(moment(d.dateTime).add(15,"m").toDate(),d.duration)
             
-        })
-        this.on("retime-apply",(d)=>{
+        // })
+        this.on("beginTimeChange",(d)=>{
             this.setTime(d.dateTime,d.duration)
         })
-        this.on("retime-router-done",()=>{
+        this.on("retime-router-done simulation:begin-calculation",()=>{
             this.show()
         })
         this.timeAdjuster.on("dragend",(o)=>{

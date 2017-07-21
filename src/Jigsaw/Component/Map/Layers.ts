@@ -56,11 +56,13 @@ export class Layer {
         if(!this.visible()){
             this._leafletLayer.addTo(this.map.getLeaflet())
         }
+        return this
     }
     hide(){
         if (this.visible()) {
              this._leafletLayer.remove();
         }
+        return this
     }
     removeFromControl(){
         this.map.removeFromLeafletControl(this._leafletLayer)

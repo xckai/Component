@@ -1,3 +1,4 @@
+import { duration } from '../../../vendor/moment/moment';
 import { App } from '../../Jigsaw/Core/App';
 import { TimeSlider } from './Chart/TimeSlider';
 import { VicroadMap } from './Map/VicroadMap';
@@ -7,7 +8,7 @@ import { SimulatorPanal } from './Panal/SimulatorPanal';
 import { G2Map } from '.../../Jigsaw/Component/Map/G2Map';
 import { CircleLoader } from '../../Jigsaw/Component/Loader/CircleLoader';
 import { IProgressLoader } from '../../Jigsaw/Component/Loader/ILoader';
-import moment=require("moment")
+import moment = require('moment');
 
 export class MainApp extends App {
     constructor(conf?){
@@ -15,13 +16,13 @@ export class MainApp extends App {
         this.initApp()
     }
     initApp(){
-        this.addRule("*path","router",this.proxy("reRouter"))
-        this.addRule("reRouter","router",this.proxy("reRouter"))
+        this.addRule("*path","router",this.proxy("reRoute"))
+        this.addRule("ReRoute","router",this.proxy("reRoute"))
         //this.addRule("Adjuster","adjuster",this.proxy("Adjuster"))
-        this.addRule("reTime","retime",this.proxy("reTime"))
+        this.addRule("ReTime","retime",this.proxy("reTime"))
         ///add bar
         this.bar=new VicroadNavBar()
-        this.bar.initDropDown({curValue:"reRouter",items:["reTime","reRouter"]})
+        this.bar.initDropDown({curValue:"ReRoute",items:["ReTime","ReRoute"]})
         this.bar.addTo(this)
         ///add map
         this.mapComponent=new VicroadMap({style:{
@@ -43,9 +44,18 @@ export class MainApp extends App {
         ///add progressbar
         this.progressBar=new CircleLoader(200,300,5)
         this.progressBar.toElement()
-        this.on("time-change",(d)=>{
-           
+        this.on("time-change",(d)=>{   
             this.setContext("currentTime", moment(d.dateTime).seconds(0).milliseconds(0).toDate())
+        })
+        this.on("simulation:begin-calculation",(d)=>{
+            this.setContext("beginTime",moment(d.dateTime).add(15,"m").seconds(0).milliseconds(0).toDate())
+            this.setContext("duration",d.duration)
+            this.send("beginTimeChange",{dateTime:this.getContext("beginTime"),duration:d.duration})
+        })
+        this.on("retime-apply",(d)=>{
+            this.setContext("beginTime",moment(d.dateTime).seconds(0).milliseconds(0).toDate())
+             this.setContext("duration",d.duration)
+            this.send("beginTimeChange",{dateTime:this.getContext("beginTime"),duration:d.duration})
         })
         this.initReRouter()
         this.initReTime()
@@ -65,27 +75,27 @@ export class MainApp extends App {
     reTimePanal:ReTimePanal
     // rightSide:Side
     reTime(){
-        this.router.navigate("reTime/",{trigger: false, replace: true})
+        this.router.navigate("ReTime/",{trigger: false, replace: true})
         this.resetAll()
         this.reTimePanal=new ReTimePanal
         this.reTimePanal.addTo(this)
         this.reTimePanal.show()
         this.mapComponent.doReTime()
-        this.on("reTime:reRouter",()=>{
-            this.timeSlider.reset()
-        })
+        // this.on("reTime:reRouter",()=>{
+        //     this.timeSlider.reset()
+        // })
         //this.send("begin-retime")
     }
-    reRouter(){
-        this.router.navigate("reRouter/",{trigger: false, replace: true})
+    reRoute(){
+        this.router.navigate("ReRoute/",{trigger: false, replace: true})
         this.resetAll()
         this.simulatorPanal=new SimulatorPanal()
         this.simulatorPanal.addTo(this)
         this.simulatorPanal.show()
         this.mapComponent.doReRouter()
-        this.on("reRouter:rePickRoad reRouter:reRoute",()=>{
-            this.timeSlider.reset()
-        })
+        // this.on("reRouter:rePickRoad reRouter:reRoute",()=>{
+        //     this.timeSlider.reset()
+        // })
        
     }
     resetAll(){

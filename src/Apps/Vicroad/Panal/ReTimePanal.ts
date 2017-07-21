@@ -44,6 +44,7 @@ class ReTimeView extends View{
     onApply(){
          this.trigger("retime-apply",{dateTime:new Date(this.$(".datetimeinput").val()),duration:this.$(".durationinput").val()})
          this.$(".applybtn").addClass("btn-disable")
+         this.$(".datetimeinput").off("focus")
         }
    setApplyButtonIsEnable(isable){
         if(isable){

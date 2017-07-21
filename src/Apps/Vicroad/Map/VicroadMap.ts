@@ -105,7 +105,7 @@ export class VicroadMap extends G2Map {
                 })
                 latlngs = e.latlngs
                 this.on("time-change", retimeHandler)
-                API.getReTimeDatas(e.latlngs, this.getContext("currentTime")).done((d) => {
+                API.getReTimeDatas(e.latlngs, this.getContext("beginTime")).done((d) => {
                     chart.clearMeasure()
                     chart.loadMeasures(d)
                     this.on("time-change", (d) => {
@@ -115,6 +115,7 @@ export class VicroadMap extends G2Map {
                     })
                     mEnd.bindPopup(chart.toElement())
                     mEnd.openPopup()
+                    chart.setTimeAdjust(this.getContext("currentTime"))
                 })
                 setTimeout(() => {
                     this.routerPicker.begin()
@@ -128,7 +129,7 @@ export class VicroadMap extends G2Map {
                 // this.send("retime-router-drawing", { latlngs: e.latlngs })
                 this.off("time-change", retimeHandler)
                 this.layer("router").hide()
-                this.send("reTime:reRouter")
+               
             })
             this.routerPicker.begin()
         })
@@ -200,6 +201,7 @@ export class VicroadMap extends G2Map {
             roadPickLayers.clearLayers()
             routerLayers.clearLayers()
             adjusterLayers.clearLayers()
+            this.off("time-change")
             this.layer("router").hide()
         }
         let doAdjuster = () => {
@@ -265,12 +267,12 @@ export class VicroadMap extends G2Map {
         let showSimultaionResult = () => {
             let time = this.getContext("currentTime")
             if (time) {
-                this.layer("simulationResult").setContext({ timeTo: moment(time).format("YYYY-MM-DDTHH:mm:00Z") })
-                this.layer("simulationResultWithoutAdjuster").setContext({ timeTo: moment(time).format("YYYY-MM-DDTHH:mm:00Z") })
+                this.layer("Traffic Condition - After ReRoute").setContext({ timeTo: moment(time).format("YYYY-MM-DDTHH:mm:00Z") })
+                this.layer("Traffic Condition - Before ReRoute").setContext({ timeTo: moment(time).format("YYYY-MM-DDTHH:mm:00Z") })
             }
-            this.layer("simulationResultWithoutAdjuster").addToControl("baselayer")
-            this.layer("simulationResult").addToControl("baselayer")
-            this.layer("simulationResult").show()
+            this.layer("Traffic Condition - Before ReRoute").addToControl("baselayer")
+            this.layer("Traffic Condition - After ReRoute").addToControl("baselayer")
+            this.layer("Traffic Condition - After ReRoute").show()
 
             this.on("time-change", this.updateSimulationResult, this)
         }
@@ -293,7 +295,7 @@ export class VicroadMap extends G2Map {
             this.roadPicker.on("drawing", (e) => {
                 roadMark.setOpacity(1)
                 roadMark.setLatLng(e.latlng)
-                this.send("reRouter:rePickRoad")
+                //this.send("reRouter:rePickRoad")
             })
             this.roadPicker.on("fail", (e) => {
                 roadMark.setOpacity(.5)
@@ -306,10 +308,11 @@ export class VicroadMap extends G2Map {
                     road.setLatLngs(e.path)
                 }
                 if (e.id) {
-                    API.getSimulationRoadDetail(e.id, this.getContext("currentTime")).done((d) => {
+                    API.getSimulationRoadDetail(e.id, this.getContext("beginTime")).done((d) => {
                         roadChart.clearMeasure()
                         roadChart.loadMeasures(d)
                         roadMark.bindPopup(roadChart.toElement())
+                        roadChart.setTimeAdjust(this.getContext("currentTime"))
                         this.on("time-change", () => {
                             setTimeout(() => {
                                 roadChart.setTimeAdjust(this.getContext("currentTime"))
@@ -363,7 +366,7 @@ export class VicroadMap extends G2Map {
 
                     })
                 })
-                API.getSimulationRouterChartData(e.latlngs, this.getContext("currentTime")).done((d) => {
+                API.getSimulationRouterChartData(e.latlngs, this.getContext("beginTime")).done((d) => {
                     let linechart = new VicroadLineChart({chartTitle:{
                     value:"Travel Time Chart"
                 }, style: { width: "30rem", height: "20rem" } })
@@ -375,6 +378,7 @@ export class VicroadMap extends G2Map {
                     })
                     mEnd.bindPopup(linechart.toElement())
                     mEnd.openPopup()
+                    linechart.setTimeAdjust(this.getContext("currentTime"))
                 })
                 setTimeout(() => {
                     this.routerPicker.begin()
@@ -384,7 +388,7 @@ export class VicroadMap extends G2Map {
                 mPath.setLatLngs(e.latlngs)
             })
             this.routerPicker.on("drawbegin", (e) => {
-                this.send("reRouter:reRoute")
+                //this.send("reRouter:reRoute")
                 this.layer("router").hide()
 
 
@@ -580,24 +584,19 @@ export class VicroadMap extends G2Map {
         this.roadPicker.off("*")
         this.routerPicker.off("*")
         this.off("*")
-        this.layer("simulationResult").hide()
+        this.layer("Traffic Condition - After ReRoute").hide().removeFromControl()
+        this.layer("Traffic Condition - Before ReRoute").hide().removeFromControl()
         this.vicroadlayers.clearLayers()
         this.layer("router").hide()
         this.addHooks()
         // this.showArea()
     }
     initLayers() {
-        let l = this.layer("simulationResult", {
-            renderer: "canvas",
-            url: API.getSimulationResultURL(),
-            selectable: false
-        })
-        let l0 = this.layer("simulationResultWithoutAdjuster", {
+        let l = this.layer("Traffic Condition - Before ReRoute", {
             renderer: "canvas",
             url: API.getSimulationResultWithoutAdjusterURL(),
             selectable: false
-        })
-        l0.style("*").line({
+        }).style("*").line({
             width: (c) => {
 
                 if (c("zoom")) {
@@ -606,13 +605,22 @@ export class VicroadMap extends G2Map {
                     return 2
                 }
             }, color: (c) => {
-                if (c("SIM_SPEED") > 60)
-                    return "yellow";
-                else
-                    return "red";
+                 var k = c('SIM_DENSITY');
+                    if(k < 18)
+                       return "#84CA50"; //free
+                   if(k >= 18 && k <= 42)
+                       return "#F07D02";
+                   if(k > 42 && k <= 115)
+                       return "#E60000";
+                   if(k > 115)
+                       return "#9E1313";
             }
         })
-        l.style("*").line({
+        let l0 = this.layer("Traffic Condition - After ReRoute", {
+            renderer: "canvas",
+            url: API.getSimulationResultURL(),
+            selectable: false
+        }).style("*").line({
             width: (c) => {
 
                 if (c("zoom")) {
@@ -621,12 +629,18 @@ export class VicroadMap extends G2Map {
                     return 2
                 }
             }, color: (c) => {
-                if (c("SIM_SPEED") > 60)
-                    return "yellow";
-                else
-                    return "red";
+                   var k = c('SIM_DENSITY');
+                    if(k < 18)
+                       return "#84CA50"; //free
+                   if(k >= 18 && k <= 42)
+                       return "#F07D02";
+                   if(k > 42 && k <= 115)
+                       return "#E60000";
+                   if(k > 115)
+                       return "#9E1313";
             }
         })
+    
         this.layer("router", { renderer: "canvasOnMap" }).style("*").line({
             width: 3, color: "#2b82cb", marker: {
                 end: {
@@ -653,18 +667,14 @@ export class VicroadMap extends G2Map {
     //     this.layer("simulationResultWithoutAdjuster").addToControl("baselayer")
     //     this.on("time-change", this.updateSimulationResult, this)
     // }
-    hiddenSimulationResult() {
-        this.layer("simulationResult").hide()
-        this.off("time-change", this.updateSimulationResult, this)
-    }
     updateSimulationResult() {
         let time = this.getContext("currentTime")
         if (time) {
-            this.layer("simulationResult").setContext({ timeTo: moment(time).format("YYYY-MM-DDTHH:mm:00Z") })
-            this.layer("simulationResultWithoutAdjuster").setContext({ timeTo: moment(time).format("YYYY-MM-DDTHH:mm:00Z") })
+            this.layer("Traffic Condition - After ReRoute").setContext({ timeTo: moment(time).format("YYYY-MM-DDTHH:mm:00Z") })
+            this.layer("Traffic Condition - Before ReRoute").setContext({ timeTo: moment(time).format("YYYY-MM-DDTHH:mm:00Z") })
         }
-        this.layer("simulationResult").redraw()
-        this.layer("simulationResultWithoutAdjuster").redraw()
+        this.layer("Traffic Condition - Before ReRoute").redraw()
+        this.layer("Traffic Condition - After ReRoute").redraw()
     }
     showArea() {
         if (!this.pickableArea) {
