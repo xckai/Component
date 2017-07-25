@@ -709,9 +709,11 @@ export class VicroadMap extends G2Map {
                     this.routerPicker.setInteractiveLayer(this.pickableArea)
                 }
             }).fail(() => {
-                alert("error ")
+                alert("Login in Please")
             })
             // this.doRoadPick()
+        }else{
+              this.map.leaflet.fitBounds(this.pickableArea.getBounds())
         }
     }
     pickableArea: L.Polygon

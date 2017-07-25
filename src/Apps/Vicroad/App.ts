@@ -17,12 +17,12 @@ export class MainApp extends App {
     }
     initApp(){
         this.addRule("*path","router",this.proxy("reRoute"))
-        this.addRule("ReRoute","router",this.proxy("reRoute"))
+        this.addRule("Re-Route","router",this.proxy("reRoute"))
         //this.addRule("Adjuster","adjuster",this.proxy("Adjuster"))
-        this.addRule("ReTime","retime",this.proxy("reTime"))
+        this.addRule("Re-Time","retime",this.proxy("reTime"))
         ///add bar
         this.bar=new VicroadNavBar()
-        this.bar.initDropDown({curValue:"ReRoute",items:["ReTime","ReRoute"]})
+        this.bar.initDropDown({curValue:"Re-Route",items:["Re-Time","Re-Route"]})
         this.bar.addTo(this)
         ///add map
         this.mapComponent=new VicroadMap({style:{
@@ -75,7 +75,7 @@ export class MainApp extends App {
     reTimePanal:ReTimePanal
     // rightSide:Side
     reTime(){
-        this.router.navigate("ReTime/",{trigger: false, replace: true})
+        this.router.navigate("Re-Time/",{trigger: false, replace: true})
         this.resetAll()
         this.reTimePanal=new ReTimePanal
         this.reTimePanal.addTo(this)
@@ -87,7 +87,7 @@ export class MainApp extends App {
         //this.send("begin-retime")
     }
     reRoute(){
-        this.router.navigate("ReRoute/",{trigger: false, replace: true})
+        this.router.navigate("Re-Route/",{trigger: false, replace: true})
         this.resetAll()
         this.simulatorPanal=new SimulatorPanal()
         this.simulatorPanal.addTo(this)

@@ -639,110 +639,139 @@ define("Jigsaw/Utils/Util", ["require", "exports", "underscore", "Jigsaw/Utils/F
 define("Jigsaw/Core/Evented", ["require", "exports", "underscore"], function (require, exports, _) {
     "use strict";
     exports.__esModule = true;
-    var EventBus = (function () {
-        function EventBus() {
-            this.eventId = _.uniqueId("eventbus");
-            this.eventBusChildren = [];
-            this.events = {};
-        }
-        EventBus.prototype.on = function (str, callback, ctx) {
-            var _this = this;
-            _.each(str.split(" "), function (t) {
-                _this._on(t, callback, ctx);
-            });
-        };
-        EventBus.prototype.off = function (str, callback, ctx) {
-            var _this = this;
-            _.each(str.split(" "), function (t) {
-                _this._off(t, callback, ctx);
-            });
-        };
-        EventBus.prototype._on = function (t, callback, ctx) {
-            if (this.events[t] != undefined) {
-                if (_.some(this.events[t], function (e) { return e.callback.toString() == callback.toString() && e.ctx == ctx; })) {
-                    return this;
+    var Evented = (function () {
+        function Evented() {
+            this.eventObj = {};
+            this.eventId = _.uniqueId("event-");
+            this.setEventSplitter(" ");
+            this.setEventKeyMatcher(function (a, b) {
+                if (b == "*" || b == "all" || a == "*" || a == "all") {
+                    return true;
                 }
                 else {
-                    var obj = {};
-                    obj.callback = callback;
-                    obj.ctx = ctx;
-                    this.events[t].push(obj);
+                    return a == b;
                 }
-            }
-            else {
-                this.events[t] = [];
-                var obj = {};
-                obj.callback = callback;
-                obj.ctx = ctx;
-                this.events[t].push(obj);
-            }
+            });
+        }
+        Evented.prototype.setEventKeyMatcher = function (fn) {
+            this.keyMatcher = fn;
             return this;
         };
-        EventBus.prototype._off = function (t, callback, ctx) {
-            if (t == "*") {
-                this.events = {};
+        Evented.prototype.setEventSplitter = function (s) {
+            this.eventSplitter = s;
+            return this;
+        };
+        Evented.eachEvent = function (iteratee, eventObj, name, callback, context, args) {
+            var names = name.split(eventObj.eventSplitter);
+            for (var i = 0; i < names.length; ++i) {
+                iteratee(eventObj, eventObj.eventObj, names[i], callback, context, args);
             }
-            else if (this.events[t] == undefined) {
-                return this;
-            }
-            else {
-                if (callback == undefined) {
-                    return this._offAllKey(t);
+        };
+        Evented.onApi = function (eventObj, eventsDataObj, name, callback, context) {
+            if (_.isFunction(callback)) {
+                var handlers = eventsDataObj[name] || (eventsDataObj[name] = []);
+                var handler = {
+                    callback: callback, context: context
+                };
+                var isFind = _.some(handlers, function (h) { return h.callback.toString() == callback.toString() && h.context == context; });
+                if (isFind) {
+                    return eventObj;
                 }
                 else {
-                    var newEvents = [];
-                    newEvents = _.reject(this.events[t], function (e) { return e.callback.toString() == callback.toString() && e.ctx == ctx; });
-                    this.events[t] = newEvents;
-                    return this;
+                    handlers.push(handler);
+                    return eventObj;
                 }
             }
         };
-        EventBus.prototype.send = function (t) {
+        Evented.offApi = function (eventObj, eventsDataObj, key, callback, context) {
+            _.each(eventsDataObj, function (v, k) {
+                if (eventObj.keyMatcher(k, key)) {
+                    if (_.isFunction(callback)) {
+                        eventsDataObj[k] = _.reject(v, function (handle) { return handle.callback.toString() == callback.toString() && handle.context == context; });
+                    }
+                    else {
+                        eventsDataObj[k] = [];
+                    }
+                }
+            });
+            return eventObj;
+        };
+        Evented.onceApi = function (eventObj, eventsDataObj, key, callback, context) {
+            if (_.isFunction(callback)) {
+                var newCallback = function () {
+                    var args = [];
+                    for (var _i = 0; _i < arguments.length; _i++) {
+                        args[_i] = arguments[_i];
+                    }
+                    callback.apply(context, args);
+                    eventObj.off(key, callback, context);
+                };
+                eventObj.on(key, newCallback, null);
+            }
+        };
+        Evented.triggerApi = function (eventObj, eventsDataObj, key, callback, context, args) {
+            _.each(eventsDataObj, function (v, k) {
+                if (eventObj.keyMatcher(k, key)) {
+                    _.each(v, function (v) { return v.callback.apply(v.context, args); });
+                }
+            });
+        };
+        Evented.prototype.on = function (keys, callback, context) {
+            Evented.eachEvent(Evented.onApi, this, keys, callback, context);
+            return this;
+        };
+        Evented.prototype.off = function (keys, callback, context) {
+            Evented.eachEvent(Evented.offApi, this, keys, callback, context);
+            return this;
+        };
+        Evented.prototype.once = function (keys, callback, context) {
+            Evented.eachEvent(Evented.onceApi, this, keys, callback, context);
+            return this;
+        };
+        Evented.prototype.trigger = function (keys) {
             var args = [];
             for (var _i = 1; _i < arguments.length; _i++) {
                 args[_i - 1] = arguments[_i];
             }
-            var message = {
-                eventId: this.eventId,
-                eventKey: t,
-                args: args
-            };
-            this.fire(t, args);
-            this.setToParent(message);
+            Evented.eachEvent(Evented.triggerApi, this, keys, null, null, args);
+            return this;
         };
-        EventBus.prototype.setToParent = function (e) {
+        Evented.prototype.fire = function (keys) {
+            var args = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                args[_i - 1] = arguments[_i];
+            }
+            Evented.eachEvent(Evented.triggerApi, this, keys, null, null, args);
+            return this;
+        };
+        return Evented;
+    }());
+    exports.Evented = Evented;
+    var EventBus = (function (_super) {
+        __extends(EventBus, _super);
+        function EventBus() {
+            var _this = _super.call(this) || this;
+            _this.eventBusChildren = [];
+            return _this;
+        }
+        EventBus.prototype.removeChildrenEventBus = function (c) {
+            this.eventBusChildren = _.reject(this.eventBusChildren, function (e) { return e.eventId == c.eventId; });
+            c.eventBusParent = null;
+        };
+        EventBus.prototype.sentToParent = function (e) {
             if (this.eventBusParent) {
-                this.eventBusParent.setToParent(e);
+                this.eventBusParent.sentToParent(e);
             }
             else {
                 this.handleEventMessage(e);
             }
         };
-        EventBus.prototype.setToChildren = function (e) {
-            _.chain(this.eventBusChildren).filter(function (c) { return e.eventId != c.eventId; }).each(function (c) { return c.handleEventMessage(e); });
-        };
         EventBus.prototype.handleEventMessage = function (e) {
-            this.fire(e.eventKey, e.args);
-            this.setToChildren(e);
+            this.trigger.apply(this, [e.keys].concat(e.args));
+            this.sentToChildren(e);
         };
-        EventBus.prototype.fire = function (t, args) {
-            _.each(this.events[t], function (e) {
-                e.callback.apply(e.ctx, args);
-            });
-        };
-        EventBus.prototype.destroy = function () {
-            _.each(this.eventBusChildren, function (c) { return c.eventBusParent = null; });
-            if (this.eventBusParent) {
-                this.eventBusParent.removeChildrenEventBus(this);
-            }
-        };
-        EventBus.prototype.listenTo = function (c) {
-            c.eventBusParent = this;
-            this.addChildrenEventBus(c);
-        };
-        EventBus.prototype.observe = function (c) {
-            c.eventBusParent = this;
-            this.addChildrenEventBus(c);
+        EventBus.prototype.sentToChildren = function (e) {
+            _.chain(this.eventBusChildren).filter(function (c) { return e.eventId != c.eventId; }).each(function (c) { return c.handleEventMessage(e); });
         };
         EventBus.prototype.addChildrenEventBus = function (c) {
             if (_.some(this.eventBusChildren, function (i) { return c.eventId == i.eventId; })) {
@@ -752,12 +781,24 @@ define("Jigsaw/Core/Evented", ["require", "exports", "underscore"], function (re
                 this.eventBusChildren.push(c);
             }
         };
-        EventBus.prototype.removeChildrenEventBus = function (c) {
-            this.eventBusChildren = _.reject(this.eventBusChildren, function (e) { return e.eventId == c.eventId; });
-            c.eventBusParent = null;
+        EventBus.prototype.destroy = function () {
+            _.each(this.eventBusChildren, function (c) {
+                c.eventBusParent = null;
+            });
+            if (this.eventBusParent) {
+                this.eventBusParent.removeChildrenEventBus(this);
+            }
         };
-        EventBus.prototype._offAllKey = function (t) {
-            this.events[t] = [];
+        EventBus.prototype.send = function (keys) {
+            var args = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                args[_i - 1] = arguments[_i];
+            }
+            var message = {
+                eventId: this.eventId, keys: keys, args: args
+            };
+            this.trigger.apply(this, [keys].concat(args));
+            this.sentToParent(message);
             return this;
         };
         EventBus.prototype.proxyEvents = function (obj) {
@@ -768,91 +809,21 @@ define("Jigsaw/Core/Evented", ["require", "exports", "underscore"], function (re
             }
             _.each(args, function (k) {
                 obj.on(k, function () {
-                    var objs = [];
+                    var args = [];
                     for (var _i = 0; _i < arguments.length; _i++) {
-                        objs[_i] = arguments[_i];
+                        args[_i] = arguments[_i];
                     }
-                    _this.send.apply(_this, [k].concat(objs));
+                    _this.send.apply(_this, [k].concat(args));
                 });
             });
         };
+        EventBus.prototype.observe = function (c) {
+            c.eventBusParent = this;
+            this.addChildrenEventBus(c);
+        };
         return EventBus;
-    }());
+    }(Evented));
     exports.EventBus = EventBus;
-    var Evented = (function () {
-        function Evented() {
-            this.events = {};
-        }
-        Evented.prototype.on = function (t, fn, ctx) {
-            var _this = this;
-            var st = t.split(" ");
-            st.forEach(function (tt) {
-                _this._on(tt, fn, ctx);
-            });
-            return this;
-        };
-        Evented.prototype._on = function (t, fn, ctx) {
-            if (this.events[t]) {
-                if (_.some(this.events[t], function (e) { return e.fn.toString() == fn.toString() && e.ctx == ctx; })) {
-                    return;
-                }
-                else {
-                    var obj = {};
-                    obj.fn = fn;
-                    obj.ctx = ctx;
-                    this.events[t].push(obj);
-                }
-            }
-            else {
-                this.events[t] = [];
-                var obj = {};
-                obj.fn = fn;
-                obj.ctx = ctx;
-                this.events[t].push(obj);
-            }
-        };
-        Evented.prototype._off = function (t, fn, ctx) {
-            if (t == "*") {
-                this.events = {};
-            }
-            if (!this.events[t]) {
-                return this;
-            }
-            else {
-                var nEs_1 = [];
-                if (fn) {
-                    this.events[t].forEach(function (o) {
-                        if (o.fn.toString() != fn.toString() && o.ctx != ctx) {
-                            nEs_1.push(o);
-                        }
-                    });
-                }
-                this.events[t] = nEs_1;
-            }
-        };
-        Evented.prototype.off = function (t, fn) {
-            var _this = this;
-            var st = t.split(" ");
-            st.forEach(function (s) { return _this._off(s, fn); });
-            return this;
-        };
-        Evented.prototype.fire = function (t) {
-            var args = [];
-            for (var _i = 1; _i < arguments.length; _i++) {
-                args[_i - 1] = arguments[_i];
-            }
-            _.each(this.events[t], function (e) {
-                e.fn.apply(e.ctx, args);
-            });
-            return this;
-        };
-        Evented.prototype.listenTo = function (e) {
-            e.event_parent = this;
-            return this;
-        };
-        return Evented;
-    }());
-    exports.Evented = Evented;
 });
 define("Jigsaw/Core/View", ["require", "exports", "Backbone", "underscore", "Jigsaw/Utils/Util"], function (require, exports, Backbone, _, Util_1) {
     "use strict";
@@ -4210,9 +4181,12 @@ define("Apps/Vicroad/Map/VicroadMap", ["require", "exports", "Jigsaw/Component/M
                         _this.routerPicker.setInteractiveLayer(_this.pickableArea);
                     }
                 }).fail(function () {
-                    alert("error ");
+                    alert("Login in Please");
                 });
                 // this.doRoadPick()
+            }
+            else {
+                this.map.leaflet.fitBounds(this.pickableArea.getBounds());
             }
         };
         return VicroadMap;
@@ -4491,6 +4465,7 @@ define("Apps/Vicroad/Panal/ReTimePanal", ["require", "exports", "Jigsaw/Componen
         ReTimeView.prototype.onApply = function () {
             this.trigger("retime-apply", { dateTime: new Date(this.$(".datetimeinput").val()), duration: this.$(".durationinput").val() });
             this.$(".applybtn").addClass("btn-disable");
+            this.$(".datetimeinput").off("focus");
         };
         ReTimeView.prototype.setApplyButtonIsEnable = function (isable) {
             if (isable) {
@@ -4912,12 +4887,12 @@ define("Apps/Vicroad/App", ["require", "exports", "Jigsaw/Core/App", "Apps/Vicro
         MainApp.prototype.initApp = function () {
             var _this = this;
             this.addRule("*path", "router", this.proxy("reRoute"));
-            this.addRule("ReRoute", "router", this.proxy("reRoute"));
+            this.addRule("Re-Route", "router", this.proxy("reRoute"));
             //this.addRule("Adjuster","adjuster",this.proxy("Adjuster"))
-            this.addRule("ReTime", "retime", this.proxy("reTime"));
+            this.addRule("Re-Time", "retime", this.proxy("reTime"));
             ///add bar
             this.bar = new VicroadNavBar_1.VicroadNavBar();
-            this.bar.initDropDown({ curValue: "ReRoute", items: ["ReTime", "ReRoute"] });
+            this.bar.initDropDown({ curValue: "Re-Route", items: ["Re-Time", "Re-Route"] });
             this.bar.addTo(this);
             ///add map
             this.mapComponent = new VicroadMap_1.VicroadMap({ style: {
@@ -4963,7 +4938,7 @@ define("Apps/Vicroad/App", ["require", "exports", "Jigsaw/Core/App", "Apps/Vicro
         };
         // rightSide:Side
         MainApp.prototype.reTime = function () {
-            this.router.navigate("ReTime/", { trigger: false, replace: true });
+            this.router.navigate("Re-Time/", { trigger: false, replace: true });
             this.resetAll();
             this.reTimePanal = new ReTimePanal_1.ReTimePanal;
             this.reTimePanal.addTo(this);
@@ -4975,7 +4950,7 @@ define("Apps/Vicroad/App", ["require", "exports", "Jigsaw/Core/App", "Apps/Vicro
             //this.send("begin-retime")
         };
         MainApp.prototype.reRoute = function () {
-            this.router.navigate("ReRoute/", { trigger: false, replace: true });
+            this.router.navigate("Re-Route/", { trigger: false, replace: true });
             this.resetAll();
             this.simulatorPanal = new SimulatorPanal_1.SimulatorPanal();
             this.simulatorPanal.addTo(this);
