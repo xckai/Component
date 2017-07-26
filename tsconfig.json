@@ -7,7 +7,7 @@
     "baseUrl": "./",
     "paths": {
         "moment": [
-            "vendor/moment/moment"
+            "node_modules/moment/moment"
         ]
     }
   },

@@ -134,61 +134,7 @@ export class VicroadMap extends G2Map {
             this.routerPicker.begin()
         })
     }
-    // doReTimeRouter() {
-    //     this.roadPicker.off("*")
-    //     let latlngs
-    //     let mBegin = L.marker([0, 0]), mEnd = L.marker([0, 0]), mPath = L.polyline([], { interactive: false })
-    //     this.reTimeRouterLayerGroup.addLayer(mBegin).addLayer(mEnd).addLayer(mPath)
-    //     let retimeHandler = () => {
-    //         API.getReTimeRouter(latlngs, this.getContext("currentTime")).done((d) => {
-    //             this.routerChart
-    //             this.layer("router").setData(d)
-    //             this.layer("router").redraw(true)
-    //             mPath.setLatLngs([])
-    //         })
-    //     }
-    //     this.routerPicker.on("from", (e) => {
-    //         mBegin.setLatLng(e.latlngs[0])
-    //         mEnd.setLatLng([0, 0])
-    //         mPath.setLatLngs([])
-    //     })
-    //     this.routerPicker.on("to", (e) => {
-    //         mEnd.setLatLng(e.latlngs[1])
-    //     })
-
-    //     this.routerPicker.on("drawend", (e) => {
-    //         mPath.setLatLngs(e.latlngs)
-    //         this.send("retime-router-done", { latlngs: e.latlngs })
-    //         API.getReTimeRouter(e.latlngs, this.getContext("currentTime")).done((d) => {
-
-    //             this.layer("router").setData(d)
-    //             this.layer("router").redraw(true)
-    //             mPath.setLatLngs([])
-
-    //         })
-    //         latlngs = e.latlngs
-    //         this.on("time-change", retimeHandler)
-    //         API.getReTimeDatas(e.latlngs, this.getContext("currentTime")).done((d) => {
-    //             this.routerChart.clearMearsure()
-    //             this.routerChart.loadMeasures(d)
-    //             mEnd.bindPopup(this.routerChart.toElement())
-    //             mEnd.openPopup()
-    //         })
-    //         setTimeout(() => {
-    //             this.routerPicker.begin()
-    //         }, 200)
-    //     })
-    //     this.routerPicker.on("drawing", (e) => {
-    //         mPath.setLatLngs(e.latlngs)
-
-    //     })
-    //     this.routerPicker.on("drawbegin", (e) => {
-    //         this.send("retime-router-drawing", { latlngs: e.latlngs })
-    //         this.off("time-change", retimeHandler)
-    //         this.layer("router").hide()
-    //     })
-    //     this.routerPicker.begin()
-    // }
+ 
     doReRouter() {
         let adjusterLayers = L.layerGroup([])
         this.vicroadlayers.addLayer(adjusterLayers)

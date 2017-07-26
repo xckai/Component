@@ -96,6 +96,7 @@ export interface IMap{
     addToLeafletControl(layer,id,type?):any
     removeFromLeafletControl(layer):any
 }
+
 export class G2Map  extends Component implements IMap{
      constructor(conf?){
         super(conf)

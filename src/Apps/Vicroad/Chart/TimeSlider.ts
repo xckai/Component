@@ -1,4 +1,4 @@
-/// <reference path="./Vendor/VicroadChart.d.ts" />
+/// <reference path="../Vendor/VicroadChart.d.ts" />
 import { DragAblePanal } from '../../../Jigsaw/Component/Panal/DragAblePanal';
 import moment=require("moment");
 import { TimeAdjust } from 'CustomizedChart/Vicroad/VicroadChart';

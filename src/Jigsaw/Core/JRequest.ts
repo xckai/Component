@@ -91,7 +91,7 @@ export class JRequest extends JPromise{
             success:this.handleDone.bind(this),
             error:this.handleError.bind(this),
             method:this.method.toUpperCase(),
-            data:JSON.stringify(this.buildData(ctx))
+            data:this.buildData?JSON.stringify(this.buildData(ctx)):null
         })
     }
     
@@ -99,11 +99,11 @@ export class JRequest extends JPromise{
         let us=[]
         _.each(_.extend({},this.params,_.pick.apply(null,[this.context].concat(_.keys(this.params))),_.pick.apply(null,[ctx].concat(_.keys(this.params)))),(v:any,k)=>{
             if(_.isArray(this.params[k])){
-                _.each(v,(vv)=>{
-                      us.push(`${k}=${vv}`)
+                _.each(v,(vv:any)=>{
+                      us.push(`${k}=${encodeURIComponent(vv)}`)
                 })
             }else{
-                 us.push(`${k}=${v}`)
+                 us.push(`${k}=${encodeURIComponent(v)}`)
             }
         })
         let base=us.length>0?this.url+"?":this.url

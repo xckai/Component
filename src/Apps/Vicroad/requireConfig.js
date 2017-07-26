@@ -1,18 +1,19 @@
- requirejs.config({
+var nodePath="./node_modules/" 
+requirejs.config({
         //By default load any module IDs from js/lib
         baseUrl: './',
         paths:{
-                leaflet:"../vendor/leaflet/dist/leaflet-src",
-                underscore:"../vendor/underscore/underscore",
-                jquery:"../vendor/jquery/dist/jquery",
-                bootstrap:"../vendor/bootstrap/dist/js/bootstrap",
-                d3:"../vendor/d3/d3",
-                text : "../vendor/text/text",
-                Backbone:"../vendor/backbone/backbone",
-                timepicker:"../vendor/air-datepicker/dist/js/i18n/datepicker.en",
-                timepicker_main:"../vendor/air-datepicker/dist/js/datepicker",
-                "CustomizedChart/Vicroad/VicroadChart":'../dist/Apps/Vicroad/Chart/Vendor/VicroadChart',
-                "moment":"../Vendor/moment/moment"
+                leaflet:nodePath+"leaflet/dist/leaflet-src",
+                underscore:nodePath+"underscore/underscore",
+                jquery:nodePath+"jquery/dist/jquery",
+                bootstrap:nodePath+"bootstrap/dist/js/bootstrap",
+                d3:nodePath+"d3/build/d3",
+                text : nodePath+"text/text",
+                Backbone:nodePath+"backbone/backbone",
+                timepicker:nodePath+"air-datepicker/dist/js/i18n/datepicker.en",
+                timepicker_main:nodePath+"air-datepicker/dist/js/datepicker",
+                "CustomizedChart/Vicroad/VicroadChart":'./dist/Apps/Vicroad/Vendor/VicroadChart',
+                "moment":nodePath+"moment/moment"
         },
         shim:{
                 leaflet:{

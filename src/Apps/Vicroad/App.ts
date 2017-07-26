@@ -1,4 +1,3 @@
-import { duration } from '../../../vendor/moment/moment';
 import { App } from '../../Jigsaw/Core/App';
 import { TimeSlider } from './Chart/TimeSlider';
 import { VicroadMap } from './Map/VicroadMap';
@@ -8,7 +7,7 @@ import { SimulatorPanal } from './Panal/SimulatorPanal';
 import { G2Map } from '.../../Jigsaw/Component/Map/G2Map';
 import { CircleLoader } from '../../Jigsaw/Component/Loader/CircleLoader';
 import { IProgressLoader } from '../../Jigsaw/Component/Loader/ILoader';
-import moment = require('moment');
+import  * as moment  from 'moment';
 
 export class MainApp extends App {
     constructor(conf?){
