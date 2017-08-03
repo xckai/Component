@@ -60,7 +60,7 @@ export class SimulatorPanal extends Side{
            // this.simulatorView.setAdjusterActive(false) 
             isButtonEnable()            
         })
-        this.on("simulation:calculation-done",()=>{
+        this.on("simulation_calculation_done",()=>{
             this.simulatorView.setRouterEnable(true)
         })  
    }
@@ -80,11 +80,11 @@ export class SimulatorPanal extends Side{
                 console.log('open');
                 eb.registerHandler("client.CTMProgress", function(err, msg){
                     console.log('received  '+msg.body);
-                    self.send("simulation:calculation-progress",{value:msg.body})
+                    self.send("simulation_calculation_progress",{value:msg.body})
                 });
                 eb.registerHandler("client.CTMComplete",function(){
                     console.log("Calculation done")
-                    self.send("simulation:calculation-done")
+                    self.send("simulation_calculation_done")
                     eb.onclose = function (e) {};
                     eb.close()
                 })
@@ -96,7 +96,7 @@ export class SimulatorPanal extends Side{
        }
       
     API.beginSimulation(controls,this.dateTime).done(()=>{
-            this.send("simulation:begin-calculation",{dateTime:this.dateTime,duration:this.duration})
+            this.send("simulation_begin_calculation",{dateTime:this.dateTime,duration:this.duration})
             enableEventBus()
         })
    }
@@ -138,6 +138,7 @@ class SimulatorView extends View{
         this.trigger("simulator-apply",{dateTime:new Date(this.$(".datetimeinput").val()),duration:this.$(".durationinput").val()})
         this.setAdjusterEnable(false)
         this.setApplyButtonIsEnable(false)
+        this.$(".datetimeinput").off("focus")
         
         
     }

@@ -66,13 +66,14 @@ export class VicroadMap extends G2Map {
             this.roadPicker.off("*")
             let latlngs
             let chart = new VicroadLineChart({
-                chartTitle: {
-                    value: "Travel Time Chart"
-                },
+                
                 style: { width: "30rem", height: "20rem" }, line: {
                     defaultTimeAdjust: this.getContext("currentTime")
                 }
             })
+            chart.setConfig({chartTitle: {
+                    value: "Travel Time Chart"
+                }})
             let layers = L.layerGroup([])
             this.vicroadlayers.addLayer(layers)
             let mBegin = L.marker([0, 0], { icon: L.divIcon({ className: 'routerFrom' }) }), mEnd = L.marker([0, 0], { icon: L.divIcon({ className: 'routerTo' }) }), mPath = L.polyline([], { interactive: false })
@@ -96,6 +97,7 @@ export class VicroadMap extends G2Map {
 
             this.routerPicker.on("drawend", (e) => {
                 mPath.setLatLngs(e.latlngs)
+               
                 this.send("retime-router-done", { latlngs: e.latlngs })
                 API.getReTimeRouter(e.latlngs, this.getContext("currentTime")).done((d) => {
                     this.layer("router").setData(d)
@@ -106,8 +108,9 @@ export class VicroadMap extends G2Map {
                 latlngs = e.latlngs
                 this.on("time-change", retimeHandler)
                 API.getReTimeDatas(e.latlngs, this.getContext("beginTime")).done((d) => {
-                    chart.clearMeasure()
+
                     chart.loadMeasures(d)
+
                     this.on("time-change", (d) => {
                         setTimeout(() => {
                             chart.setTimeAdjust(this.getContext("currentTime"))
@@ -123,12 +126,16 @@ export class VicroadMap extends G2Map {
             })
             this.routerPicker.on("drawing", (e) => {
                 mPath.setLatLngs(e.latlngs)
+               
 
             })
             this.routerPicker.on("drawbegin", (e) => {
                 // this.send("retime-router-drawing", { latlngs: e.latlngs })
                 this.off("time-change", retimeHandler)
                 this.layer("router").hide()
+                chart.clearMeasure()
+                mEnd.bindPopup(chart.toElement())
+
                
             })
             this.routerPicker.begin()
@@ -142,24 +149,29 @@ export class VicroadMap extends G2Map {
         this.vicroadlayers.addLayer(routerLayers)
         let roadPickLayers = L.layerGroup([])
         this.vicroadlayers.addLayer(roadPickLayers)
-
-        let clearMap = () => {
+         this.off("simulation_calculation_done")
+        let doAdjuster = () => {
             roadPickLayers.clearLayers()
             routerLayers.clearLayers()
             adjusterLayers.clearLayers()
-            this.off("time-change")
             this.layer("router").hide()
-        }
-        let doAdjuster = () => {
-            clearMap()
+
             let oneAdjuster = () => {
                 this.roadPicker.off("*")
                 ////begin adjute road
                 let adjuster = new Adjuster()
+                let roadMark = L.marker([0, 0], { icon: L.divIcon({ className: 'adjusterIcon fa fa-times' }) })
+                this.on("simulation_begin_calculation",()=>{
+                    adjuster.disable()
+                    roadMark.closePopup()
+                })
                 this.proxyEvents(adjuster, "simulate-road-change")
                 let road = L.polyline([], { color: "#af1919" })
+                let arrow=new Arrow([0,0])
+                arrow.setColor("#af1919" )
                 adjusterLayers.addLayer(road)
-                let roadMark = L.marker([0, 0], { icon: L.divIcon({ className: 'adjusterIcon fa fa-times' }) })
+                adjusterLayers.addLayer(arrow)
+               
                 roadMark.bindPopup(adjuster.getNode())
                 adjusterLayers.addLayer(roadMark)
 
@@ -185,6 +197,7 @@ export class VicroadMap extends G2Map {
                     }
                     if (e.path) {
                         road.setLatLngs(e.path)
+                        arrow.asideEnd(e.path)
 
                     }
                     if (e.roadNum != undefined) {
@@ -198,12 +211,9 @@ export class VicroadMap extends G2Map {
                     roadMark.setOpacity(1)
                 })
                 this.roadPicker.begin()
-                this.on("simulate-road-change", () => {
-                    this.roadPicker.off("*")
-                })
             }
             oneAdjuster()
-            this.on("simulate-road-change", () => {
+            this.on("simulate-road-change:reRoute", () => {
                 oneAdjuster()
             })
         }
@@ -223,43 +233,61 @@ export class VicroadMap extends G2Map {
             this.on("time-change", this.updateSimulationResult, this)
         }
         let doRoadPick = () => {
-            clearMap()
+            roadPickLayers.clearLayers()
+            routerLayers.clearLayers()
+            this.layer("router").hide()
+            this.off("time-change:router")
+            this.off("simulate-road-change:reRoute")
             this.roadPicker.off("*")
             this.routerPicker.off("*")
+
             let roadChart = new VicroadLineChart({
-                axis:{
+                 style: { width: "30rem", height: "20rem" } 
+            })
+            roadChart.setConfig({axis:{
                     yAxisTitleType:"speed"
                 },
                 chartTitle: {
                     value: "Road Speed Chart"
-                }, style: { width: "30rem", height: "20rem" } 
-            })
+                },line:{
+                    yAxisTitleType:"speed"
+                }})
             let roadMark = L.marker([0, 0])
             roadPickLayers.addLayer(roadMark)
+            let arrow=new Arrow([0,0])
+            arrow.setColor("#3388ff" )
+            roadPickLayers.addLayer(arrow)
             let road = L.polyline([])
             roadPickLayers.addLayer(road)
             this.roadPicker.on("drawing", (e) => {
                 roadMark.setOpacity(1)
+                this.off("time-change:roadDetail")
                 roadMark.setLatLng(e.latlng)
                 //this.send("reRouter:rePickRoad")
             })
             this.roadPicker.on("fail", (e) => {
+                roadChart.clearMeasure()
+                road.setLatLngs([])
+                arrow.setLatLng([0,0])
                 roadMark.setOpacity(.5)
             })
             this.roadPicker.on("drawend", (e) => {
+                
                 if (e.point) {
                     roadMark.setLatLng(e.point)
                 }
                 if (e.path) {
                     road.setLatLngs(e.path)
+                    arrow.asideEnd(e.path)
                 }
                 if (e.id) {
                     API.getSimulationRoadDetail(e.id, this.getContext("beginTime")).done((d) => {
-                        roadChart.clearMeasure()
+                       
                         roadChart.loadMeasures(d)
                         roadMark.bindPopup(roadChart.toElement())
+                        roadMark.openPopup()
                         roadChart.setTimeAdjust(this.getContext("currentTime"))
-                        this.on("time-change", () => {
+                        this.on("time-change:roadDetail", () => {
                             setTimeout(() => {
                                 roadChart.setTimeAdjust(this.getContext("currentTime"))
                             }, 10)
@@ -272,12 +300,19 @@ export class VicroadMap extends G2Map {
         }
 
         let doRouter = () => {
+            roadPickLayers.clearLayers()
+            routerLayers.clearLayers()
+            this.layer("router").hide()
+            this.off("time-change:roadDetail")
             this.roadPicker.off("*")
             this.routerPicker.off("*")
-            clearMap()
+
             let mBegin = L.marker([0, 0], { icon: L.divIcon({ className: 'routerFrom' }) }), mEnd = L.marker([0, 0], { icon: L.divIcon({ className: 'routerTo' }) }), mPath = L.polyline([], { interactive: false })
             routerLayers.addLayer(mBegin).addLayer(mEnd).addLayer(mPath)
-
+            let linechart = new VicroadLineChart({ style: { width: "30rem", height: "20rem" } })
+                linechart.setConfig({chartTitle:{
+                    value:"Travel Time Chart"
+                }})
             this.routerPicker.on("from", (e) => {
                 mBegin.setLatLng(e.latlngs[0])
                 mEnd.setLatLng([0, 0])
@@ -303,7 +338,7 @@ export class VicroadMap extends G2Map {
                     mPath.setLatLngs([])
                 })
                 let latlngs = e.latlngs
-                this.on("time-change", () => {
+                this.on("time-change:router:layer", () => {
                     API.getReTimeRouter(e.latlngs, this.getContext("currentTime")).done((d) => {
 
                         this.layer("router").setData(d)
@@ -313,11 +348,10 @@ export class VicroadMap extends G2Map {
                     })
                 })
                 API.getSimulationRouterChartData(e.latlngs, this.getContext("beginTime")).done((d) => {
-                    let linechart = new VicroadLineChart({chartTitle:{
-                    value:"Travel Time Chart"
-                }, style: { width: "30rem", height: "20rem" } })
+                    
+                
                     linechart.loadMeasures(d)
-                    this.on("time-change", () => {
+                    this.on("time-change:router:chart", () => {
                         setTimeout(() => {
                             linechart.setTimeAdjust(this.getContext("currentTime"))
                         }, 10)
@@ -336,17 +370,8 @@ export class VicroadMap extends G2Map {
             this.routerPicker.on("drawbegin", (e) => {
                 //this.send("reRouter:reRoute")
                 this.layer("router").hide()
-
-
-                this.off("time-change", () => {
-                    API.getReTimeRouter(e.latlngs, this.getContext("currentTime")).done((d) => {
-                        this.layer("router").setData(d)
-                        this.layer("router").redraw()
-                        mPath.setLatLngs([])
-
-                        //
-                    })
-                })
+                linechart.clearMeasure()
+                this.off("time-change:router")
                 this.layer("router").hide()
             })
             this.routerPicker.begin()
@@ -354,14 +379,18 @@ export class VicroadMap extends G2Map {
 
 
         let simulationDone = () => {
-            clearMap()
+            roadPickLayers.clearLayers()
+            routerLayers.clearLayers()
+            this.layer("router").hide()
+
             showSimultaionResult()
             doRoadPick()
             this.on("simulate-router-btn-off", doRoadPick, this)
             this.on("simulate-router-btn-on", doRouter, this)
 
         }
-        this.on("simulation:calculation-done", simulationDone, this)
+       
+        this.on("simulation_calculation_done", simulationDone, this)
         this.on("adjuster-btn-on", doAdjuster, this)
 
     }
@@ -664,4 +693,41 @@ export class VicroadMap extends G2Map {
     }
     pickableArea: L.Polygon
 
+}
+export class Arrow extends L.Marker{
+   constructor(latlng?){
+       super(latlng,{icon: L.divIcon({ className: 'leaflet-arrow-container' })})
+   }
+   onAdd(l){
+       super.onAdd(l)
+       let node=this.arrowElement=document.createElement("div")
+       node.className="fa fa-arrow-up"
+       this.getElement().appendChild(node)
+       this.setColor(this.color)
+       return this
+   }
+   color:string
+   arrowElement:HTMLElement
+   setRotation(r){
+       
+        this.arrowElement.style.transform=`rotate(${r}deg)`
+        this.arrowElement.style.transformOrigin="center"
+   }
+   setColor(c){
+      this.color=c
+      if(this.arrowElement){
+           this.arrowElement.style.color=c
+      }
+   }
+   asideEnd(p:L.LatLng[]){
+       let ps=_.last(p,2)
+       let p1=ps[0],p2=ps[1]
+       let angle=0
+        angle = Math.atan2((p2.lng - p1.lng), (p2.lat -p1.lat)) * 180 / Math.PI;
+        angle%=360
+        this.setRotation(angle)
+        this.setLatLng(p2)
+        return this
+
+   }
 }

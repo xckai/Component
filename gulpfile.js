@@ -89,7 +89,7 @@ gulp.task("vicroad", ["vicroadinit"], () => {
 
     var middleware = proxy(['/service/apps',
         '/apps', '/lib', '/sap_logon.html', '/j_spring_security_check', '/resources'], {
-            target: 'http://10.58.75.98:8080',
+            target: 'http://10.58.75.98:8123',
 
             //target:"http://10.59.176.34:8080"
         })
@@ -229,5 +229,8 @@ gulp.task("bundlejs", () => {
 gulp.task("release",["bundlecss","bundlejs"],()=>{
     gulp.src("./src/Apps/Vicroad/circleLoader.*").pipe(gulp.dest("release/Vicroad/loader"))
     gulp.src("./src/Apps/Vicroad/index-release.html").pipe(rename("index.html")).pipe(gulp.dest("release/Vicroad"))
-    gulp.src("./node_modules/requirejs/requirejs.js").pipe(gulp.dest("release/Vicroad"))
+    gulp.src("./node_modules/requirejs/require.js").pipe(gulp.dest("release/Vicroad"))
+})
+gulp.task("copy",()=>{
+     gulp.src("./node_modules/requirejs/require.js").pipe(gulp.dest("release/Vicroad"))
 })

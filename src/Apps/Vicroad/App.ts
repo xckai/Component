@@ -46,7 +46,7 @@ export class MainApp extends App {
         this.on("time-change",(d)=>{   
             this.setContext("currentTime", moment(d.dateTime).seconds(0).milliseconds(0).toDate())
         })
-        this.on("simulation:begin-calculation",(d)=>{
+        this.on("simulation_begin_calculation",(d)=>{
             this.setContext("beginTime",moment(d.dateTime).add(15,"m").seconds(0).milliseconds(0).toDate())
             this.setContext("duration",d.duration)
             this.send("beginTimeChange",{dateTime:this.getContext("beginTime"),duration:d.duration})
@@ -61,8 +61,8 @@ export class MainApp extends App {
             
     }   
     initReRouter(){  
-         this.on("simulation:begin-calculation",this.showProgressBar,this)
-         this.on("simulation:calculation-done",this.hiddenProgressBar,this)
+         this.on("simulation_begin_calculation",this.showProgressBar,this)
+         this.on("simulation_calculation_done",this.hiddenProgressBar,this)
     }
     initReTime(){
 
@@ -114,7 +114,7 @@ export class MainApp extends App {
             let progressBar=this.progressBar
             progressBar.addTo(this.rootView.getNode())
             progressBar.show()
-            this.on("simulation:calculation-progress",(d)=>{progressBar.setProgress(d.value)},this) 
+            this.on("simulation_calculation_progress",(d)=>{progressBar.setProgress(d.value)},this) 
         }
        
     }

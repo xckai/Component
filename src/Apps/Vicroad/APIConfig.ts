@@ -253,10 +253,30 @@ export namespace API{
                 fc=d
             }
             _.each(fc.features,(f)=>{
-                        origion.push({x:f["TIMESLOT"],y:f["ORIGION_SPEED"]})
-                        change.push({x:f["TIMESLOT"],y:f["CHANGE_SPEED"]})
+                        let b=new Date(f['TIMESLOT'])
+                        let t=new Date(Date.UTC(b.getFullYear(),b.getMonth(),b.getDate(),b.getHours(),b.getMinutes(),b.getSeconds())).toString()
+                        origion.push({x:t,y:f["ORIGION_SPEED"]})
+                        change.push({x:t,y:f["CHANGE_SPEED"]})
                     })
-            r.doDone([{id:1, data:origion, type:"line"},{id:2, data:change, type:"line"}])
+            let ro=_.reduce(origion,(r:any,d)=>{
+                if(d.x){
+                    if(d.y==undefined){
+                        d.y=0
+                    }
+                    r.push(d)
+                }
+                return r
+            },[])
+            let rc=_.reduce(change,(r:any,d)=>{
+                if(d.x){
+                    if(d.y==undefined){
+                        d.y=0
+                    }
+                    r.push(d)
+                }
+                return r
+            },[])
+            r.doDone([{id:"Before ReRoute", data:ro, type:"line"},{id:"After ReRoute", data:rc, type:"line"}])
         })
         r.send({id,timeFrom:moment(time).format("YYYY-MM-DDTHH:mm:00Z")})
         return r
@@ -270,7 +290,7 @@ export namespace API{
          let rs1=JMultiRequest(5,(r,i)=>{
              r.url=url;
              r.params={
-                 l:ls,timeFrom:"",catagory:1, project:"user1"
+                 l:ls,timeFrom:"",category:0, project:"user1"
              }
              r.setContext({timeFrom:moment(time).add(15*i,'m').format("YYYY-MM-DDTHH:mm:00Z")})
              r.changeDoneHandler((d)=>{
@@ -281,14 +301,14 @@ export namespace API{
                         t+=+Util.getProperty(f,"time")
                     }
                 })
-                console.log(r.context["timeFrom"],t)
+                
                 r.doDone({y:t,x:r.context["timeFrom"]})
             })
          })
          let rs2=JMultiRequest(5,(r,i)=>{
              r.url=url;
              r.params={
-                 l:ls,timeFrom:"",catagory:1
+                  l:ls,timeFrom:"",category:1, project:"user1"
              }
              r.setContext({timeFrom:moment(time).add(15*i,'m').format("YYYY-MM-DDTHH:mm:00Z")})
              r.changeDoneHandler((d)=>{
@@ -305,7 +325,7 @@ export namespace API{
          })
         JWhenAll(rs1.concat(rs2)).done(
             (d0,d1,d2,d3,d4,d5,d6,d7,d8,d9)=>{
-                p.doDone([{id:1, data:[d0,d1,d2,d3,d4], type:"line"},{id:2, data:[d5,d6,d7,d8,d9], type:"line"}])
+                p.doDone([{id:"Before ReRoute", data:[d0,d1,d2,d3,d4], type:"line"},{id:"After ReRoute", data:[d5,d6,d7,d8,d9], type:"line"}])
             }
         ).fail((d)=>{
             p.doFail(d)

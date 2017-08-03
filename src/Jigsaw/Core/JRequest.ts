@@ -100,10 +100,19 @@ export class JRequest extends JPromise{
         _.each(_.extend({},this.params,_.pick.apply(null,[this.context].concat(_.keys(this.params))),_.pick.apply(null,[ctx].concat(_.keys(this.params)))),(v:any,k)=>{
             if(_.isArray(this.params[k])){
                 _.each(v,(vv:any)=>{
-                      us.push(`${k}=${encodeURIComponent(vv)}`)
+                      if(/^:{1}/.test(vv)){
+                           us.push(`${k}=${vv}`)
+                      }else{
+                          us.push(`${k}=${encodeURIComponent(vv)}`)
+                      }
+                     
                 })
             }else{
-                 us.push(`${k}=${encodeURIComponent(v)}`)
+                if(/^:{1}/.test(v)){
+                          us.push(`${k}=${v}`)
+                      }else{
+                          us.push(`${k}=${encodeURIComponent(v)}`)
+                      }
             }
         })
         let base=us.length>0?this.url+"?":this.url

@@ -17,6 +17,12 @@ export class Adjuster extends View{
             "click .operation .btn":"onBtn"
        }
     }
+    disable(){
+        this.$("button").addClass("btn-disable")
+    }
+    enable(){
+        this.$("button").removeClass("btn-disable")
+    }
     onBtn(e){
         let i=$(e.currentTarget ).attr("index")
         let roads=this.data.roads
