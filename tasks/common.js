@@ -51,12 +51,12 @@ module.exports=function(gulp){
         gulp.watch('**/*.ts', { cwd: path.resolve(cwdSrc, baseSrc) }, (e) => {
             console.log(e)
             gulp.src(e.path, { base: baseSrc })
-                .pipe(ts.createProject("tsconfig.json"))
+                .pipe(ts.createProject("tsconfig.json")())
                 .pipe(gulp.dest(path.resolve(cwdDist, baseDist)))
         })
         gulp.watch('**/*.less', { cwd: path.resolve(cwdSrc, baseSrc) }, e => {
             console.log(e)
-            gulp.src(path.resolve(cwdSrc, baseSrc, "./**/*.less"), { base: baseSrc })
+            gulp.src(path.resolve(cwdSrc, baseSrc, "./**/main.less"), { base: baseSrc })
                 .pipe(plumber())
                 .pipe(less().on("error",function(e){
                     gutil.log(e)

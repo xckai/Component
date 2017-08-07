@@ -66,7 +66,8 @@ export class EventBus extends Evented{
         })
     }
     observe(c:EventBus){
-          c.eventBusParent=this
-          this.addChildrenEventBus(c)
+        ///observe all eventbus's event
+          this.eventBusParent=this
+          c.addChildrenEventBus(this)
     }
 }
