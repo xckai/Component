@@ -7,6 +7,7 @@ export class App extends Component{
     constructor(conf?){
         super(_.extend({el:"body"},conf))
         this.id=_.uniqueId("App")
+        this.start()
      }
      start(){
         Backbone.history.start()

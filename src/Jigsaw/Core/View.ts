@@ -1,41 +1,28 @@
 import Backbone = require('backbone');
 import _ = require("lodash")
 import { Util } from "../Utils/Util"
+import { Model } from "./Model";
 export interface IViewConfig {
-    tagName: string | null | undefined,
-    className: string | null | undefined,
-    el: HTMLElement | SVGAElement,
-    $el: JQuery | undefined
-    style: IViewStyle
+    tagName?: string | null | undefined,
+    className?: string | null | undefined,
+    el?: HTMLElement | SVGAElement,
+    $el?: JQuery | undefined,
+    model?:Model
+    class?:string
+    position?:string,
+    left?:string,
+    right?:string,
+    top?:string,
+    bottom?:string
+    width?:string
+    height?:string
 }
-export interface IViewStyle {
-    position: string | null | undefined,
-    left: string | null | undefined,
-    right: string | null | undefined,
-    top: string | null | undefined,
-    bottom: string | null | undefined,
-    width: string | null | undefined,
-    height: string | null | undefined
-}
-const defaultConfig: IViewConfig ={
-            tagName:"div",
-            el: undefined,
-            $el: undefined,
-            className:undefined,
-            style: {
-                position: "absolute",
-                left: "0px",
-                right: "0px",
-                top: "0px",
-                bottom: "0px",
-                width: null,
-                height: null
-            }
-        }
 export class View extends Backbone.View<Backbone.Model>{
-    constructor(conf?) {
-        super(_.extend({},defaultConfig,conf))
-        this.style(_.extend({},defaultConfig.style,(conf||{}).style))      
+    constructor(conf?:IViewConfig) {
+        super(_.extend({tagName:"div"},conf))
+        let styleObj=_.pick(conf,"left","position","right","top","bottom","width","height")
+        this.style(styleObj)
+        this.addClass(_.pick(conf,["class"])["class"])
     }
 getNode$() {
     return this.$el
@@ -51,15 +38,6 @@ getContentNode$() {
 }
 attr(obj) {
     this.$el.attr(obj)
-    return this
-}
-setDate(o: string | Object, v ?: string) {
-    if (_.isString(o)) {
-        this.model.set(o, v)
-    }
-    if (_.isObject(o)) {
-        this.model.set(o)
-    }
     return this
 }
 style(obj) {
