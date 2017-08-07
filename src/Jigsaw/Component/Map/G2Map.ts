@@ -1,4 +1,4 @@
-import _ = require('underscore');
+import _ = require("lodash")
 import { W } from './DS';
 import L= require("leaflet")
 import {View} from "../../Core/View"

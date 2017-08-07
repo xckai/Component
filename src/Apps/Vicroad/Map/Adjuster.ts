@@ -1,7 +1,7 @@
 ///<reference path="../Module.ts" />
 import { Model } from "../../../Jigsaw/Core/Model"
 import { View } from "../../../Jigsaw/Core/View"
-import _ =require("underscore")
+import _ =require("lodash")
 export interface IRoad{
     id:string,
     name:string,
@@ -55,7 +55,7 @@ export class Adjuster extends View{
         return this
     }
     getRenderData(){
-        let n= _.pick(this.data,"roads","name","id")
+        let n= this.data
         n.roads=_.map(n.roads,(dd:any)=>{
                         let n:any={}
                         n.name=dd.name

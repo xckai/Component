@@ -1,7 +1,7 @@
 import {View} from "./View"
-import _ =require("underscore")
+import _ =require("lodash")
 import {Util}from "../Utils/Util"
-import {EventBus} from "./Evented"
+import {EventBus} from "./EventBus"
 const getProperty=Util.getProperty
 export class Component extends EventBus  {
      constructor(conf?){

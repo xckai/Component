@@ -22,26 +22,33 @@ declare module "Core/Util" {
     }
 }
 declare module "Core/Evented" {
-    export interface IEvented {
-        on: (t: string, fn: Function, ctx?: object) => this;
-        off: (t: string, fn: Function) => this;
-        fire: (t: string, obj?: any) => this;
-        listen: (o: IEvented, estr: string, fn: Function) => this;
-        clear: () => void;
-    }
-    export class Evented implements IEvented {
+    export type EventsDataObj = {
+        [key: string]: {
+            callback: Function;
+            context: Object | null | undefined;
+        }[];
+    };
+    export class Evented {
+        eventId: string;
+        private eventObj;
+        private eventSplitter;
+        private eventSuffixSplitter;
         constructor();
-        private events;
-        private parent;
-        on(t: string, fn: Function, ctx?: Object): this;
-        private _on(t, fn, ctx?);
-        private _off(t, fn?, ctx?);
-        off(t: string, fn: Function): this;
-        fire(t: string, obj?: any): this;
-        listen(o: IEvented, estr: string, fn: Function): this;
-        listenTo(e: Evented): this;
-        clear(): void;
-        proxyEvents(obj: IEvented, ...args: any[]): void;
+        private offKeyMatcher(objkey, key);
+        private triggerKeyMatcher(objkey, key);
+        setEventSplitter(s: any): this;
+        setEventSuffixSplitter(s: any): this;
+        static eachEvent(iteratee: (eventObj: Evented, eventsDataObj: EventsDataObj, name, callback, context?, args?) => any, eventObj: Evented, name: any, callback: any, context?: any, args?: any): void;
+        static onApi(eventObj: Evented, eventsDataObj: EventsDataObj, name: any, callback: any, context?: any): Evented;
+        static offApi(eventObj: Evented, eventsDataObj: EventsDataObj, key: any, callback?: any, context?: any): Evented;
+        static onceApi(eventObj: Evented, eventsDataObj: EventsDataObj, key: any, callback: any, context?: any): void;
+        static triggerApi(eventObj: Evented, eventsDataObj: EventsDataObj, key: any, callback: any, context?: any, args?: any): void;
+        on(keys: any, callback: any, context?: any): this;
+        off(keys: any, callback?: any, context?: any): this;
+        once(keys: any, callback: any, context?: any): this;
+        trigger(keys: any, ...args: any[]): this;
+        fire(keys: any, ...args: any[]): this;
+        proxyEvents(e: Evented, ...args: any[]): void;
     }
 }
 declare module "Core/View" {
@@ -188,7 +195,7 @@ declare module "Core/BaseMeasure" {
     }
     export class BaseMeasure implements IBaseMeasure {
         id: string;
-        data: any;
+        data: any[];
         type: string;
         style: any;
         constructor(id?: any, data?: any, type?: any, style?: any);
@@ -200,8 +207,8 @@ declare module "Component/MultiDataChart/MultiTypeMeasure" {
     export interface IMultiDataMeasure extends IBaseMeasure, IGetDomain {
     }
     export class MultiDataMeasure extends BaseMeasure implements IMultiDataMeasure {
-        max(k?: any): any;
-        min(k?: any): any;
+        max(k?: string): any;
+        min(k?: string): any;
         getDomain(k?: any): any[];
     }
 }

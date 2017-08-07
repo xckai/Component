@@ -1,5 +1,5 @@
 import { G2Map } from "../../../Jigsaw/Component/Map/G2Map"
-import _ = require('underscore');
+import _ = require('lodash');
 import L = require('leaflet')
 import moment = require("moment")
 import { Adjuster } from './Adjuster';
@@ -720,7 +720,7 @@ export class Arrow extends L.Marker{
       }
    }
    asideEnd(p:L.LatLng[]){
-       let ps=_.last(p,2)
+       let ps=_.takeRight(p,2)
        let p1=ps[0],p2=ps[1]
        let angle=0
         angle = Math.atan2((p2.lng - p1.lng), (p2.lat -p1.lat)) * 180 / Math.PI;

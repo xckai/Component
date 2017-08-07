@@ -1,6 +1,6 @@
 import {W2} from "../../Data/DataDefine"
 import * as leaflet from 'leaflet';
-import _ = require('underscore');
+import _ = require("lodash")
 function _evaluate(v, args?, std?) {
         if (_.isFunction(v)) {
             var v2 = v.apply(null, args);
@@ -134,7 +134,7 @@ export namespace W{
             return this
         }
         values():T1{
-            let r=_.mapObject(this.obj,(v,ix)=>{
+            let r=_.mapValues(this.obj,(v,ix)=>{
                 return _evaluate(v,this.args,this.defalut[ix])
             })
             return _.defaults(r,this.defalut)   
@@ -156,7 +156,7 @@ export namespace W{
     }
     export function values<T>(obj:T,...args){
         return <T1>(defaults:T1):T1=>{
-                    var r = _.mapObject(obj, function (v, ix) {
+                    var r = _.mapValues(obj, function (v, ix) {
                          return _evaluate(v, args, defaults[ix]);
                     });
                     return _.defaults(r, defaults);
@@ -170,7 +170,7 @@ export namespace W{
                     return _evaluate(obj[k], args, std);
                 } else { // whole object mode
                     var defaults = k;
-                    var r = _.mapObject(obj, function (v, ix) {
+                    var r = _.mapValues(obj, function (v, ix) {
                         if (defaults) {
                             return _evaluate(v, args, defaults[ix]);
                         } else {
@@ -188,7 +188,7 @@ export namespace W{
          var _urls = url.split("?");
             let _url = _urls[0];
             let rs = _.chain(_url)
-                .reduce(function (memo, a) {
+                .reduce(function (memo, a:string) {
                     if (a === "/" || a === ".") {
                         memo.push(a);
                         memo.push("");
@@ -212,7 +212,7 @@ export namespace W{
             if (_urls.length > 1) {
                 var _queries = _urls[1].split("&");
                 r = _.chain(_queries)
-                    .reduce(function (memo, a, ix0) {
+                    .reduce(function (memo, a:any, ix0) {
                         var nv = a.split("=");
                         if (ix0 > 0) {
                             memo += "&";
@@ -250,7 +250,7 @@ export namespace W{
     
     export function toGeometries (vs, extent, zoom) {
             vs.features = _.map(vs.features, function (g) {
-                return _.mapObject(g, function(v, k) {
+                return _.mapValues(g, function(v, k) {
                     if(!v.t && v.t !== 0) {
                         return v;
                     }
@@ -350,7 +350,7 @@ export namespace W{
                     let mercator = W.mercator(256);
                     let newVs=JSON.parse(JSON.stringify(vs))
                         newVs.features=_.map(vs.features,(g)=>{
-                            return _.mapObject(g,(v,k)=>{
+                            return _.mapValues(g,(v,k)=>{
                                 v.p = _.map(v.p, function (path:any[]) {
                                     return _.map(path, function (p) {
                                         return mercator.lonLat2Pixel(p, extent, zoom);

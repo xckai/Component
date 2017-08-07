@@ -1,7 +1,6 @@
-import Backbone = require('Backbone');
-import _ = require("underscore")
+import Backbone = require('backbone');
+import _ = require("lodash")
 import { Util } from "../Utils/Util"
-import { EventBus } from "./Evented"
 export interface IViewConfig {
     tagName: string | null | undefined,
     className: string | null | undefined,

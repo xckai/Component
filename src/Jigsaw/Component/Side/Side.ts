@@ -2,7 +2,7 @@ import {Component} from"../../Core/Component"
 import {Model} from"../../Core/Model"
 import { View } from "../../Core/View"
 import {Util}from "../../Utils/Util"
-import _=require("underscore")
+import _=require("lodash")
 class SideView extends View{
     constructor(conf?){
         super(conf)

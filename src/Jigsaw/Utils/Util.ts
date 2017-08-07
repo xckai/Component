@@ -1,4 +1,4 @@
-import _ =require("underscore")
+import _ =require("lodash")
 import {curry}from "./FP"
 export module Util{
 export function isEndWith(s:any,ed:string){

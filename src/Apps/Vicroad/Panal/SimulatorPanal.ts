@@ -7,7 +7,7 @@ import { Model } from '../../../Jigsaw/Core/Model';
 import { View } from '../../../Jigsaw/Core/View';
 import { IRoad } from '../Map/Adjuster';
 import{API}from "../APIConfig"
-import _ = require('underscore');
+import _ = require('lodash');
 import { Util } from "../../../Jigsaw/Utils/Util";
 declare var EventBus: any
 export class SimulatorPanal extends Side{

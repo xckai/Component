@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define("Core/Util", ["require", "exports", "underscore"], function (require, exports, _) {
+define("Core/Util", ["require", "exports", "lodash"], function (require, exports, _) {
     "use strict";
     exports.__esModule = true;
     var Util;
@@ -272,112 +272,145 @@ define("Core/Util", ["require", "exports", "underscore"], function (require, exp
         Util.enableAutoResize = enableAutoResize;
     })(Util = exports.Util || (exports.Util = {}));
 });
-define("Core/Evented", ["require", "exports", "underscore"], function (require, exports, _) {
+define("Core/Evented", ["require", "exports", "lodash"], function (require, exports, _) {
     "use strict";
     exports.__esModule = true;
     var Evented = (function () {
         function Evented() {
-            this.events = {};
+            this.eventObj = {};
+            this.eventId = _.uniqueId("event-");
+            this.setEventSplitter(" ");
+            this.setEventSuffixSplitter(":");
         }
-        Evented.prototype.on = function (t, fn, ctx) {
-            var _this = this;
-            var st = t.split(" ");
-            st.forEach(function (tt) {
-                _this._on(tt, fn, ctx);
-            });
+        Evented.prototype.offKeyMatcher = function (objkey, key) {
+            if (key == "*" || key == "all") {
+                return true;
+            }
+            else {
+                var reg = new RegExp("^" + key + ":{1}|^" + key + "$");
+                return reg.test(objkey);
+            }
+        };
+        Evented.prototype.triggerKeyMatcher = function (objkey, key) {
+            if (key == "*" || key == "all" || objkey == "*" || objkey == "all") {
+                return true;
+            }
+            else {
+                key = key.split(this.eventSuffixSplitter)[0].trim();
+                objkey = objkey.split(this.eventSuffixSplitter)[0].trim();
+                return key == objkey;
+            }
+        };
+        Evented.prototype.setEventSplitter = function (s) {
+            this.eventSplitter = s;
             return this;
         };
-        Evented.prototype._on = function (t, fn, ctx) {
-            if (this.events[t]) {
-                if (_.some(this.events[t], function (e) { return e.fn == fn && e.ctx == ctx; })) {
-                    return;
+        Evented.prototype.setEventSuffixSplitter = function (s) {
+            this.eventSuffixSplitter = s;
+            return this;
+        };
+        Evented.eachEvent = function (iteratee, eventObj, name, callback, context, args) {
+            var names = name.split(eventObj.eventSplitter);
+            for (var i = 0; i < names.length; ++i) {
+                iteratee(eventObj, eventObj.eventObj, names[i], callback, context, args);
+            }
+        };
+        Evented.onApi = function (eventObj, eventsDataObj, name, callback, context) {
+            if (_.isFunction(callback)) {
+                var handlers = eventsDataObj[name] || (eventsDataObj[name] = []);
+                var handler = {
+                    callback: callback, context: context
+                };
+                var isFind = _.some(handlers, function (h) { return h.callback == callback && h.context == context; });
+                if (isFind) {
+                    return eventObj;
                 }
                 else {
-                    var obj = {};
-                    obj.fn = fn;
-                    obj.ctx = ctx;
-                    this.events[t].push(obj);
+                    handlers.push(handler);
+                    return eventObj;
                 }
             }
-            else {
-                this.events[t] = [];
-                var obj = {};
-                obj.fn = fn;
-                obj.ctx = ctx;
-                this.events[t].push(obj);
-            }
         };
-        Evented.prototype._off = function (t, fn, ctx) {
-            if (!this.events[t]) {
-                return this;
-            }
-            else {
-                var nEs_1 = [];
-                if (fn) {
-                    this.events[t].forEach(function (o) {
-                        if (o.fn != fn && o.ctx != ctx) {
-                            nEs_1.push(o);
-                        }
-                    });
-                }
-                this.events[t] = nEs_1;
-            }
-        };
-        Evented.prototype.off = function (t, fn) {
-            var _this = this;
-            var st = t.split(" ");
-            st.forEach(function (s) { return _this._off(s, fn); });
-            return this;
-        };
-        Evented.prototype.fire = function (t, obj) {
-            var _this = this;
-            t.split(" ").forEach(function (tt) {
-                if (_this.events[tt]) {
-                    _this.events[tt].forEach(function (o) { return o.fn.call(o.ctx, obj); });
+        Evented.offApi = function (eventObj, eventsDataObj, key, callback, context) {
+            _.each(eventsDataObj, function (v, k) {
+                if (eventObj.offKeyMatcher(k, key)) {
+                    if (_.isFunction(callback)) {
+                        eventsDataObj[k] = _.reject(v, function (handle) { return handle.callback == callback && handle.context == context; });
+                    }
+                    else {
+                        eventsDataObj[k] = [];
+                    }
                 }
             });
-            var p = this.parent;
-            if (p) {
-                p.fire(t, obj);
+            return eventObj;
+        };
+        Evented.onceApi = function (eventObj, eventsDataObj, key, callback, context) {
+            if (_.isFunction(callback)) {
+                var newCallback = function () {
+                    var args = [];
+                    for (var _i = 0; _i < arguments.length; _i++) {
+                        args[_i] = arguments[_i];
+                    }
+                    callback.apply(context, args);
+                    eventObj.off(key, callback, context);
+                };
+                eventObj.on(key, newCallback, null);
             }
-            if (t != "*") {
-                this.fire("*", obj);
+        };
+        Evented.triggerApi = function (eventObj, eventsDataObj, key, callback, context, args) {
+            _.each(eventsDataObj, function (v, k) {
+                if (eventObj.triggerKeyMatcher(k, key)) {
+                    _.each(v, function (v) { return v.callback.apply(v.context, args); });
+                }
+            });
+        };
+        Evented.prototype.on = function (keys, callback, context) {
+            Evented.eachEvent(Evented.onApi, this, keys, callback, context);
+            return this;
+        };
+        Evented.prototype.off = function (keys, callback, context) {
+            Evented.eachEvent(Evented.offApi, this, keys, callback, context);
+            return this;
+        };
+        Evented.prototype.once = function (keys, callback, context) {
+            Evented.eachEvent(Evented.onceApi, this, keys, callback, context);
+            return this;
+        };
+        Evented.prototype.trigger = function (keys) {
+            var args = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                args[_i - 1] = arguments[_i];
             }
+            Evented.eachEvent(Evented.triggerApi, this, keys, null, null, args);
             return this;
         };
-        Evented.prototype.listen = function (o, estr, fn) {
-            o.on(estr, fn);
+        Evented.prototype.fire = function (keys) {
+            var args = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                args[_i - 1] = arguments[_i];
+            }
+            Evented.eachEvent(Evented.triggerApi, this, keys, null, null, args);
             return this;
         };
-        Evented.prototype.listenTo = function (e) {
-            e.parent = this;
-            return this;
-        };
-        Evented.prototype.clear = function () {
-            this.events = {};
-            this.parent = null;
-        };
-        Evented.prototype.proxyEvents = function (obj) {
+        Evented.prototype.proxyEvents = function (e) {
             var _this = this;
             var args = [];
             for (var _i = 1; _i < arguments.length; _i++) {
                 args[_i - 1] = arguments[_i];
             }
-            _.each(args, function (k) {
-                obj.on(k, function () {
-                    var objs = [];
-                    for (var _i = 0; _i < arguments.length; _i++) {
-                        objs[_i] = arguments[_i];
-                    }
-                    _this.fire.apply(_this, [k].concat(objs));
-                });
-            });
+            _.each(args, function (arg) { return e.on(arg, function () {
+                var targs = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    targs[_i] = arguments[_i];
+                }
+                _this.fire.apply(_this, [arg].concat(targs));
+            }); });
         };
         return Evented;
     }());
     exports.Evented = Evented;
 });
-define("Core/View", ["require", "exports", "d3", "underscore", "Core/Evented", "Core/Util"], function (require, exports, d3, _, Evented_1, Util_1) {
+define("Core/View", ["require", "exports", "d3", "lodash", "Core/Evented", "Core/Util"], function (require, exports, d3, _, Evented_1, Util_1) {
     "use strict";
     exports.__esModule = true;
     var styles = Util_1.Util.d3Invoke("style");
@@ -438,7 +471,7 @@ define("Core/View", ["require", "exports", "d3", "underscore", "Core/Evented", "
     }(Evented_1.Evented));
     exports.View = View;
 });
-define("Core/BaseLayer", ["require", "exports", "underscore", "Core/Util", "Core/View"], function (require, exports, _, Util_2, View_1) {
+define("Core/BaseLayer", ["require", "exports", "lodash", "Core/Util", "Core/View"], function (require, exports, _, Util_2, View_1) {
     "use strict";
     exports.__esModule = true;
     var BaseLayer = (function (_super) {
@@ -512,7 +545,7 @@ define("Core/BaseLayer", ["require", "exports", "underscore", "Core/Util", "Core
         BaseLayer.prototype.clear = function () {
             this.el.remove();
             this.el = null;
-            _super.prototype.clear.call(this);
+            _super.prototype.off.call(this, "*");
         };
         BaseLayer.prototype.getNode = function () {
             return this.el;
@@ -525,7 +558,7 @@ define("Core/BaseLayer", ["require", "exports", "underscore", "Core/Util", "Core
     }(View_1.View));
     exports.BaseLayer = BaseLayer;
 });
-define("Core/BaseChart", ["require", "exports", "d3", "underscore", "Core/Evented", "Core/Util", "Core/View"], function (require, exports, d3, _, Evented_2, Util_3, View_2) {
+define("Core/BaseChart", ["require", "exports", "d3", "lodash", "Core/Evented", "Core/Util", "Core/View"], function (require, exports, d3, _, Evented_2, Util_3, View_2) {
     "use strict";
     exports.__esModule = true;
     var BaseChart = (function (_super) {
@@ -685,7 +718,7 @@ define("Core/BaseChart", ["require", "exports", "d3", "underscore", "Core/Evente
     }(BaseChart));
     exports.SingleDataChart = SingleDataChart;
 });
-define("Component/SingleDataChart/TimeAdjust/TimeAdjust", ["require", "exports", "d3", "underscore", "Core/Util", "Core/BaseChart", "Core/BaseLayer"], function (require, exports, d3, _, Util_4, BaseChart_1, BaseLayer_1) {
+define("Component/SingleDataChart/TimeAdjust/TimeAdjust", ["require", "exports", "d3", "lodash", "Core/Util", "Core/BaseChart", "Core/BaseLayer"], function (require, exports, d3, _, Util_4, BaseChart_1, BaseLayer_1) {
     "use strict";
     exports.__esModule = true;
     var TimeAdjustLayer = (function (_super) {
@@ -912,7 +945,7 @@ define("Component/SingleDataChart/TimeAdjust/TimeAdjust", ["require", "exports",
     }(BaseChart_1.SingleDataChart));
     exports.TimeAdjust = TimeAdjust;
 });
-define("Core/BaseMeasure", ["require", "exports", "underscore"], function (require, exports, _) {
+define("Core/BaseMeasure", ["require", "exports", "lodash"], function (require, exports, _) {
     "use strict";
     exports.__esModule = true;
     var BaseMeasure = (function () {
@@ -926,7 +959,7 @@ define("Core/BaseMeasure", ["require", "exports", "underscore"], function (requi
     }());
     exports.BaseMeasure = BaseMeasure;
 });
-define("Component/MultiDataChart/MultiTypeMeasure", ["require", "exports", "Core/BaseMeasure", "underscore"], function (require, exports, BaseMeasure_1, _) {
+define("Component/MultiDataChart/MultiTypeMeasure", ["require", "exports", "Core/BaseMeasure", "lodash"], function (require, exports, BaseMeasure_1, _) {
     "use strict";
     exports.__esModule = true;
     var MultiDataMeasure = (function (_super) {
@@ -935,10 +968,10 @@ define("Component/MultiDataChart/MultiTypeMeasure", ["require", "exports", "Core
             return _super !== null && _super.apply(this, arguments) || this;
         }
         MultiDataMeasure.prototype.max = function (k) {
-            return _.max(_.pluck(this.data, k));
+            return _.max(_.map(this.data, k));
         };
         MultiDataMeasure.prototype.min = function (k) {
-            return _.min(_.pluck(this.data, k));
+            return _.min(_.map(this.data, k));
         };
         MultiDataMeasure.prototype.getDomain = function (k) {
             return [this.min(k), this.max(k)];
@@ -947,7 +980,7 @@ define("Component/MultiDataChart/MultiTypeMeasure", ["require", "exports", "Core
     }(BaseMeasure_1.BaseMeasure));
     exports.MultiDataMeasure = MultiDataMeasure;
 });
-define("Component/MultiDataChart/MultiDataChart", ["require", "exports", "d3", "underscore", "Core/BaseChart", "Component/MultiDataChart/MultiTypeMeasure"], function (require, exports, d3, _, BaseChart_2, MultiTypeMeasure_1) {
+define("Component/MultiDataChart/MultiDataChart", ["require", "exports", "d3", "lodash", "Core/BaseChart", "Component/MultiDataChart/MultiTypeMeasure"], function (require, exports, d3, _, BaseChart_2, MultiTypeMeasure_1) {
     "use strict";
     exports.__esModule = true;
     var MultiDataChart = (function (_super) {
@@ -992,7 +1025,7 @@ define("Component/MultiDataChart/MultiDataChart", ["require", "exports", "d3", "
         MultiDataChart.prototype.removeMeasure = function (m) {
             if (_.isString(m)) {
                 if (_.some(this.measures, function (mm) { return mm.id == m; })) {
-                    var rm = _.findWhere(this.measures, { id: m });
+                    var rm = _.find(this.measures, { id: m });
                     this.measures = _.filter(this.measures, function (mm) { return mm.id != m; });
                     this.fire("measure_change measure_remove", {
                         measure: rm
@@ -1087,7 +1120,7 @@ define("Component/MultiDataChart/BarChart/BarData", ["require", "exports"], func
     "use strict";
     exports.__esModule = true;
 });
-define("Component/MultiDataChart/AxisLayer", ["require", "exports", "d3", "underscore", "Core/Util", "Core/BaseLayer"], function (require, exports, d3, _, Util_5, BaseLayer_2) {
+define("Component/MultiDataChart/AxisLayer", ["require", "exports", "d3", "lodash", "Core/Util", "Core/BaseLayer"], function (require, exports, d3, _, Util_5, BaseLayer_2) {
     "use strict";
     exports.__esModule = true;
     var AxisLayer = (function (_super) {
@@ -1244,7 +1277,7 @@ define("Component/MultiDataChart/AxisLayer", ["require", "exports", "d3", "under
     }(BaseLayer_2.BaseLayer));
     exports.AxisLayer = AxisLayer;
 });
-define("Component/Layer/TooltipLayer", ["require", "exports", "d3", "underscore", "Core/Util", "Core/BaseLayer"], function (require, exports, d3, _, Util_6, BaseLayer_3) {
+define("Component/Layer/TooltipLayer", ["require", "exports", "d3", "lodash", "Core/Util", "Core/BaseLayer"], function (require, exports, d3, _, Util_6, BaseLayer_3) {
     "use strict";
     exports.__esModule = true;
     var TooltipLayer = (function (_super) {
@@ -1323,7 +1356,7 @@ define("Component/Layer/TooltipLayer", ["require", "exports", "d3", "underscore"
     }(BaseLayer_3.BaseLayer));
     exports.TooltipLayer = TooltipLayer;
 });
-define("Component/MultiDataChart/LegendLayer", ["require", "exports", "underscore", "Core/BaseLayer"], function (require, exports, _, BaseLayer_4) {
+define("Component/MultiDataChart/LegendLayer", ["require", "exports", "lodash", "Core/BaseLayer"], function (require, exports, _, BaseLayer_4) {
     "use strict";
     exports.__esModule = true;
     var LegendLayer = (function (_super) {
@@ -1411,7 +1444,7 @@ define("Component/Layer/TitleLayer", ["require", "exports", "Core/BaseLayer"], f
     }(BaseLayer_5.BaseLayer));
     exports.TitleLayer = TitleLayer;
 });
-define("Component/MultiDataChart/LineChart/LineChart", ["require", "exports", "d3", "underscore", "Core/Util", "Component/MultiDataChart/MultiDataChart", "Core/BaseLayer", "Component/MultiDataChart/AxisLayer", "Component/Layer/TooltipLayer", "Component/MultiDataChart/LegendLayer", "Component/Layer/TitleLayer", "Component/MultiDataChart/MultiTypeMeasure"], function (require, exports, d3, _, Util_7, MultiDataChart_1, BaseLayer_6, AxisLayer_1, TooltipLayer_1, LegendLayer_1, TitleLayer_1, MultiTypeMeasure_2) {
+define("Component/MultiDataChart/LineChart/LineChart", ["require", "exports", "d3", "lodash", "Core/Util", "Component/MultiDataChart/MultiDataChart", "Core/BaseLayer", "Component/MultiDataChart/AxisLayer", "Component/Layer/TooltipLayer", "Component/MultiDataChart/LegendLayer", "Component/Layer/TitleLayer", "Component/MultiDataChart/MultiTypeMeasure"], function (require, exports, d3, _, Util_7, MultiDataChart_1, BaseLayer_6, AxisLayer_1, TooltipLayer_1, LegendLayer_1, TitleLayer_1, MultiTypeMeasure_2) {
     "use strict";
     exports.__esModule = true;
     var LineChartMeasure = (function (_super) {
@@ -1550,7 +1583,7 @@ define("Component/MultiDataChart/LineChart/LineChart", ["require", "exports", "d
             if (this.config.hasTooltip) {
                 var allRect_1 = [], allRectX_1 = [], allRectInterval = [];
                 _.each(ds, function (d, i) {
-                    allRectX_1 = _.union(allRectX_1, _.pluck(d.data, "x"));
+                    allRectX_1 = _.union(allRectX_1, _.map(d.data, "x"));
                 });
                 allRectX_1 = allRectX_1.sort(function (a, b) {
                     return a > b ? 1 : -1;
@@ -1635,7 +1668,11 @@ define("Component/MultiDataChart/LineChart/LineChart", ["require", "exports", "d
                 });
                 _this.chart.fire("lineZooming");
             };
-            //svgNode.call(d3.zoom().scaleExtent([1, 5]).on("zoom", zoomed));
+            var zoom = d3.zoom()
+                .scaleExtent([1, 5])
+                .translateExtent([[0, 0], [width, height]])
+                .on("zoom", zoomed);
+            svgNode.call(zoom);
             return this;
         };
         LineLayer.prototype.setTime = function (time) {

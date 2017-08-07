@@ -1,6 +1,6 @@
-import Backbone =require( 'Backbone');
+import Backbone =require( 'backbone');
 import {View} from "./View"
-import _ =require("underscore")
+import _ =require("lodash")
 import {Component} from "./Component"
 import {Util}from "../Utils/Util"
 export class App extends Component{

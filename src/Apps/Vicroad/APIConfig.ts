@@ -1,4 +1,4 @@
-import _ = require('underscore');
+import _ = require('lodash');
 import moment=require("moment");
 import { JMultiRequest, JPromise, JRequest, JWhenAll } from '../../Jigsaw/Core/JRequest';
 import { GeoJSON } from '../../Jigsaw/Data/DataDefine';

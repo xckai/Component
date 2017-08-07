@@ -1,6 +1,6 @@
 import { W2 } from '../../Data/DataDefine';
 import { Style } from './G2Map';
-import _ = require('underscore');
+import _ = require("lodash")
 import { W } from './DS';
 export interface IStyleResult{
     [k:string]:any
@@ -145,7 +145,7 @@ export class CanvasBrush implements IBrush
             geometry:f.g
         }).values()
         this._ctx.fillStyle=s.fill
-        if(Painter.buildPath(s.geometry.p[0],true,s.offset,_.rest(s.geometry.p),this.pathMovement)){
+        if(Painter.buildPath(s.geometry.p[0],true,s.offset,_.tail(s.geometry.p),this.pathMovement)){
             this._ctx.fill()
         }
         
@@ -164,7 +164,7 @@ export class CanvasBrush implements IBrush
             }else{
                 this._ctx.setLineDash([])
             }
-            let np=Painter.buildPath(s.geometry.p[0],false,s.offset,_.rest(s.geometry.p),this.pathMovement)
+            let np=Painter.buildPath(s.geometry.p[0],false,s.offset,_.tail(s.geometry.p),this.pathMovement)
             if(!np){
                 return
             }else{
@@ -178,7 +178,7 @@ export class CanvasBrush implements IBrush
                     })
                      
                     if (k == "mid") {
-                        _.each(np[0], function (pt, ix) {
+                        _.each(np[0], function (pt, ix:number) {
                             if (ix > 0 && ix < np[0].length - 1) {
                                 this.marker(f, st, np[0], ix);
                             }
@@ -242,7 +242,7 @@ export class CanvasBrush implements IBrush
         if (s.placement === "point") {
             pt = _.first(path);
         } else if (s.placement === "end") {
-            p = _.last(path, 2);
+            p = _.takeRight(path, 2);
             if(p.length<2){
                 return
             }
@@ -253,7 +253,7 @@ export class CanvasBrush implements IBrush
             pt2 = rt[0];
             pt = rt[1];
         } else if (s.placement === "start") {
-            p = _.first(path, 2);
+            p = _.take(path, 2);
             pt = p[0];
             pt2 = p[1];
             rotate = W.angle2X(pt, pt2) * Math.PI / 180;

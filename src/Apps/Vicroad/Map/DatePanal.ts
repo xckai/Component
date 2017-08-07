@@ -1,6 +1,6 @@
 import { View } from '../../../Jigsaw/Core/View';
 import moment=require("moment");
-import _ = require('underscore');
+import _ = require('lodash');
 import { Util } from "../../../Jigsaw/Utils/Util";
 export class DatePanal extends View {
     constructor(conf?){

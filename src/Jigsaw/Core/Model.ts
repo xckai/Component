@@ -1,5 +1,4 @@
-import Backbone =require( 'Backbone');
-import _=require("underscore")
+import Backbone =require( 'backbone');
 export class Model extends Backbone.Model{
     constructor(conf?){
         super(conf)

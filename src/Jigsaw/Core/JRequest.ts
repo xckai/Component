@@ -1,4 +1,4 @@
-import _=require("underscore")
+import _=require("lodash")
 import $ =require("jquery")
 import { Evented } from "./Evented";
 export class JPromise extends Evented {
