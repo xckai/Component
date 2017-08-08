@@ -1,19 +1,10 @@
 import {Component} from"../../Core/Component"
 import { View, IViewConfig } from "../../Core/View"
-import { Model } from "../../Core/Model"
 import _=require("lodash")
 import { Util } from "../../Utils/Util";
-import { Controller, IControllerConfig } from "../../Core/Controller";
-class TitleModel extends Model {
-    constructor(conf?){
-        super(conf)
-    }
-    defaults(){
-       return {
-            title:"Default Title"
-       }
-    }
-}
+import {  IControllerConfig, IController } from "../../Core/Controller";
+import { Evented } from "../../Core/Evented";
+
 class NavBarView extends View{
     constructor(conf?){
         super(conf)
@@ -32,20 +23,38 @@ class NavBarView extends View{
 export interface INavBarConfig extends IControllerConfig{
     title?:string|number
 }
-export class NavBar extends Controller{
+export class NavBar extends Evented implements IController {
     constructor(conf?:INavBarConfig){
         super()
-        this.view=new NavBarView(_.extend({width:"100%",position:"absolute",top:"0px",height:"3rem"},conf))
+        this.id=_.uniqueId("navbar-")
+        this.view=new NavBarView(_.extend(this.defaultConfig(),conf))
     }
-    children:{[id:string]:Controller}
-    addContent(c:Controller|HTMLElement|JQuery){
-        if(c instanceof Controller){
-            this.view.getContentNode$().append(c.view.getNode())
-            this.children[c.id]=c
-        }else{
-            this.view.getContentNode$().append(c)
+    defaultConfig(){
+        return {
+            class:"navbar",title:""
         }
+    }
+    render(){
+        this.view.doRender()
         return this
+    }
+    id:string
+    view:NavBarView
+    children:{[id:string]:IController}
+    addController(c:IController){
+        if(this.children[c.id]){
+            this.children[c.id].remove()
+        }
+        this.children[c.id]=c
+        this.addContent(c.getNode())
+        return this
+    }
+    addContent(c:HTMLElement|JQuery|SVGAElement){
+        this.view.getContentNode$().append(c)
+        return this
+    }
+    getNode(){
+        return this.view.el
     }
     setTitle(t:string){
         let node=this.view.$(".title")
@@ -56,5 +65,14 @@ export class NavBar extends Controller{
         }
         return this
     }
+    setBusy(b){
+        this.view.setBusy(b)
+        return this
+    }
+    remove(){
+        this.view.remove()
+        return this
+    }
+    
 }
     

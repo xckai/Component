@@ -1,18 +1,15 @@
 import _ = require("lodash")
-import { Evented } from "./Evented";
+import { Evented, IEvented } from "./Evented";
 import { View, IViewConfig } from "./View";
-export interface IControllerConfig extends IViewConfig{
-    id?:string
+export interface IControllerConfig{
+    id?:string,
+    class?:string
 }
-export class Controller extends Evented {
-    constructor(conf?:IControllerConfig){
-        super()
-        this.view=new View(conf)
-        this.id=(conf&&conf.id!=undefined)?conf.id:_.uniqueId("controller-")
-    }
-    id:string
-    view:View
-    setBusy(b){
-         this.view.setBusy(b)
-     }
+export interface IController extends IEvented{
+    id:string|number
+    defaultConfig():IControllerConfig
+    getNode():HTMLElement|SVGAElement
+    setBusy(b:boolean):this
+    remove():this
+    render():this
 }

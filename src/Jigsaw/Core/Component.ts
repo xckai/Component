@@ -1,62 +1,81 @@
-import { View } from "./View"
+import { View, IViewConfig } from "./View"
 import _ = require("lodash")
 import { Util } from "../Utils/Util"
 import { EventBus } from "./EventBus"
+import { IController } from "./Controller";
 const getProperty = Util.getProperty
-export class Component extends EventBus {
-    constructor(conf?) {
-        super()
-        this.id = _.uniqueId("Component")
-        this.initRootView(conf)
+export interface IComponentConfig extends IViewConfig{
+    id?:string
 
-    }
+}
+export class Component extends EventBus{
+    constructor(conf?:IComponentConfig) {
+        super()
+        this.id=(conf && conf.id!=undefined)?conf.id:_.uniqueId("component-")
+        this.initRootView(conf)
+    }   
     initRootView(conf) {
-        this.rootView = new View(_.extend({ tagName: "section" }, conf))
-        this.rootView.addClass("componentContainer")
+        this.view = new View(_.extend(this.defaultConfig(), conf))
+        this.view.addClass("componentContainer")
     }
-    rootView: View
+    defaultConfig():IComponentConfig{
+        return {
+            tagName:"section"
+        }
+    }
+    view: View
+    getNode$(){
+        return this.view.$el
+    }
     parent: Component
     children: { [id: string]: Component }
     id: string
     private context = {}
-    deepExtend(...args) {
-        return Util.deepExtend.apply(null, args)
-    }
-    getContext(k?) {
-        if (this.parent) {
-            if (k != undefined) {
-                return _.extend(this.parent.getContext(k), this.context[k])
-            } else {
-                return _.extend(this.parent.getContext(), this.context)
-            }
-        } else {
-            if (k != undefined) {
-                return this.context[k]
-            } else {
-                return this.context
-            }
+    getContext(k?:string|number) {
+        let ctx={}
+        ctx=_.extend(ctx,this.context)
+        if(this.parent){
+            ctx=_.extend(ctx,this.parent.getContext())
+        }
+        if(this.children){
+           let cCtx= _.chain(this.children).filter((v,key)=>key!=this.id).reduce((memo,c)=>_.extend(memo,c.getContext()),{}).value()
+           ctx=_.extend(ctx,cCtx)
+        }
+        if(k!=undefined){
+            return ctx[k]
+        }else{
+            return ctx
         }
     }
-    setContext(k, v) {
-        this.context[k] = v
+    setContext(k, v?) {
+        if(_.isObject(k)){
+            this.context=_.extend(this.context,k)
+        }else{
+             this.context[k] = v
+        }
+        return this
     }
-    setStyle(s) {
-        this.rootView.style(s)
+    style(s) {
+        this.view.style(s)
         return this
     }
     addClass(c) {
-        this.rootView.addClass(c)
+        this.view.addClass(c)
         return this
     }
     removeClass(c) {
-        this.rootView.removeClass(c)
+        this.view.removeClass(c)
+    }
+    addController(c:IController){
+        this.view.$el.append(c.getNode())
+        c.render()
     }
     addTo(c: Component, listen?) {
         this.parent = c
-        this.parent.addChild(this,listen)
+        this.parent.addComponent(this,listen)
         return this
     }
-    addChild(nc: Component,listen?) {
+    addComponent(nc: Component,listen?) {
         if (!this.children) {
             this.children = {}
         }
@@ -65,15 +84,15 @@ export class Component extends EventBus {
             nc.observe(this)
         }
         this.children[nc.id] = nc
-        nc.rootView.getNode$().appendTo(this.rootView.getNode$())
+        nc.view.getNode$().appendTo(this.view.getNode$())
         return this
     }
     remove() {
         if (this.parent) {
             this.parent.removeChild(this)
         }
-        this.rootView.remove()
-        super.destroy()
+        this.view.remove()
+        this.destroy()
     }
     removeChild(c: Component|string) {
         if(_.isString(c)||_.isNumber(c)){
@@ -90,21 +109,6 @@ export class Component extends EventBus {
         return this
     }
     setBusy(b) {
-        this.rootView.setBusy(b)
-    }
-}
-export interface IComponentConfig {
-    className: string,
-    class: string,
-    $el: JQuery | null
-    el: any | null,
-    style: {
-        position: string | null | undefined,
-        left: string | null | undefined,
-        right: string | null | undefined,
-        top: string | null | undefined,
-        bottom: string | null | undefined,
-        width: string | null | undefined,
-        height: string | null | undefined
+        this.view.setBusy(b)
     }
 }

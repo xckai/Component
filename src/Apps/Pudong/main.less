@@ -3,6 +3,23 @@
 }
 .app{
     overflow: hidden;
+    .componentContainer{
+        z-index: 1
+    }
+    .mapComponent{
+        .secondMap{
+        border: black 2px solid;
+        z-index: 1000;
+    }
+    .sapLogo{
+        background: url(./sap-logo.png);
+        background-size: contain;
+        background-position-y: bottom;
+        background-repeat: no-repeat;
+        width: 4em;
+        height: 2em;
+        z-index: 11000
+        }
+    }
 }
-@import "../BlueDark/Bar/NavBar.less";
-@import "./Side/LeftSide.less";
+@import "../../Jigsaw/Jigsaw.less";

@@ -4,9 +4,10 @@ type IEventMessage={
     keys:string,
     args:any[]
 }
-interface IEvented{
+export interface IEvented{
     on(key:string,callback?:Function,ctx?:any)
-    off(key:string,callback?:Function,ctx?:any)
+    off(key?:string,callback?:Function,ctx?:any)
+    fire(key:string,...args)
 }
 type EventsDataObj={
     [key:string]:{callback:Function,context:Object|null|undefined}[]

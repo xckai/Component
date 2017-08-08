@@ -1,13 +1,11 @@
 import Backbone =require( 'backbone');
 import {View} from "./View"
 import _ =require("lodash")
-import {Component} from "./Component"
+import { Component, IComponentConfig } from "./Component"
 import {Util}from "../Utils/Util"
 export class App extends Component{
-    constructor(conf?){
-        super(_.extend({el:"body"},conf))
-        this.id=_.uniqueId("App")
-        this.start()
+     defaultConfig():IComponentConfig{
+         return _.extend(super.defaultConfig(),{el:"body",class:"app",position:"absolute",left:"0px",right:"0px",bottom:"0px",top:"0px",width:null,height:null})
      }
      start(){
         Backbone.history.start()
