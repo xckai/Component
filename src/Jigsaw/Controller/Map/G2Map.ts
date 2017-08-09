@@ -1,11 +1,11 @@
 import _ = require("lodash")
 import { W } from './DS';
 import L= require("leaflet")
-import { View, IViewConfig } from "../../Core/View"
 import { Layer,layerFactor } from './Layers';
-import {  IControllerConfig, IController } from "../../Core/Controller";
+import { IControllerConfig, Controller } from "../../Core/Controller";
 import { Evented } from "../../Core/Evented";
-export class Style{
+import { IBackboneViewConfig, BackboneView } from "../../Core/View";
+export class Style {
     constructor(id,options?,defaultStyle?){
          this._id = id;
          this._symbolizers = [];
@@ -103,16 +103,18 @@ export interface IMapSetting{
     zoom?: number,
     scrollWheelZoom?:boolean
 }
-export interface IMapConfig extends IControllerConfig,IViewConfig,IMapSetting{
+export interface IMapConfig extends IControllerConfig,IBackboneViewConfig,IMapSetting{
      zoomControl?:boolean
 }
-export class G2Map  extends Evented implements IMap,IController{
+export class G2Map  extends Controller implements IMap{
      constructor(conf?:IMapConfig){
-        super()
+        super(conf)
         this.id=_.uniqueId("map-")
-        this.view=new MapView(_.extend(this.defaultConfig(),conf))
         // this.config=_.extend({zoomControl:true},conf)
         // this.view=new MapView(this.config)
+    }
+    init(){
+        this.view=new MapView(this.config)
     }
     id:string
     defaultConfig():IMapConfig{
@@ -123,11 +125,8 @@ export class G2Map  extends Evented implements IMap,IController{
     getMapContext(){
 
     }
-    getNode(){
-        return this.view.el
-    }
     render(){
-        this.view.doRender()
+        this.view.render()
         return this
     }
     config:IMapConfig
@@ -175,7 +174,7 @@ export class G2Map  extends Evented implements IMap,IController{
     }
     
 }
- class MapView extends View {
+ class MapView extends BackboneView {
     constructor(conf?){
         super(conf)
         this.mapSetting=conf
@@ -189,10 +188,10 @@ export class G2Map  extends Evented implements IMap,IController{
         this.control.addTo(this.leaflet)
         this.control.updataStyle()
         this.leaflet.setView(this.mapSetting.center,this.mapSetting.zoom)
+        setTimeout(()=>{
+             this.leaflet.invalidateSize()
+        })
         return this
-    }
-    onAfterRender(){
-         this.leaflet.invalidateSize()
     }
     setMapSetting(s:IMapSetting){
         this.mapSetting=_.extend({},this.mapSetting,s)

@@ -7,7 +7,7 @@ import { CircleSide } from "../../../Jigsaw/Controller/Side/CircleSide";
 export class SideComponent extends Component {
     constructor(c?: IComponentConfig) {
         super(c)
-        this.addClass("mapComponent")
+        this.addClass("SideComponent")
         this.side=new CircleSide({top:"3rem"})
         this.addController(this.side)
 

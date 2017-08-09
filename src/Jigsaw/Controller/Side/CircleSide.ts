@@ -1,13 +1,13 @@
-import { IController, IControllerConfig } from "../../Core/Controller";
+import { IControllerConfig } from "../../Core/Controller";
 import { Evented } from "../../Core/Evented";
 import _ = require("lodash")
-import { View, IViewConfig } from "../../Core/View";
-export interface ICircleSideConfig extends IControllerConfig, IViewConfig {
+import { ContainerView, Container } from "../Container/Container";
+export interface ICircleSideConfig extends IControllerConfig {
     direction?: string,
     isOpen?: boolean
 }
 
-class CircleSideView extends View {
+class CircleSideView extends ContainerView {
     constructor(c: ICircleSideConfig) {
         super(c)
         this.config = c
@@ -16,8 +16,8 @@ class CircleSideView extends View {
     render() {
         this.$el.html(`<div class='toggleContainer'>
                                <span class ='toggle fa fa-angle-double-${this.config.direction} fa-rotate-180'> 
-                            </div>
-                            <content></content>`)
+                        </div>
+                        <content></content>`)
         return this
     }
     show(){
@@ -41,53 +41,19 @@ class CircleSideView extends View {
         this.addClass("toggle-hide")
     }
 }
-export class CircleSide extends Evented implements IController {
-    constructor(c?: ICircleSideConfig) {
-        super()
-        this.id = (c && c.id != undefined) ? c.id : _.uniqueId("container-")
-        this.view = new CircleSideView(_.extend(this.defaultConfig(),c))
+export class CircleSide extends Container {
+    init(){
+        this.view=new CircleSideView(this.config)
         this.view.addClass("circleSide")
-        this.childrenControllers = {}
     }
+    config:ICircleSideConfig
     id: string
     view: CircleSideView
-    getNode() {
-        return this.view.el
-    }
-    getNode$() {
-        return this.view.$el
-    }
-    addController(c: IController) {
-        if (this.childrenControllers[c.id]) {
-            this.childrenControllers[c.id].remove()
-        }
-        this.childrenControllers[c.id] = c
-        this.getNode$().append(c.getNode())
-        c.render()
-        return this
-    }
-    addContent(e:HTMLElement|SVGAElement){
-        this.view.$("content").append(e)
-        return this
-    }
-    childrenControllers: { [id: string]: IController }
     defaultConfig(): ICircleSideConfig {
         return {
             tagName: "div",
             direction: "left"
         }
-    }
-    setBusy(b) {
-        this.view.setBusy(b)
-        return this
-    }
-    render() {
-        this.view.doRender()
-        return this
-    }
-    remove() {
-        this.view.remove()
-        return this
     }
 
 }

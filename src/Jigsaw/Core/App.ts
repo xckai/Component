@@ -1,5 +1,4 @@
 import Backbone =require( 'backbone');
-import {View} from "./View"
 import _ =require("lodash")
 import { Component, IComponentConfig } from "./Component"
 import {Util}from "../Utils/Util"

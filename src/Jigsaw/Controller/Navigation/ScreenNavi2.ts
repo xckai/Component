@@ -1,31 +1,33 @@
 import {Component} from"../../Core/Component"
-import { BackboneView } from "../../Core/View"
+import { View, IViewConfig } from "../../Core/View"
 import _=require("lodash")
 import {  IControllerConfig, IController } from "../../Core/Controller";
 import { Containter, IContainerConfig } from "../Containter";
 import mustache=require("mustache")
 
-class NavBarView extends BackboneView{
+class ScreenNavi2View extends View{
     constructor(conf?){
         super(conf)
-    }  
+    }
     render(){
-        this.$el.html("<content></content>")
+        this.$el.html("<content><div class='screen screen1'></div><div class='screen screen2'></div></content>")
         return this
     }
-    getContentNode(){
-        return this.$("content").eq(0)
+    getScreen1(){
+        return this.$("screen1")
     }
-    getContentNode$(){
-        return this.$("content")
+    getScreen2(){
+
     }
 }
 export interface INavBarConfig extends IContainerConfig{
     title?:string|number
 }
 export class NavBar extends Containter {
-    init(){
-        this.view=new NavBarView(this.config)
+    constructor(conf?:INavBarConfig){
+        super()
+        this.id=_.uniqueId("navbar-")
+        this.view=new NavBarView(_.extend(this.defaultConfig(),conf))
     }
     defaultConfig(){
         return {
@@ -34,7 +36,7 @@ export class NavBar extends Containter {
     }
     id:string
     view:NavBarView
-
+    children:{[id:string]:IController}
     getNode$(){
         return this.view.getContentNode$()
     }

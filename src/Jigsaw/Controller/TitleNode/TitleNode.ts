@@ -1,12 +1,13 @@
-import { View, IViewConfig } from "../../Core/View"
-import {  IControllerConfig, IController } from "../../Core/Controller";
+
+import { IControllerConfig, Controller } from "../../Core/Controller";
 import { Evented } from "../../Core/Evented";
 import _=require("lodash")
+import { BackboneView } from "../../Core/View";
 
-export interface ITitleNodeConfig extends IControllerConfig,IViewConfig{
+export interface ITitleNodeConfig extends IControllerConfig{
     title?:string
 }
-class titleView extends View{
+class TitleView extends BackboneView{
     constructor(c:ITitleNodeConfig){
         super(c)
         this.title=c.title
@@ -18,35 +19,22 @@ class titleView extends View{
     title:string
 
 }
-export class TitleNode extends Evented implements IController {
+export class TitleNode extends Controller {
     constructor(conf?:ITitleNodeConfig){
-        super()
+        super(conf)
         this.id=_.uniqueId("title-")
-        this.view=new titleView(_.extend(this.defaultConfig(),conf))
-        this.view.addClass("title")
     }
     defaultConfig(){
-        return {}
+        return {title:"Title"}
     }
+    init(){
+        this.view=new TitleView(this.config)
+        this.view.addClass("title")
+    }
+    view:TitleView
     setTitle(t:string){
         this.view.title=t
-        this.view.doRender()
-    }
-    render(){
-        this.view.doRender()
-        return this
-    }
-    id:string
-    view:titleView
-    getNode(){
-        return this.view.el
-    }
-    setBusy(b){
-        return this
-    }
-    remove(){
-        this.view.remove()
-        return this
+        this.view.render()
     }
     
 }

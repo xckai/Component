@@ -1,22 +1,22 @@
-import { View, IViewConfig } from "./View"
+import { IViewConfig, IControllerView } from "./IView"
 import _ = require("lodash")
 import { Util } from "../Utils/Util"
 import { EventBus } from "./EventBus"
-import { IController } from "./Controller";
+import { Controller } from "./Controller";
+import { BackboneView } from "./View";
 const getProperty = Util.getProperty
 export interface IComponentConfig extends IViewConfig{
     id?:string
-
 }
 export class Component extends EventBus{
     constructor(conf?:IComponentConfig) {
         super()
         this.id=(conf && conf.id!=undefined)?conf.id:_.uniqueId("component-")
         this.config=_.extend(this.defaultConfig(),conf)
-        this.initRootView(conf)
+        this.init()
     }   
-    initRootView(conf) {
-        this.view = new View(_.extend(this.defaultConfig(), conf))
+    init() {
+        this.view=new BackboneView(this.config)
         this.view.addClass("componentContainer")
     }
     defaultConfig():IComponentConfig{
@@ -25,9 +25,9 @@ export class Component extends EventBus{
         }
     }
     config:IComponentConfig
-    view: View
+    view: IControllerView
     getNode$(){
-        return this.view.$el
+        return this.view.getNode$()
     }
     parent: Component
     children: { [id: string]: Component }
@@ -68,8 +68,8 @@ export class Component extends EventBus{
     removeClass(c) {
         this.view.removeClass(c)
     }
-    addController(c:IController){
-        this.view.$el.append(c.getNode())
+    addController(c:Controller){
+        this.view.getNode$().append(c.getNode$())
         c.render()
     }
     addTo(c: Component, listen?) {
@@ -93,7 +93,7 @@ export class Component extends EventBus{
         if (this.parent) {
             this.parent.removeChild(this)
         }
-        this.view.remove()
+        $(this.view.getNode$()).remove()
         this.destroy()
     }
     removeChild(c: Component|string) {
