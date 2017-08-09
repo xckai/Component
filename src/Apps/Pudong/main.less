@@ -11,14 +11,25 @@
         border: black 2px solid;
         z-index: 1000;
     }
-    .sapLogo{
-        background: url(./sap-logo.png);
-        background-size: contain;
-        background-position-y: bottom;
-        background-repeat: no-repeat;
-        width: 4em;
-        height: 2em;
-        z-index: 11000
+    }
+    .barComponent{
+        .sapLogo{
+            background: url(./sap-logo.png);
+            background-size: contain;
+            background-position-y: bottom;
+            background-repeat: no-repeat;
+            width: 3.5em;
+            height: 3em;
+            z-index: 11000;
+            background-position: center;
+            margin-left: .5rem;
+            }
+        .title{
+            align-self: center;
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            font-size: 1.3rem;
         }
     }
 }

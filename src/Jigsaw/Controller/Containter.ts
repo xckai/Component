@@ -39,6 +39,7 @@ export class Containter extends Evented implements IController {
     }
     render(){
         this.view.doRender()
+        _.each(this.childrenControllers,c=>this.getNode$().append(c.getNode()))
         return this
     }
     remove(){

@@ -1,9 +1,9 @@
 import {Component} from"../../Core/Component"
 import { View, IViewConfig } from "../../Core/View"
 import _=require("lodash")
-import { Util } from "../../Utils/Util";
 import {  IControllerConfig, IController } from "../../Core/Controller";
-import { Evented } from "../../Core/Evented";
+import { Containter, IContainerConfig } from "../Containter";
+import mustache=require("mustache")
 
 class NavBarView extends View{
     constructor(conf?){
@@ -20,10 +20,10 @@ class NavBarView extends View{
         return this.$("content")
     }
 }
-export interface INavBarConfig extends IControllerConfig{
+export interface INavBarConfig extends IContainerConfig{
     title?:string|number
 }
-export class NavBar extends Evented implements IController {
+export class NavBar extends Containter {
     constructor(conf?:INavBarConfig){
         super()
         this.id=_.uniqueId("navbar-")
@@ -34,36 +34,11 @@ export class NavBar extends Evented implements IController {
             class:"navbar",title:""
         }
     }
-    render(){
-        this.view.doRender()
-        return this
-    }
     id:string
     view:NavBarView
     children:{[id:string]:IController}
-    addController(c:IController){
-        if(this.children[c.id]){
-            this.children[c.id].remove()
-        }
-        this.children[c.id]=c
-        this.addContent(c.getNode())
-        return this
-    }
-    addContent(c:HTMLElement|JQuery|SVGAElement){
-        this.view.getContentNode$().append(c)
-        return this
-    }
-    getNode(){
-        return this.view.el
-    }
-    setTitle(t:string){
-        let node=this.view.$(".title")
-        if(node.empty()){
-            this.view.$el.append(`<div class='title'>${t}</div>`)
-        }else{
-            node.val(t)
-        }
-        return this
+    getNode$(){
+        return this.view.getContentNode$()
     }
     setBusy(b){
         this.view.setBusy(b)

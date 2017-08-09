@@ -12,6 +12,7 @@ export class Component extends EventBus{
     constructor(conf?:IComponentConfig) {
         super()
         this.id=(conf && conf.id!=undefined)?conf.id:_.uniqueId("component-")
+        this.config=_.extend(this.defaultConfig(),conf)
         this.initRootView(conf)
     }   
     initRootView(conf) {
@@ -23,6 +24,7 @@ export class Component extends EventBus{
             tagName:"section"
         }
     }
+    config:IComponentConfig
     view: View
     getNode$(){
         return this.view.$el

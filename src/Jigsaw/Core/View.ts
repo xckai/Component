@@ -23,6 +23,10 @@ export class View extends Backbone.View<Backbone.Model>{
         this.style(styleObj)
         this.addClass(_.pick(conf, ["class"])["class"])
     }
+    render(){
+        this.$el.html("")
+        return this
+    }
     getNode$() {
         return this.$el
     }

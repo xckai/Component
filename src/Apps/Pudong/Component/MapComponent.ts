@@ -19,11 +19,9 @@ export class MapComponent extends Component {
         this.secondMap.layer("base", { renderer: "png", url: "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", visible: true })
         this.secondMap.view.addClass("secondMap")
         
-        this.mainIcon=new DivNode({class:"sapLogo",left:".5rem",top:".5rem",position: "absolute"})
-        this.addController(this.mainIcon)
+       
 
     }
-    mainIcon:DivNode
     mainMap: G2Map
     secondMap: G2Map
 }
