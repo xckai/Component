@@ -23,7 +23,7 @@ export class BarComponent extends Component{
     }
     config:BarComponentConfig
     defaultConfig(){
-       return _.extend(super.defaultConfig(),{left:"0px",right:"0px",height:"3rem",top:"0px",position:"absolute",title:"交通概况",class:"barComponent"})
+       return _.extend(super.defaultConfig(),{left:"0px",right:"0px",height:"3rem",top:"0px",position:"absolute",title:"交通概况",class:"bar-component"})
     }
     bar:Container
     mainIcon:DivNode

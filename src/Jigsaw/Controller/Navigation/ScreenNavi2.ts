@@ -12,7 +12,7 @@ class ScreenNavi2View extends BackboneView{
     }
     events(){
         return{
-            "click .screenNavIcon":"switchScreen"
+            "click .screen-nav-icon":"switchScreen"
         }
     }
     switchScreen(){
@@ -25,10 +25,10 @@ class ScreenNavi2View extends BackboneView{
         
     }
     render(){
-        this.$el.html(`<div class='screenNavIcon screenNavIcon-left' style="display:none">
+        this.$el.html(`<div class='screen-nav-icon screen-nav-icon-left' style="display:none">
                                <span class ='toggle fa fa-angle-double-left '> 
                         </div>
-                        <div class='screenNavIcon screenNavIcon-right'>
+                        <div class='screen-nav-icon screen-nav-icon-right'>
                                <span class ='toggle fa fa-angle-double-right '> 
                         </div>
                         <content><div class='screen screen1'></div><div class='screen screen2'></div></content>`)
@@ -47,12 +47,12 @@ class ScreenNavi2View extends BackboneView{
         }else{
             if(i==1){
                 this.$("content").css("transform","translate(0px,0px)")
-                this.$(".screenNavIcon-left").fadeOut(500)
-                this.$(".screenNavIcon-right").fadeIn(500)
+                this.$(".screen-nav-icon-left").fadeOut(500)
+                this.$(".screen-nav-icon-right").fadeIn(500)
             }else{
                 this.$("content").css("transform","translate(-100%,0px)")
-                this.$(".screenNavIcon-left").fadeIn(500)
-                this.$(".screenNavIcon-right").fadeOut(500)
+                this.$(".screen-nav-icon-left").fadeIn(500)
+                this.$(".screen-nav-icon-right").fadeOut(500)
             }
             this.currentScreen=i
         }
@@ -65,7 +65,7 @@ export class ScreenNavi2 extends ControllerView {
     init(){
         this.view=new ScreenNavi2View(this.config)
         this.proxyEvents(this.view,"screenChange")
-        this.addClass("screenNav")
+        this.addClass("screen-nav")
     }
     id:string
     view:ScreenNavi2View

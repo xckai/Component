@@ -2,23 +2,19 @@ import { IControllerConfig } from "../../Core/Controller";
 import { Evented } from "../../Core/Evented";
 import _ = require("lodash")
 import { ContainerView, Container } from "../Container/Container";
-export interface ICircleSideConfig extends IControllerConfig {
-    direction?: string,
-    isOpen?: boolean
-}
 
-class CircleSideView extends ContainerView {
-    constructor(c: ICircleSideConfig) {
-        super(c)
-        this.config = c
-    }
-    config: ICircleSideConfig
+export interface IDialogViewConfig extends IControllerConfig{
+    title?:string
+}
+class DialogView extends ContainerView {
+    config:IDialogViewConfig
     render() {
-        this.$el.html(`<div class='toggle-container'>
-                               <span class ='toggle fa fa-angle-double-${this.config.direction} fa-rotate-180'> 
-                        </div>
-                        <content></content>`)
+        this.$el.html(`<div><content></content></div>`)
         return this
+    }
+    initOctagon(){
+        this.$el.append(`<div class=octagon><aside class=top><span/></aside><aside class=bottom><span/></aside><aside class=left><span/></aside><aside class=right><span/></aside>' +
+      '<aside class=left-top><span/></aside><aside class=right-top><span/></aside><aside class=left-bottom><span/></aside><aside class=right-bottom><span/></aside><main/></div>`)
     }
     show(){
         requestAnimationFrame(()=>{
@@ -44,7 +40,7 @@ class CircleSideView extends ContainerView {
 export class CircleSide extends Container {
     init(){
         this.view=new CircleSideView(this.config)
-        this.view.addClass("circle-side")
+        this.view.addClass("circleSide")
     }
     config:ICircleSideConfig
     id: string

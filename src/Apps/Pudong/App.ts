@@ -1,5 +1,4 @@
 import { App } from "../../Jigsaw/Core/App"
-import { MapComponent } from "./Component/MapComponent";
 import { CircleSide } from "../../Jigsaw/Controller/Side/CircleSide";
 import { ScreenNavComponent } from "./Component/ScreenNavComponent";
 import { BarComponent } from "./Component/BarComponent";
@@ -23,7 +22,6 @@ export class MainApp extends App {
     }
     bar:BarComponent
     screenNav:ScreenNavComponent
-    mapComponent: MapComponent
     // rightSide:Side
     Main() {
         this.router.navigate("Pudong/", { trigger: false, replace: true })

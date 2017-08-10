@@ -9,7 +9,7 @@ import { TaxiMapComponent } from "./TaxiMapComponent";
 export class ScreenNavComponent extends Component {
     constructor(c?: IComponentConfig) {
         super(c)
-        this.addClass("ScreenComponent")
+        this.addClass("screen-component")
     }
     view:ScreenNavi2Cool
     init(){
