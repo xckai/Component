@@ -17,7 +17,7 @@ export class Layer {
         this._cxt = _.extend(this._cxt, c)
     }
     getContext(c?) {
-        let mapContext = this.map ? this.map.getContext() : {}
+        let mapContext = this.map ? this.map.getMapContext() : {}
         return _.extend({}, mapContext, this._cxt, c)
     }
     defaultConfig() {
@@ -306,7 +306,7 @@ export class CanvasLayer extends CanvasTileLayer {
         return new leafletCanvasLayer
     }
 }
-export function layerFactor(map, id, options) {
+export function layerFactor(map, id, options:ILayerConfig) {
     if (options.renderer == "canvastile") {
         return new CanvasTileLayer(map, id, options)
     } else if (options.renderer == "png") {

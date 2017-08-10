@@ -1,141 +1,56 @@
-import Backbone = require('Backbone');
-import _ = require("underscore")
+import Backbone = require('backbone');
+import _ = require("lodash")
 import { Util } from "../Utils/Util"
-import { EventBus } from "./Evented"
-export interface IViewConfig {
-    tagName: string | null | undefined,
-    className: string | null | undefined,
-    el: HTMLElement | SVGAElement,
-    $el: JQuery | undefined
-    style: IViewStyle
+import { IView, IControllerView, IViewConfig } from "./IView";
+export interface IBackboneViewConfig extends IViewConfig {
+    className?: string | null | undefined,
+    el?: HTMLElement | SVGAElement | string,
+    $el?: JQuery | undefined,
+    model?: Backbone.Model
 }
-export interface IViewStyle {
-    position: string | null | undefined,
-    left: string | null | undefined,
-    right: string | null | undefined,
-    top: string | null | undefined,
-    bottom: string | null | undefined,
-    width: string | null | undefined,
-    height: string | null | undefined
-}
-const defaultConfig: IViewConfig ={
-            tagName:"div",
-            el: undefined,
-            $el: undefined,
-            className:undefined,
-            style: {
-                position: "absolute",
-                left: "0px",
-                right: "0px",
-                top: "0px",
-                bottom: "0px",
-                width: null,
-                height: null
-            }
+export class BackboneView extends  Backbone.View<Backbone.Model> implements IControllerView{
+    constructor(c?:IBackboneViewConfig){
+        super(c)
+        this.initView(c)
+    }
+    initView(c){
+         this.getNode$().addClass(_.get(c,"class"))
+         this.style(_.pick(c,"width","height","left","right","top","bottom","position"))
+         return this
+    }
+    getNode$(){
+        return this.$el
+    }
+    fire(k:string,...args){
+        this.trigger.apply(this,[k].concat(args))
+    }
+    style(k,v?){
+        if(_.isObject(k)){
+            _.each(k,(vv,kk)=>{
+                vv=vv?vv:""
+                this.$el.css(kk,vv)
+            })
+        }else{
+            this.$el.css(k,v)
         }
-export class View extends Backbone.View<Backbone.Model>{
-    constructor(conf?) {
-        super(_.extend({},defaultConfig,conf))
-        this.style(_.extend({},defaultConfig.style,(conf||{}).style))      
+        return this
     }
-getNode$() {
-    return this.$el
-}
-getNode() {
-    return this.el
-}
-getContentNode() {
-    return this.el
-}
-getContentNode$() {
-    return this.$el
-}
-attr(obj) {
-    this.$el.attr(obj)
-    return this
-}
-setDate(o: string | Object, v ?: string) {
-    if (_.isString(o)) {
-        this.model.set(o, v)
+    addClass(cls) {
+        if (cls) {
+            this.$el.addClass(cls)
+        }
+        return this
     }
-    if (_.isObject(o)) {
-        this.model.set(o)
+    removeClass(cls) {
+        this.$el.removeClass(cls)
+        return this
     }
-    return this
-}
-style(obj) {
-    _.each(obj, (v: string, k: string) => {
-        if (v) {
-            this.$el.css(k, v)
+    setBusy(busy: boolean, size?) {
+        if (busy) {
+            this.$el.append(Util.loader.genBallBusy(size || .5))
         } else {
-            this.$el.css(k, "")
+            this.$(".busyContainer").remove()
         }
-    })
-
-    return this
-}
-setClass(cls: string) {
-    //this.$el.removeClass()
-    if (_.isArray(cls)) {
-        _.each(cls, (v: string) => {
-            this.$el.addClass(v)
-        })
+        return this
     }
-    if (_.isString(cls)) {
-        this.$el.addClass(cls)
-    }
-}
-addClass(cls) {
-    if (cls) {
-        this.$el.addClass(cls)
-    }
-    return this
-}
-removeClass(cls) {
-    this.$el.removeClass(cls)
-    return this
-}
-toogleClass(cls) {
-    this.$el.toggleClass(cls)
-    return this
-}
-appendAt(dom) {
-    this.invokeBeforeRender()
-    this.render()
-    this.getNode$().appendTo(dom)
-    this.invokeAterRender()
-}
-onAfterRender() { }
-onBeforeRender() { }
-invokeAterRender() {
-    if (this.onAfterRender) {
-        this.onAfterRender()
-    }
-    return this
-}
-invokeBeforeRender() {
-    if (this.onBeforeRender) {
-        setTimeout(() => {
-            this.onBeforeRender()
-        })
-
-    }
-}
-setModel(m) {
-    this.model = m
-    this.listenTo(this.model, "change", this.render)
-    return this
-}
-doRender() {
-    this.invokeBeforeRender()
-    this.render()
-    this.invokeAterRender()
-}
-setBusy(busy: boolean, size ?) {
-    if (busy) {
-        this.$el.append(Util.loader.genBallBusy(size || .5))
-    } else {
-        this.$(".busyContainer").remove()
-    }
-}
 }

@@ -1,7 +1,7 @@
 import {Component} from"../../Core/Component"
 import { View } from "../../Core/View"
 import { Model } from "../../Core/Model"
-import _=require("underscore")
+import _=require("lodash")
 let htmlLooper=(ds:any[],template:string)=>{
     _.templateSettings= {
     interpolate: /\{(.+?)\}/g

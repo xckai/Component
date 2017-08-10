@@ -3,15 +3,13 @@
     "target": "es5",
     "module": "amd",
     "sourceMap": false,
-    "outDir": "dist",
     "baseUrl": "./",
     "paths": {
         "moment": [
             "node_modules/moment/moment"
         ]
     }
-  },
-  "include":["./src/**/*","./node_modules/chart/src_new/**/*"]
+  }
   // "exclude": [
   //   "./node_modules/*"
   // ]

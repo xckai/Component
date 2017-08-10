@@ -1,5 +1,5 @@
 import { checkIteratorCollection, curry, curry2, curry3 } from '../Utils/FP';
-import _ = require("underscore")
+import _ = require("lodash")
 let getProperty = function (obj, paths: string) {
     let spliter = "/"
     let path = paths.split("/")

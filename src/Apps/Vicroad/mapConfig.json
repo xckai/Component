@@ -1,8 +1,0 @@
-{
-    "center":{"lat":-37,"lng":145},
-    "zoom":9,
-    "baseLayer":{
-        "mapUrl":"https://api.mapbox.com/styles/v1/mapbox/traffic-night-v2/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaGVucnkxOTg0IiwiYSI6ImI1a0FvUzQifQ.zLCAzKNjXNiRUQoJBzAsZQ",  
-        "maxZoom":18
-    }
-}

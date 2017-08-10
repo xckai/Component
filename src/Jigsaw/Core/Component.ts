@@ -1,101 +1,116 @@
-import {View} from "./View"
-import _ =require("underscore")
-import {Util}from "../Utils/Util"
-import {EventBus} from "./Evented"
-const getProperty=Util.getProperty
-export class Component extends EventBus  {
-     constructor(conf?){
-         super()
-         this.id=_.uniqueId("Component")
-         this.initRootView(conf)
-
+import { IViewConfig, IControllerView } from "./IView"
+import _ = require("lodash")
+import { Util } from "../Utils/Util"
+import { EventBus } from "./EventBus"
+import { Controller } from "./Controller";
+import { BackboneView } from "./View";
+const getProperty = Util.getProperty
+export interface IComponentConfig extends IViewConfig{
+    id?:string
+}
+export class Component extends EventBus{
+    constructor(conf?:IComponentConfig) {
+        super()
+        this.id=(conf && conf.id!=undefined)?conf.id:_.uniqueId("component-")
+        this.config=_.extend(this.defaultConfig(),conf)
+        this.init()
+    }   
+    init() {
+        this.view=new BackboneView(this.config)
+        this.view.addClass("componentContainer")
     }
-    initRootView(conf){
-         this.rootView=new View(_.extend({tagName:"section"},conf))
-         this.rootView.addClass("componentContainer")
-    }
-    rootView:View
-    parent:Component
-    children:Component []=[]
-    id:string
-    private context={}
-    deepExtend(...args){
-        return Util.deepExtend.apply(null,args)
-    }
-    getContext(k?){
-        if(this.parent){
-            if(k!=undefined){
-                return _.extend(this.parent.getContext(k),this.context[k])
-            }else{
-                return _.extend(this.parent.getContext(),this.context)
-            }
-        }else{
-             if(k!=undefined){
-                return this.context[k]
-            }else{
-                return this.context
-            }
+    defaultConfig():IComponentConfig{
+        return {
+            tagName:"section"
         }
-       
     }
-    setContext(k,v){
-        this.context[k]=v
+    config:IComponentConfig
+    view: IControllerView
+    getNode$(){
+        return this.view.getNode$()
     }
-    setStyle(s){
-        this.rootView.style(s)
-        return this
-    }
-    addClass(c){
-        this.rootView.addClass(c)
-        return this
-    }
-    removeClass(c){
-        this.rootView.removeClass(c)
-    }
-    addTo(c:Component,listen?){
-        this.parent=c
-        this.parent.add(this,listen)
-        return this
-    }
-    add(nc:Component,listen?){
-       let i=_.findIndex(this.children,c=>c.id==nc.id)
-       nc.parent=this
-       this.observe(nc)
-       if(i==-1){
-           this.children.push(nc)
-          
-       }else{
-           this.children[i]=nc
-       }
-       nc.rootView.getNode$().appendTo(this.rootView.getNode$())
-       return this
-    }
-    remove(){
+    parent: Component
+    children: { [id: string]: Component }
+    id: string
+    private context = {}
+    getContext(k?:string|number) {
+        let ctx={}
+        ctx=_.extend(ctx,this.context)
         if(this.parent){
+            ctx=_.extend(ctx,this.parent.getContext())
+        }
+        if(this.children){
+           let cCtx= _.chain(this.children).filter((v,key)=>key!=this.id).reduce((memo,c)=>_.extend(memo,c.getContext()),{}).value()
+           ctx=_.extend(ctx,cCtx)
+        }
+        if(k!=undefined){
+            return ctx[k]
+        }else{
+            return ctx
+        }
+    }
+    setContext(k, v?) {
+        if(_.isObject(k)){
+            this.context=_.extend(this.context,k)
+        }else{
+             this.context[k] = v
+        }
+        return this
+    }
+    style(s) {
+        this.view.style(s)
+        return this
+    }
+    addClass(c) {
+        this.view.addClass(c)
+        return this
+    }
+    removeClass(c) {
+        this.view.removeClass(c)
+    }
+    addController(c:Controller){
+        this.view.getNode$().append(c.getNode$())
+        c.render()
+    }
+    addTo(c: Component, listen?) {
+        this.parent = c
+        this.parent.addComponent(this,listen)
+        return this
+    }
+    addComponent(nc: Component,listen?) {
+        if (!this.children) {
+            this.children = {}
+        }
+        nc.parent = this
+        if(listen ===undefined||listen==true){
+            nc.observe(this)
+        }
+        this.children[nc.id] = nc
+        nc.view.getNode$().appendTo(this.view.getNode$())
+        return this
+    }
+    remove() {
+        if (this.parent) {
             this.parent.removeChild(this)
         }
-        this.rootView.remove()
-        super.destroy()
+        $(this.view.getNode$()).remove()
+        this.destroy()
     }
-    removeChild(c:Component){
-        
-    }
-    setBusy(b){
-        this.rootView.setBusy(b)
-    }
-}
-export interface IComponentConfig{
-            className:string ,
-            class:string,
-            $el:JQuery|null
-            el:any|null,
-            style:{
-                    position:string | null |undefined,
-                    left:string | null |undefined,
-                    right:string | null |undefined,
-                    top:string | null |undefined,
-                    bottom:string | null |undefined,
-                    width:string | null |undefined,
-                    height:string | null |undefined
+    removeChild(c: Component|string) {
+        if(_.isString(c)||_.isNumber(c)){
+            if(this.children[c]){
+                this.children[c].remove()
             }
+            this.children[c]=undefined
+        }else{
+            if(this.children[c.id]){
+                this.children[c.id].remove()
+            }
+            this.children[c.id]=undefined
+        }
+        return this
+    }
+    setBusy(b) {
+        this.view.setBusy(b)
+    }
 }
