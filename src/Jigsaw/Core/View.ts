@@ -14,7 +14,7 @@ export class BackboneView extends  Backbone.View<Backbone.Model> implements ICon
         this.initView(c)
     }
     initView(c){
-         this.getNode$().addClass(_.get(c,"class"))
+         this.getNode$().addClass(_.get(c,"class",""))
          this.style(_.pick(c,"width","height","left","right","top","bottom","position"))
          return this
     }

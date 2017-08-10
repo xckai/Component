@@ -10,6 +10,7 @@ let rename=require("gulp-rename")
 let gutil=require("gulp-util")
 let plumber=require("gulp-plumber")
 let clean = require('gulp-clean');
+var sourcemaps = require('gulp-sourcemaps');
 module.exports=function(gulp){
     let namespace = path.basename(__filename).split(".")[0]+"."
     let baseSrc = 'src', cwdSrc = './', baseDist = "dist", cwdDist = "./"
@@ -23,10 +24,11 @@ module.exports=function(gulp){
     })
     gulp.task(namespace + "init", () => {
         let tsSteam = gulp.src(path.resolve(cwdSrc, baseSrc, "./**/*.ts"), { base: baseSrc })
+            .pipe(sourcemaps.init())
             .pipe(ts.createProject('tsconfig.json')())
+            .pipe(sourcemaps.write())
             .pipe(gulp.dest(path.resolve(cwdDist, baseDist)))
             .pipe(count("## ts files compiled"))
-
         let lessSteam = gulp.src(path.resolve(cwdSrc, baseSrc, "./**/*.less"), { base: baseSrc })
             .pipe(plumber())
             .pipe(less().on("error",function(e){
@@ -50,8 +52,10 @@ module.exports=function(gulp){
     gulp.task(namespace + "watchFile", [namespace + "init"], () => {
         gulp.watch('**/*.ts', { cwd: path.resolve(cwdSrc, baseSrc) }, (e) => {
             console.log(e)
-            gulp.src(e.path, { base: baseSrc })
+            let t=gulp.src(e.path, { base: baseSrc })
+                .pipe(sourcemaps.init())
                 .pipe(ts.createProject("tsconfig.json")())
+                .pipe(sourcemaps.write())
                 .pipe(gulp.dest(path.resolve(cwdDist, baseDist)))
         })
         gulp.watch('**/*.less', { cwd: path.resolve(cwdSrc, baseSrc) }, e => {

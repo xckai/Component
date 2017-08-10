@@ -2,6 +2,7 @@ import {  IControllerConfig, Controller } from "../../Core/Controller";
 import _ = require("lodash")
 import { IView } from "../../Core/IView";
 import { BackboneView } from "../../Core/View";
+import { ControllerView } from "../..//Controller/Container/ControllerView";
 export class ContainerView extends BackboneView {
     render(){
         this.$el.html("<content></content>")
@@ -12,7 +13,7 @@ export class ContainerView extends BackboneView {
     }
     
 }
-export class Container extends Controller implements IView {
+export class Container extends ControllerView{
     id:string
     initView(){
         return this

@@ -15,6 +15,11 @@ export class BarComponent extends Component{
         this.bar.addController(this.mainIcon)
         this.title=new TitleNode(_.pick(this.config,"title"))
         this.bar.addController(this.title)
+        this.on("titleChange",(d)=>{
+            setTimeout(()=>{
+                this.title.setTitle(d.title)
+            },800);
+        })
     }
     config:BarComponentConfig
     defaultConfig(){
