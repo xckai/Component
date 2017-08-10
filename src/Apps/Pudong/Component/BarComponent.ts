@@ -11,7 +11,7 @@ export class BarComponent extends Component{
         super(c)
         this.bar=new Container({position:"absolute",left:"0px",right:"0px",bottom:"0px",top:"0px",class:"navbar"})
         this.addController(this.bar)
-        this.mainIcon=new DivNode({class:"sapLogo"})
+        this.mainIcon=new DivNode({class:"sap-logo"})
         this.bar.addController(this.mainIcon)
         this.title=new TitleNode(_.pick(this.config,"title"))
         this.bar.addController(this.title)
