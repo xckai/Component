@@ -17,7 +17,8 @@ export class Component extends EventBus{
     }   
     init() {
         this.view=new BackboneView(this.config)
-        this.view.addClass("componentContainer")
+        this.view.render()
+       
     }
     defaultConfig():IComponentConfig{
         return {
@@ -72,21 +73,23 @@ export class Component extends EventBus{
         this.view.getNode$().append(c.getNode$())
         c.render()
     }
-    addTo(c: Component, listen?) {
+    addTo(c: Component,autoAppend?:boolean,listen?:boolean) {
         this.parent = c
-        this.parent.addComponent(this,listen)
+        this.parent.addComponent(this,autoAppend,listen)
         return this
     }
-    addComponent(nc: Component,listen?) {
+    addComponent(nc: Component,autoAppend?:boolean,listen?:boolean) {
         if (!this.children) {
             this.children = {}
         }
         nc.parent = this
         if(listen ===undefined||listen==true){
-            nc.observe(this)
+            this.observe(nc)
         }
         this.children[nc.id] = nc
-        nc.view.getNode$().appendTo(this.view.getNode$())
+        if(autoAppend==undefined||autoAppend==true){
+             nc.view.getNode$().appendTo(this.getNode$())
+        }
         return this
     }
     remove() {
@@ -112,5 +115,6 @@ export class Component extends EventBus{
     }
     setBusy(b) {
         this.view.setBusy(b)
+        return this
     }
 }

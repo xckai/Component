@@ -2,12 +2,12 @@ import { Component, IComponentConfig } from "../../../Jigsaw/Core/Component";
 import _ = require("lodash")
 import { G2Map, IMapConfig } from "../../../Jigsaw/Controller/Map/G2Map"
 import { DivNode } from "../../../Jigsaw/Controller/DivNode/DivNode";
-export interface IMapComponentConfig extends IComponentConfig {
+export interface ITaxiMapComponent extends IComponentConfig {
     mainMapConfig?: IMapConfig
     secondMapConfig?:IMapConfig
 }
-export class MapComponent extends Component {
-    constructor(c?: IMapComponentConfig) {
+export class TaxiMapComponent extends Component {
+    constructor(c?: ITaxiMapComponent) {
         super(c)
         this.addClass("mapComponent")
         this.mainMap = new G2Map(_.extend({ position: "absolute", left: "0px", right: "0px", bottom: "0px", top: "0px" }, _.get(c, "mainMapConfig")))

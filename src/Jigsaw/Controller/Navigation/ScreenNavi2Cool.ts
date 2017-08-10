@@ -61,11 +61,11 @@ class ScreenNavi2View extends BackboneView{
     }
 }
 
-export class ScreenNavi2 extends ControllerView {
+export class ScreenNavi2Cool extends ControllerView {
     init(){
         this.view=new ScreenNavi2View(this.config)
         this.proxyEvents(this.view,"screenChange")
-        this.addClass("screenNav")
+        this.addClass("screenNavCool")
     }
     id:string
     view:ScreenNavi2View
