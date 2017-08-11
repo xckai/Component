@@ -5,6 +5,7 @@
   top: 0;
   bottom: 0;
   @border-size: 2px * .68;
+  @bd-diamond-size:5rem;
   @media(min-width: 1280px) {
      @border-size: 2px * .68;
   }
@@ -24,7 +25,7 @@
    > .right,
   > .top {
     position: absolute;
-    background: @bd-bg-color;
+    background: @bg-color;
   }
 
    > .bottom,
@@ -74,7 +75,7 @@
       position: absolute;
       width: @bd-diamond-size * sqrt(2) / 2 * 0.68;
       height: @bd-diamond-size * sqrt(2) / 2 * 0.68;
-      background: @bd-bg-color;
+      background: @bg-color;
       border: @dialog-border;
     }
   }
@@ -121,6 +122,6 @@
     right: @bd-diamond-size * sqrt(2) / 2 * 0.68;
     top: @bd-diamond-size * sqrt(2) / 2 * 0.68;
     bottom: @bd-diamond-size * sqrt(2) / 2 * 0.68;
-    background: @bd-bg-color;
+    background: @bg-color;
   }
 }
