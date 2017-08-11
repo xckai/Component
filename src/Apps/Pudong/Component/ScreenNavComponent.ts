@@ -1,3 +1,4 @@
+import { OverViewComponent } from './OverViewComponent';
 import { Component, IComponentConfig } from "../../../Jigsaw/Core/Component";
 import _ = require("lodash")
 import { G2Map, IMapConfig } from "../../../Jigsaw/Controller/Map/G2Map"
@@ -12,7 +13,7 @@ export class ScreenNavComponent extends Component {
         this.addClass("screen-component")
     }
     view:ScreenNavi2Cool
-    init(){
+    initView(){
         this.view=new ScreenNavi2Cool(this.config).render()
         this.view.on("screenChange",(data)=>{
             let title=""
@@ -25,14 +26,21 @@ export class ScreenNavComponent extends Component {
         })
     }
     taxiComponent:TaxiMapComponent
+    mainComponent:OverViewComponent
     doMain(){
         this.taxiComponent = new TaxiMapComponent({
-                position: "absolute", left: "0px", right: "0px", top: "0px", bottom: "0px",
+               
                 mainMapConfig: { center: { lat: 31.2102, lng: 121.599 }, zoom: 14, zoomControl: false },
                 secondMapConfig:{ center: { lat: 31.2102, lng: 121.599 }, zoom: 14, zoomControl: false }
             })
         this.taxiComponent.addTo(this,false)
         this.view.addToScreen2(this.taxiComponent.getNode$())
+        this.mainComponent=new OverViewComponent({
+             position: "absolute", left: "0px", right: "0px", top: "0px", bottom: "0px",
+        })
+        this.mainComponent.addTo(this,false)
+        this.view.addToScreen1(this.mainComponent.getNode$())
+
         let i=0
         // setInterval(()=>{
         //     i=++i%2

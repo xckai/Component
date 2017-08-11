@@ -13,12 +13,13 @@ export class Component extends EventBus{
         super()
         this.id=(conf && conf.id!=undefined)?conf.id:_.uniqueId("component-")
         this.config=_.extend(this.defaultConfig(),conf)
+        this.initView()
         this.init()
     }   
-    init() {
+    init() {}
+    initView(){
         this.view=new BackboneView(this.config)
         this.view.render()
-       
     }
     defaultConfig():IComponentConfig{
         return {

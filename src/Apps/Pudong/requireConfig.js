@@ -15,6 +15,7 @@ requirejs.config({
                 "CustomizedChart/Vicroad/VicroadChart":'./dist/Apps/Vicroad/Vendor/VicroadChart',
                 "moment":nodePath+"moment/moment",
                 "lodash":nodePath+"lodash/lodash",
+                mustache:nodePath+"mustache/mustache"
         },
         shim:{
                 leaflet:{

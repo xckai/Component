@@ -3,7 +3,7 @@
 }
 .app{
     overflow: hidden;
-    
+    background: @bg-color;
     .map-component{
         z-index: 1;
         .secondMap{
@@ -42,5 +42,21 @@
             color:#fff;
         }
     }
+        .title-with-underline{
+                position: relative
+            }
+            .title-with-underline::after{
+                content: "   ";
+                height: .2rem;
+                width: 100%;
+                position: absolute;
+                border-radius: 1rem;
+                bottom:-.5rem;
+                left: 0;
+                background: gray;
+            }
+    
 }
+@import "./tile.less";
+@import "./overview-component.less";
 @import "../../../Jigsaw/Themes/blue-dark.less";

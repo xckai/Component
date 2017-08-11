@@ -12,15 +12,15 @@
         right: 0px;
         top: calc(50% - 1.5rem);
      }
-     .toggle{
+    >.screen-nav-icon .toggle{
             width: 2rem;
-            border: black .1rem solid;
+            border: @font-color .1rem solid;
             border-radius: 50%;
             height: 2rem;
             font-size: 2rem;
             text-align: center;
     }
-    content{
+    >content{
            will-change: transform;
             transition: transform 1s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
             position: absolute;
@@ -28,8 +28,7 @@
             right: 0px;
             bottom: 0px;
             top: 0px;
-    }
-    .screen1{
+                >.screen1{
         position: absolute;
         left: 0px;
         /* width: 100%; */
@@ -38,13 +37,15 @@
         bottom: 0px;
         right: 0px;
     }
-    .screen2{
+    >.screen2{
         position: absolute;
         left: 100%;
         bottom: 0px;
         top: 0px;
         width:100%;
     }
+    }
+
 }
 .screen-nav{
        overflow: hidden;
