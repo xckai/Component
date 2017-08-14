@@ -1,7 +1,8 @@
-import { Controller } from "../../../Jigsaw/Core/Controller";
-import { BackboneView } from "../../..//Jigsaw/Core/View";
+import { JView } from './../../../Jigsaw/Core/JView';
+import { JController } from './../../../Jigsaw/Core/JController';
 import Backbone =require("backbone")
 import Mustache=require("mustache")
+import _ = require("lodash")
 
 class BusPanelModel extends Backbone.Model{
     defaults(){
@@ -22,7 +23,7 @@ class BusPanelModel extends Backbone.Model{
         }
     }
 }
-class BusPanelView extends BackboneView{ 
+class BusPanelView extends JView{ 
     template=`
             <div class='head'><div class="title-panel"><span class='title-with-underline'>{{mainTitle}}</span></div> </div>
     <content class='flex-container flex-row-center'>
@@ -57,17 +58,18 @@ class BusPanelView extends BackboneView{
         return this
     }
 }
-export class BusPanel extends Controller {
+export class BusPanel extends JController {
     view:BusPanelView
     model:BusPanelModel
     defaultConfig(){
         this.model=new BusPanelModel
-        return {model:this.model}
+        return _.extend(super.defaultConfig(),{model:this.model})
     }
-    init(){
+    initView(){
         this.view=new BusPanelView(this.config)
         this.view.addClass("bus-panal")
         this.model.on("change",this.view.render)
+        this.view.render()
     }
     setActive(){
         this.view.addClass("active")

@@ -1,5 +1,5 @@
-import { Controller } from "../../../Jigsaw/Core/Controller";
-import { BackboneView } from "../../..//Jigsaw/Core/View";
+import { JView } from './../../../Jigsaw/Core/JView';
+import { JController } from './../../../Jigsaw/Core/JController';
 import Backbone =require("backbone")
 import Mustache=require("mustache")
 
@@ -16,9 +16,8 @@ class OverViewModel extends Backbone.Model{
         }
     }
 }
-class OverViewPanalView extends BackboneView{ 
+class OverViewPanalView extends JView{ 
     template=`
-    <div class='head'><div class="title-panel"><span class='title-with-underline'>{{mainTitle}}</span></div> </div>
     <content>
        <div class="index-panel">
            <div class="panel-title">{{publicTransportationShareTitle}}</div>
@@ -39,16 +38,17 @@ class OverViewPanalView extends BackboneView{
         return this
     }
 }
-export class OverViewPanal extends Controller {
+export class OverViewPanal extends JController {
     view:OverViewPanalView
     model:OverViewModel
     defaultConfig(){
         this.model=new OverViewModel
         return {model:this.model}
     }
-    init(){
+    initView(){
         this.view=new OverViewPanalView(this.config)
         this.view.addClass("overview-panal")
         this.model.on("change",this.view.render)
+        this.view.render()
     }
 }

@@ -1,10 +1,10 @@
+import { JController, IJControllerConfig } from './../../Core/JController';
 import _ = require("lodash")
 import { W } from './DS';
 import L= require("leaflet")
 import { Layer,layerFactor } from './Layers';
-import { IControllerConfig, Controller } from "../../Core/Controller";
 import { Evented } from "../../Core/Evented";
-import { IBackboneViewConfig, BackboneView } from "../../Core/View";
+
 export class Style {
     constructor(id,options?,defaultStyle?){
          this._id = id;
@@ -103,36 +103,41 @@ export interface IMapSetting{
     zoom?: number,
     scrollWheelZoom?:boolean
 }
-export interface IMapConfig extends IControllerConfig,IBackboneViewConfig,IMapSetting{
+export interface IMapConfig extends IJControllerConfig,IMapSetting{
      zoomControl?:boolean
 }
-export class G2Map  extends Controller implements IMap{
+export class G2Map  extends JController implements IMap{
      constructor(conf?:IMapConfig){
         super(conf)
-        this.id=_.uniqueId("map-")
+        this.view.render()
+        this.initMap()
         // this.config=_.extend({zoomControl:true},conf)
         // this.view=new MapView(this.config)
     }
-    init(){
-        this.view=new MapView(this.config)
+    initMap(){
+        this.leaflet=L.map(this.getNode$()[0],_.pick(this.config,"scrollWheelZoom","zoomControl"))
+        this.control=new AutoHideLayerControl
+        this.control.addTo(this.leaflet)
+        this.control.updataStyle()
+        this.leaflet.setView(this.config.center,this.config.zoom)
+        setTimeout(()=>{
+             this.leaflet.invalidateSize()
+        })
     }
+    leaflet:L.Map
+    control:AutoHideLayerControl
     id:string
     defaultConfig():IMapConfig{
-        return {
-            center:{lat:0,lng:0},zoom:8,scrollWheelZoom:true,zoomControl:true
-        }
+        return _.extend(super.defaultConfig(),{
+            center:{lat:0,lng:0},zoom:8,scrollWheelZoom:true,zoomControl:true,id:_.uniqueId("map")
+        })
     }
     getMapContext(){
 
     }
-    render(){
-        this.view.render()
-        return this
-    }
     config:IMapConfig
-    view:MapView
     getLeaflet(){
-        return this.view.leaflet
+        return this.leaflet
     }
 
     // getLeafletControl(){
@@ -149,57 +154,45 @@ export class G2Map  extends Controller implements IMap{
     private layers:Layer []=[]
     addToLeafletControl(layer,id,layertype){
         if(layertype=="baselayer"){
-            this.view.control.addBaseLayer(layer,id)
+            this.control.addBaseLayer(layer,id)
         }else{
-             this.view.control.addOverlay(layer,id)
+             this.control.addOverlay(layer,id)
         }
-        this.view.control.updataStyle()
+        this.control.updataStyle()
        
     }
     removeFromLeafletControl(layer){
-        this.view.control.removeLayer(layer)
-        this.view.control.updataStyle()
-    }
-    setMapSetting(s){
-        this.view.setMapSetting(s)
-        return this
-    }
-    setBusy(b){
-        this.view.setBusy(b)
-        return this
-    }
-    remove(){
-        this.view.remove()
-        return this
+        this.control.removeLayer(layer)
+        this.control.updataStyle()
     }
     
 }
- class MapView extends BackboneView {
-    constructor(conf?){
-        super(conf)
-        this.mapSetting=conf
-    }
-    mapSetting: IMapSetting
-    leaflet: L.Map
-    control:AutoHideLayerControl
-    render() {
-        this.leaflet=L.map(this.el,_.pick(this.mapSetting,"scrollWheelZoom","zoomControl"))
-        this.control=new AutoHideLayerControl
-        this.control.addTo(this.leaflet)
-        this.control.updataStyle()
-        this.leaflet.setView(this.mapSetting.center,this.mapSetting.zoom)
-        setTimeout(()=>{
-             this.leaflet.invalidateSize()
-        })
-        return this
-    }
-    setMapSetting(s:IMapSetting){
-        this.mapSetting=_.extend({},this.mapSetting,s)
-        this.leaflet.setView(this.mapSetting.center,this.mapSetting.zoom)
-         this.leaflet.invalidateSize()
-        return this
-    }
-}
+//  class MapView extends BackboneView {
+//     constructor(conf?){
+//         super(conf)
+//         this.mapSetting=conf
+//     }
+//     mapSetting: IMapSetting
+//     leaflet: L.Map
+//     control:AutoHideLayerControl
+//     render() {
+//         this.leaflet=L.map(this.el,_.pick(this.mapSetting,"scrollWheelZoom","zoomControl"))
+//         this.control=new AutoHideLayerControl
+//         this.control.addTo(this.leaflet)
+//         this.control.updataStyle()
+//         this.leaflet.setView(this.mapSetting.center,this.mapSetting.zoom)
+//         setTimeout(()=>{
+//              this.leaflet.invalidateSize()
+//         })
+//         return this
+//     }
+//     setMapSetting(s:IMapSetting){
+//         this.mapSetting=_.extend({},this.mapSetting,s)
+//         this.leaflet.setView(this.mapSetting.center,this.mapSetting.zoom)
+//          this.leaflet.invalidateSize()
+//         return this
+//     }
+// }
 class AutoHideLayerControl extends L.Control.Layers{
     updataStyle(){
         if(this._layers&&this._layers.length<=0){

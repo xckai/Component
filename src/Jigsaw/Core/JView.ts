@@ -1,6 +1,5 @@
 
 import Backbone = require('backbone');
-import { IViewConfig,IView } from './IView';
 import { Evented } from "./Evented";
 import _ = require("lodash");
 import { Util } from "../Utils/Util"
@@ -15,7 +14,7 @@ export interface IJViewOption extends  Backbone.ViewOptions<Backbone.Model>{
     width?: string
     height?: string    
 } 
-export class JView extends  Backbone.View<Backbone.Model> implements IView {
+export class JView extends  Backbone.View<Backbone.Model>{
     constructor(c?:IJViewOption){
         super(c)
         this.updateView(c)

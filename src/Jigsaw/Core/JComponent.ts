@@ -1,20 +1,18 @@
 import { JController } from './JController';
-import { Container } from './../Controller/Container/Container';
 import _ = require("lodash")
 import { EventBus } from "./EventBus"
 export class JComponent extends JController{
     constructor(c?){
         super(c)
         this.eventBus=new EventBus
+        this.init()
     }
+    init(){}
     eventBus:EventBus
     parent: JComponent
     children: { [id: string]: JComponent }
     id: string
     private context = {}
-    defaultConfig(){
-        return {}
-    }
     on(k:string,fn:Function,ctx?){
         this.eventBus.on(k,fn,ctx)
         return this

@@ -1,3 +1,4 @@
+import { TaxiMapComponent } from './Component/TaxiMapComponent';
 import { JApp } from "../../Jigsaw/Core/JApp"
 import { CircleSide } from "../../Jigsaw/Controller/Side/CircleSide";
 import { ScreenNavComponent } from "./Component/ScreenNavComponent";
@@ -12,15 +13,18 @@ export class MainApp extends JApp {
         this.addRule("*path", "Main", this.proxy("Main"))
   
 
-        // this.screenNav=new ScreenNavComponent({position: "absolute", left: "0px", right: "0px", bottom: "0px", top: "3rem" })
-        // this.screenNav.addTo(this)
-        // this.screenNav.doMain()
-
+        this.screenNav=new ScreenNavComponent({position: "absolute", left: "0px", right: "0px", bottom: "0px", top: "3rem" })
+        this.screenNav.addTo(this)
+        this.addContent(this.screenNav)
+        this.screenNav.doMain()
+        
         this.bar=new BarComponent
         this.bar.addTo(this)
         this.addContent(this.bar)
-
+        // this.map=new TaxiMapComponent({position:"absolute",left:"0px",right:"0px",top:"3rem",bottom:"0px", mainMapConfig: { center: { lat: 31.2102, lng: 121.599 }, zoom: 14, zoomControl: false }})
+        // this.addContent(this.map)
     }
+    map:TaxiMapComponent
     bar:BarComponent
     screenNav:ScreenNavComponent
     // rightSide:Side

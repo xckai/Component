@@ -8,10 +8,11 @@ export interface IJControllerConfig extends IJViewOption{
 export class JController extends Evented{
     constructor(c?:IJControllerConfig){
         super()
-        let config=_.pick(c,"id")
-        this.config=_.extend(this.defaultConfig(),config)
+        this.config=_.extend(this.defaultConfig(),c)
+
         this.contents={}
-        this.initView(_.extend(this.config,c))
+        this.id=this.config.id
+        this.initView()
     }
     getNode$(){
         return this.view.getNode$()
@@ -20,8 +21,8 @@ export class JController extends Evented{
     defaultConfig():IJControllerConfig{
         return {id:_.uniqueId("controller")}
     }
-    initView(c?:IJControllerConfig){
-        this.view=new JView(c)
+    initView(){
+        this.view=new JView(this.config)
     }
     config:IJControllerConfig
     view:JView
@@ -32,8 +33,13 @@ export class JController extends Evented{
         [k:string]:JController
     }
     addContent(c:JController){
-        this.contents[c.id]=c
-        this.getNode$().append(c.getNode$())
+        if(!c.id){
+            console.error("Controller no id",c)
+        }else{
+            this.contents[c.id]=c
+            this.getNode$().append(c.getNode$())
+        }
+      
         return this
     }
     removeContent(id:string|JController){

@@ -1,5 +1,3 @@
-import { JController } from './JController';
-import { JView } from './JView';
 import { JComponent } from './JComponent';
 import Backbone =require( 'backbone');
 import _ =require("lodash")
