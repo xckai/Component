@@ -1,10 +1,9 @@
-import { IControllerConfig, Controller, } from "../../Core/Controller";
+import {JController } from "../../Core/JController";
 import { Evented } from "../../Core/Evented";
 import _=require("lodash")
-export class DivNode extends Controller {
+export class DivNode extends JController {
     constructor(c?){
         super(c)
-        this.id=_.uniqueId("icon-")
     }
     defaultConfig(){
         return {tagName:"div"}

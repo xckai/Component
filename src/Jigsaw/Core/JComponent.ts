@@ -2,24 +2,38 @@ import { JController } from './JController';
 import { Container } from './../Controller/Container/Container';
 import _ = require("lodash")
 import { EventBus } from "./EventBus"
-export class JComponent extends EventBus{
+export class JComponent extends JController{
     constructor(c?){
-        super()
-        this.initContainer(c)
+        super(c)
+        this.eventBus=new EventBus
     }
+    eventBus:EventBus
     parent: JComponent
     children: { [id: string]: JComponent }
     id: string
     private context = {}
-    container:JController
-    initContainer(c){
-        this.container=new JController(c)
-    }
     defaultConfig(){
         return {}
     }
-    getNode$(){
-        return this.container.getNode$()
+    on(k:string,fn:Function,ctx?){
+        this.eventBus.on(k,fn,ctx)
+        return this
+    }
+    off(k:string,fn?:Function,ctx?){
+        this.eventBus.off(k,fn,ctx)
+        return this
+    }
+    fire(k:string,...args){
+        this.eventBus.fire.apply(this.eventBus,[k].concat(args))
+        return this
+    }
+    once(k:string,fn:Function,ctx?){
+        this.eventBus.once(k,fn,ctx)
+        return this
+    }
+    send(k:string,...args){
+        this.eventBus.send.apply(this.eventBus,[k].concat(args))
+        return this
     }
     getContext(k?:string|number) {
         let ctx={}
@@ -56,7 +70,7 @@ export class JComponent extends EventBus{
         }
         nc.parent = this
         if(listen ===undefined||listen==true){
-            this.observe(nc)
+            this.eventBus.observe(nc.eventBus)
         }
         this.children[nc.id] = nc
         return this

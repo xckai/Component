@@ -1,4 +1,3 @@
-
 import { JView, IJViewOption } from './JView';
 import _ = require("lodash")
 import { Evented, IEvented } from "./Evented";
@@ -11,6 +10,7 @@ export class JController extends Evented{
         super()
         let config=_.pick(c,"id")
         this.config=_.extend(this.defaultConfig(),config)
+        this.contents={}
         this.initView(_.extend(this.config,c))
     }
     getNode$(){
@@ -29,27 +29,23 @@ export class JController extends Evented{
         this.view.style(k,v)
     }
     private contents:{
-        [k:string]:HTMLElement|SVGAElement|JQuery
+        [k:string]:JController
     }
-    addContent(c:HTMLElement|SVGAElement|JQuery,id?:string){
-        if(id==undefined){
-            id=$(c).attr("jviewid")
-            if(!id){
-                console.error("jviewid not assign")
-            }
-        }
-        if(id){
-            this.contents[id]=c
-            this.view.getNode$().append(c)
-        }
+    addContent(c:JController){
+        this.contents[c.id]=c
+        this.getNode$().append(c.getNode$())
         return this
     }
-    removeContent(id:string|HTMLElement|SVGAElement|JQuery){
-        if(!_.isString(id)){
-            id=$(id).attr("jviewid")
-        }
-        $(this.contents[id]).remove()
+    removeContent(id:string|JController){
+        if(!_.isString(id))
+            id=id.id
+            
+        if(this.contents[id])
+            this.contents[id].remove()
         delete this.contents[id]
         return this
+    }
+    remove(){
+        this.view.$el.remove()
     }
 }

@@ -18,7 +18,7 @@ export class MainApp extends JApp {
 
         this.bar=new BarComponent
         this.bar.addTo(this)
-        this.container.addContent(this.bar.getNode$())
+        this.addContent(this.bar)
 
     }
     bar:BarComponent

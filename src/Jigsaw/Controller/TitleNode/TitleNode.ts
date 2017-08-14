@@ -1,13 +1,11 @@
-
-import { IControllerConfig, Controller } from "../../Core/Controller";
-import { Evented } from "../../Core/Evented";
+import { JController, IJControllerConfig } from './../../Core/JController';
+import { JView } from './../../Core/JView';
 import _=require("lodash")
-import { BackboneView } from "../../Core/View";
 
-export interface ITitleNodeConfig extends IControllerConfig{
+export interface ITitleNodeConfig extends IJControllerConfig{
     title?:string
 }
-class TitleView extends BackboneView{
+class TitleView extends JView{
     constructor(c:ITitleNodeConfig){
         super(c)
         this.title=c.title
@@ -19,17 +17,17 @@ class TitleView extends BackboneView{
     title:string
 
 }
-export class TitleNode extends Controller {
+export class TitleNode extends JController {
     constructor(conf?:ITitleNodeConfig){
         super(conf)
-        this.id=_.uniqueId("title-")
     }
     defaultConfig(){
-        return {title:"Title"}
+        return _.extend(super.defaultConfig(),{title:"Title",id:_.uniqueId("title")})
     }
-    init(){
+    initView(){
         this.view=new TitleView(this.config)
         this.view.addClass("title")
+        this.view.render()
     }
     view:TitleView
     setTitle(t:string){

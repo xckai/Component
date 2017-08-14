@@ -7,8 +7,8 @@ export class JApp extends JComponent{
      constructor(c){
          super(c)  
      }
-     initContainer(c){
-        this.container=new JController(_.extend({el:"body",class:"app",position:"absolute",left:"0px",right:"0px",bottom:"0px",top:"0px",width:null,height:null},c))
+     defaultConfig(){
+        return {el:"body",class:"app",position:"absolute",left:"0px",right:"0px",bottom:"0px",top:"0px",width:null,height:null}
      }
      start(){
         Backbone.history.start()
