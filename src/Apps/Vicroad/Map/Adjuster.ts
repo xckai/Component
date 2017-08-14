@@ -57,16 +57,15 @@ export class Adjuster extends View{
     getRenderData(){
         let n= this.data
         n.roads=_.map(n.roads,(dd:any)=>{
-                        let n:any={}
-                        n.name=dd.name
+
                         if(dd.isOpen){
                                
-                                n.class="close"
+                                dd.class="close"
                             }else{
                             
-                                n.class="open"
+                                dd.class="open"
                             }
-                        return n
+                        return dd
                     })
       return n
     }

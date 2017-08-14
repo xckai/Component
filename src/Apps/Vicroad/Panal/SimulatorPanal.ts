@@ -70,7 +70,7 @@ export class SimulatorPanal extends Side{
     //        from:this.dateTime.toUTCString()
     //    }
        let controls=_.map(this.roads,(r)=>{
-               return {id:r.id,kj:r.capacity,f:r.capacity,duration:"360m"}
+               return {id:r.id,kj:r.capacity,f:r.capacity,duration:"360m",vf:r.capacity}
            })
      
        let enableEventBus=()=>{

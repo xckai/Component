@@ -70,7 +70,7 @@ export class Component extends EventBus {
     }
     remove() {
         if (this.parent) {
-            this.parent.removeChild(this)
+           this.parent.children[this.id]=null
         }
         this.rootView.remove()
         super.destroy()
@@ -80,12 +80,12 @@ export class Component extends EventBus {
             if(this.children[c]){
                 this.children[c].remove()
             }
-            this.children[c]=undefined
+          
         }else{
             if(this.children[c.id]){
                 this.children[c.id].remove()
             }
-            this.children[c.id]=undefined
+          
         }
         return this
     }

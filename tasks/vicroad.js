@@ -14,7 +14,7 @@ module.exports = function (gulp) {
     /////////////Server//////////
     gulp.task(namespace + "startServer", ["common.start"], () => {
         let p1 = proxy(['/service/apps', '/apps', '/lib', '/sap_logon.html', '/j_spring_security_check', '/resources'],
-            { target: 'http://10.58.75.98:8123' })
+            { target: 'http://10.58.75.98:8080' })
         let p2 = proxy(['/eventbus', '/socket.io', '/services/vicroad', '/eventbus/info'],
             { target: 'http://10.58.75.98:8089' })
         server.init({
