@@ -18,7 +18,6 @@ export class EventBus extends Evented{
     private eventBusChildren:EventBus []
     private removeChildrenEventBus(c:EventBus){
         this.eventBusChildren=_.reject(this.eventBusChildren,(e)=>e.eventId==c.eventId)
-        c.eventBusParent=null;
     }
     private sentToParent(e:IEventMessage){
         if(this.eventBusParent){
@@ -49,6 +48,12 @@ export class EventBus extends Evented{
         if(this.eventBusParent){
             this.eventBusParent.removeChildrenEventBus(this)
         }
+    }
+    remove(){
+        if(this.eventBusParent){
+            this.eventBusParent.removeChildrenEventBus(this)
+        }
+        this.eventBusParent=null;
     }
     send(keys,...args){
         let message={

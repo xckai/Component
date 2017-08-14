@@ -1,21 +1,29 @@
+
 import Backbone = require('backbone');
-import _ = require("lodash")
+import { IViewConfig,IView } from './IView';
+import { Evented } from "./Evented";
+import _ = require("lodash");
 import { Util } from "../Utils/Util"
-import { IView, IViewConfig } from "./IView";
-export interface IBackboneViewConfig extends Backbone.ViewOptions<Backbone.Model> {
-    className?: string | null | undefined,
-    el?: HTMLElement | SVGAElement | string,
-    $el?: JQuery | undefined,
-    model?: Backbone.Model
-}
-export class BackboneView extends  Backbone.View<Backbone.Model>implements IView{
-    constructor(c?:IBackboneViewConfig){
+export interface IJViewOption extends  Backbone.ViewOptions<Backbone.Model>{
+    id?:string
+    class?: string
+    position?: string,
+    left?: string,
+    right?: string,
+    top?: string,
+    bottom?: string
+    width?: string
+    height?: string    
+} 
+export class JView extends  Backbone.View<Backbone.Model> implements IView {
+    constructor(c?:IJViewOption){
         super(c)
         this.updateView(c)
     }
-    updateView(c:IBackboneViewConfig){
+    updateView(c:IJViewOption){
         this.getNode$().addClass(_.get(c,"class",""))
         this.style(_.pick(c,"width","height","left","right","top","bottom","position"))
+        this.attr("jviewid",c.id)
         return this
     }
     getNode$(){
@@ -56,7 +64,7 @@ export class BackboneView extends  Backbone.View<Backbone.Model>implements IView
         this.$el.removeClass(cls)
         return this
     }
-        setBusy(busy: boolean, size?) {
+    setBusy(busy: boolean, size?) {
         if (busy) {
             this.getNode$().append(Util.loader.genBallBusy(size || .5))
         } else {
@@ -64,4 +72,6 @@ export class BackboneView extends  Backbone.View<Backbone.Model>implements IView
         }
         return this
     }
+    
+
 }

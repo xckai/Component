@@ -25,28 +25,28 @@ class BusPanelModel extends Backbone.Model{
 class BusPanelView extends BackboneView{ 
     template=`
             <div class='head'><div class="title-panel"><span class='title-with-underline'>{{mainTitle}}</span></div> </div>
-    <content>
-       <div class="tile row-1 col-1">
+    <content class='flex-container flex-row-center'>
+       <div class="tile row-1 col-1 flex-item">
            <div class="tile-title">{{todayCardAccTitle}}</div>
            <div class="tile-value">{{todayCardAcc}}</div>
        </div>
-       <div class="tile row-1 col-1">
+       <div class="tile row-1 col-1 flex-item">
            <div class="tile-title">{{yestodayCardAccTitle}}</div>
            <div class="tile-value">{{yestodayCardAcc}}</div>
        </div>
-       <div class="tile row-1 col-1">
+       <div class="tile row-1 col-1 flex-item">
            <div class="tile-title">{{busOperatingRateTitle}}</div>
            <div class="tile-value">{{busOperatingRate}}</div>
        </div>
-       <div class="tile row-1 col-1">
+       <div class="tile row-1 col-1 flex-item">
            <div class="tile-title">{{busFastThanDriveRateTitle}}</div>
            <div class="tile-value">{{busFastThanDriveRate}}</div>
        </div>
-       <div class="tile row-1 col-1">
+       <div class="tile row-1 col-1 flex-item">
            <div class="tile-title">{{yestodayOnTimeRateTitle}}</div>
            <div class="tile-value">{{yestodayOnTimeRate}}</div>
        </div>
-       <div class="tile row-1 col-1">
+       <div class="tile row-1 col-1 flex-item">
            <div class="tile-title">{{busSpeedTitle}}</div>
            <div class="tile-value">{{busSpeed}}</div>
        </div>

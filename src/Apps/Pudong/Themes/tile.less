@@ -1,14 +1,28 @@
 .generate-tileRow(@n,@i:1) when (@i< = @n){
     .row-@{i}{
-        width:@i*12rem
+        width:@i*10rem
     }
     .generate-tileRow(@n,(@i+1))
 }
 .generate-tileCol(@n,@i:1) when (@i< = @n){
     .col-@{i}{
-        height:@i*12rem
+        height:@i*10rem
     }
     .generate-tileCol(@n,(@i+1))
 }
 .generate-tileRow(10);
 .generate-tileCol(10);
+.flex-item{
+    margin: .5rem;
+}
+.flex-container{
+    display: flex;
+    flex-wrap: wrap;
+    
+}
+.flex-row-center{
+    justify-content: center;
+}
+.flex-col-center{
+    align-items: center;
+}
