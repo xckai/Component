@@ -2,10 +2,13 @@ import { JController } from './JController';
 import _ = require("lodash")
 import { EventBus } from "./EventBus"
 export class JComponent extends JController{
-    constructor(c?){
+    constructor(c?,parent?,autoAppend?,listen?){
         super(c)
         this.eventBus=new EventBus
         this.init()
+        if(parent){
+            this.addTo(parent,autoAppend,listen)
+        }
     }
     init(){}
     eventBus:EventBus
@@ -57,18 +60,21 @@ export class JComponent extends JController{
         }
         return this
     }
-    addTo(c: JComponent,listen?:boolean) {
+    addTo(c: JComponent,autoAppend?,listen?:boolean) {
         this.parent = c
         this.parent.addComponent(this,listen)
         return this
     }
-    addComponent(nc: JComponent,listen?:boolean) {
+    addComponent(nc: JComponent,autoAppend?,listen?:boolean) {
         if (!this.children) {
             this.children = {}
         }
         nc.parent = this
         if(listen ===undefined||listen==true){
             this.eventBus.observe(nc.eventBus)
+        }
+        if(autoAppend===undefined||autoAppend==true){
+            this.addContent(nc)
         }
         this.children[nc.id] = nc
         return this
@@ -77,18 +83,14 @@ export class JComponent extends JController{
         if (this.parent) {
             this.parent.removeChild(this)
         }
+        this.parent=null;
+        this.eventBus.remove()
         super.remove()
     }
-    removeChild(c: JComponent|string) {
+    private removeChild(c: JComponent|string) {
         if(_.isString(c)||_.isNumber(c)){
-            if(this.children[c]){
-                this.children[c].remove()
-            }
             this.children[c]=undefined
         }else{
-            if(this.children[c.id]){
-                this.children[c.id].remove()
-            }
             this.children[c.id]=undefined
         }
         return this

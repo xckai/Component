@@ -6,8 +6,8 @@ export interface ITaxiMapComponent extends IJControllerConfig {
     mainMapConfig?: IMapConfig
 }
 export class TaxiMapComponent extends JComponent {
-    constructor(c?: ITaxiMapComponent) {
-        super(c)
+    constructor(c?: ITaxiMapComponent,parent?,autoAppend?,listen?) {
+        super(c,parent,autoAppend,listen)
         this.view.addClass("map-component")
         this.mainMap = new G2Map(_.extend({ position: "absolute", left: "0px", right: "0px", bottom: "0px", top: "0px" }, _.get(c, "mainMapConfig")))
         this.addContent(this.mainMap)

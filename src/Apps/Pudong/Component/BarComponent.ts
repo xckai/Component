@@ -9,8 +9,8 @@ export interface BarComponentConfig extends IJControllerConfig{
 }
 
 export class BarComponent extends JComponent{
-    constructor(c?:BarComponentConfig){
-        super(c)
+    constructor(c?:BarComponentConfig,parent?,autoAppend?,listen?){
+        super(c,parent,autoAppend,listen)
         // this.bar=new Container({position:"absolute",left:"0px",right:"0px",bottom:"0px",top:"0px",class:"navbar"})
         // this.addController(this.bar)
         this.mainIcon=new DivNode({class:"sap-logo"})

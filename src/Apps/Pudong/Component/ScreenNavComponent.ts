@@ -12,8 +12,8 @@ import { ScreenNavi2Cool } from "../../../Jigsaw/Controller/Navigation/ScreenNav
 import { TaxiMapComponent } from "./TaxiMapComponent";
 
 export class ScreenNavComponent extends JComponent {
-    constructor(c:IJControllerConfig) {
-        super(c)
+    constructor(c?:IJControllerConfig,parent?,autoAppend?,listen?) {
+        super(c,parent,autoAppend,listen)
         this.view.addClass("screen-component")
         this.screenContainer=new ScreenNavi2
         this.addContent(this.screenContainer)
