@@ -263,19 +263,23 @@ export namespace API{
                     if(d.y==undefined){
                         d.y=0
                     }
+                   
                     r.push(d)
                 }
                 return r
             },[])
+            ro=_(ro).sortBy((item)=>new Date(item.x)).value()
             let rc=_.reduce(change,(r:any,d)=>{
                 if(d.x){
                     if(d.y==undefined){
                         d.y=0
+                       
                     }
                     r.push(d)
                 }
                 return r
             },[])
+            rc=_(rc).sortBy((item)=>new Date(item.x)).value()
             r.doDone([{id:"Before ReRoute", data:ro, type:"line"},{id:"After ReRoute", data:rc, type:"line"}])
         })
         r.send({id,timeFrom:moment(time).format("YYYY-MM-DDTHH:mm:00Z")})

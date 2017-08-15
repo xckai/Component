@@ -28,7 +28,7 @@ module.exports = function (gulp) {
     })
     gulp.task(namespace + "start", [namespace +"startServer"])
     /////////Bundle//////////
-    let nodePath = path.resolve(__dirname, "./node_modules/") + "/"
+    let nodePath = path.resolve(__dirname, "../node_modules/") + "/"
     gulp.task(namespace + "bundlejs", () => {
 
         let js = gulp.src("./dist/Apps/Vicroad/main.js").pipe(requirejsOptimize({
@@ -39,11 +39,12 @@ module.exports = function (gulp) {
                 bootstrap: nodePath + "bootstrap/dist/js/bootstrap",
                 d3: nodePath + "d3/build/d3",
                 text: nodePath + "text/text",
-                Backbone: nodePath + "backbone/backbone",
+                backbone: nodePath + "backbone/backbone",
                 timepicker: nodePath + "air-datepicker/dist/js/i18n/datepicker.en",
                 timepicker_main: nodePath + "air-datepicker/dist/js/datepicker",
                 "CustomizedChart/Vicroad/VicroadChart": './Vendor/VicroadChart',
-                "moment": nodePath + "moment/moment"
+                "moment": nodePath + "moment/moment",
+                "lodash":nodePath+"lodash/lodash",
             },
             shim: {
                 leaflet: {
