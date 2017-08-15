@@ -13,8 +13,13 @@ export class JController extends Evented{
         this.contents={}
         this.id=this.config.id
         this.initView()
+        this.init()
     }
+    init(){}
     getNode$(){
+        return this.view.getNode$()
+    }
+    getContentNode$(){
         return this.view.getNode$()
     }
     id:string

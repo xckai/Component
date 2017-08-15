@@ -1,12 +1,12 @@
 .generate-tileRow(@n,@i:1) when (@i< = @n){
     .row-@{i}{
-        width:@i*10rem
+        width:@i*11rem
     }
     .generate-tileRow(@n,(@i+1))
 }
 .generate-tileCol(@n,@i:1) when (@i< = @n){
     .col-@{i}{
-        height:@i*10rem
+        height:@i*11rem
     }
     .generate-tileCol(@n,(@i+1))
 }

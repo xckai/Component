@@ -20,9 +20,11 @@ export class JView extends  Backbone.View<Backbone.Model>{
         this.updateView(c)
     }
     updateView(c:IJViewOption){
-        this.getNode$().addClass(_.get(c,"class",""))
-        this.style(_.pick(c,"width","height","left","right","top","bottom","position"))
-        this.attr("jviewid",c.id)
+        if(c){
+            this.getNode$().addClass(_.get(c,"class",""))
+            this.style(_.pick(c,"width","height","left","right","top","bottom","position"))
+            this.attr("jviewid",c.id)
+        }
         return this
     }
     getNode$(){

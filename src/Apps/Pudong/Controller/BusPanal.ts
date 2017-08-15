@@ -1,3 +1,4 @@
+import { TileView } from './../View/TileView';
 import { JView } from './../../../Jigsaw/Core/JView';
 import { JController } from './../../../Jigsaw/Core/JController';
 import Backbone =require("backbone")
@@ -27,35 +28,23 @@ class BusPanelView extends JView{
     template=`
             <div class='head'><div class="title-panel"><span class='title-with-underline'>{{mainTitle}}</span></div> </div>
     <content class='flex-container flex-row-center'>
-       <div class="tile row-1 col-1 flex-item">
-           <div class="tile-title">{{todayCardAccTitle}}</div>
-           <div class="tile-value">{{todayCardAcc}}</div>
-       </div>
-       <div class="tile row-1 col-1 flex-item">
-           <div class="tile-title">{{yestodayCardAccTitle}}</div>
-           <div class="tile-value">{{yestodayCardAcc}}</div>
-       </div>
-       <div class="tile row-1 col-1 flex-item">
-           <div class="tile-title">{{busOperatingRateTitle}}</div>
-           <div class="tile-value">{{busOperatingRate}}</div>
-       </div>
-       <div class="tile row-1 col-1 flex-item">
-           <div class="tile-title">{{busFastThanDriveRateTitle}}</div>
-           <div class="tile-value">{{busFastThanDriveRate}}</div>
-       </div>
-       <div class="tile row-1 col-1 flex-item">
-           <div class="tile-title">{{yestodayOnTimeRateTitle}}</div>
-           <div class="tile-value">{{yestodayOnTimeRate}}</div>
-       </div>
-       <div class="tile row-1 col-1 flex-item">
-           <div class="tile-title">{{busSpeedTitle}}</div>
-           <div class="tile-value">{{busSpeed}}</div>
+       <div class="tile flex-item">
+        <div class='row-1 col-1'>
+            <div class="tile-title">{{todayCardAccTitle}}</div>
+            <div class="tile-value">{{todayCardAcc}}</div>
+        </div>
        </div>
     </content>
     `
     render(){
         this.$el.html(Mustache.render(this.template,this.model.toJSON()))
+        this.initTile()
         return this
+    }
+    initTile(){
+        let todayCardAcc=new TileView({class:"today-card-acc",title:"test",value:100})
+        this.$(">content").append(todayCardAcc.el)
+        todayCardAcc.render()
     }
 }
 export class BusPanel extends JController {

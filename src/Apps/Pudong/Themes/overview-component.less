@@ -16,26 +16,20 @@
     }
     .bus-panal {
         margin: 1rem;
-        background: @panel-color;
+        background: rgba(0,0,0,.3);
         text-align: center;
         .title-panel {
             margin: 1rem 1rem 1.5rem 1rem;
         }
         >content {
-            display: flex;
-            flex-wrap: wrap;
-            table {
-                width: 100%;
-                .item-title {
-                    text-align: left;
-                    padding: .5rem 1rem;
-                    max-width: 70%;
-                }
-                .value {
-                    text-align: center;
-                    min-width: 3rem;
+            .tile{
+                background: @panel-color;
+                .tile-title{
+                    margin: .5rem;
                 }
             }
+
+
         }
         &.active{
              .title-with-underline::after{

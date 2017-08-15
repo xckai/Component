@@ -5,12 +5,10 @@ export class JComponent extends JController{
     constructor(c?,parent?,autoAppend?,listen?){
         super(c)
         this.eventBus=new EventBus
-        this.init()
         if(parent){
             this.addTo(parent,autoAppend,listen)
         }
     }
-    init(){}
     eventBus:EventBus
     parent: JComponent
     children: { [id: string]: JComponent }
