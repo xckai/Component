@@ -6,7 +6,7 @@ export class DivNode extends JController {
         super(c)
     }
     defaultConfig(){
-        return {tagName:"div"}
+        return _.extend(super.defaultConfig(), {tagName:"div"})
     }
     
 }

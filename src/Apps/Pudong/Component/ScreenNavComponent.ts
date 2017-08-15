@@ -1,3 +1,4 @@
+import { ScreenNavi2Ocatagon } from './../../../Jigsaw/Controller/Navigation/ScreenNavi2Ocatagon';
 import { IJControllerConfig } from './../../../Jigsaw/Core/JController';
 
 import { JComponent } from './../../../Jigsaw/Core/JComponent';
@@ -8,17 +9,16 @@ import _ = require("lodash")
 import { G2Map, IMapConfig } from "../../../Jigsaw/Controller/Map/G2Map"
 import { DivNode } from "../../../Jigsaw/Controller/DivNode/DivNode";
 import { CircleSide } from "../../../Jigsaw/Controller/Side/CircleSide";
-import { ScreenNavi2Cool } from "../../../Jigsaw/Controller/Navigation/ScreenNavi2Cool";
 import { TaxiMapComponent } from "./TaxiMapComponent";
 
 export class ScreenNavComponent extends JComponent {
     constructor(c?:IJControllerConfig,parent?,autoAppend?,listen?) {
         super(c,parent,autoAppend,listen)
         this.view.addClass("screen-component")
-        this.screenContainer=new ScreenNavi2
+        this.screenContainer=new ScreenNavi2Ocatagon
         this.addContent(this.screenContainer)
     }
-    screenContainer:ScreenNavi2
+    screenContainer:ScreenNavi2Ocatagon
     taxiComponent:TaxiMapComponent
     mainComponent:OverViewComponent
     doMain(){

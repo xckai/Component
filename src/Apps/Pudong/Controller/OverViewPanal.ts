@@ -2,6 +2,7 @@ import { JView } from './../../../Jigsaw/Core/JView';
 import { JController } from './../../../Jigsaw/Core/JController';
 import Backbone =require("backbone")
 import Mustache=require("mustache")
+import _ = require("lodash")
 
 class OverViewModel extends Backbone.Model{
     defaults(){
@@ -43,7 +44,7 @@ export class OverViewPanal extends JController {
     model:OverViewModel
     defaultConfig(){
         this.model=new OverViewModel
-        return {model:this.model}
+        return _.extend(super.defaultConfig(),{model:this.model})
     }
     initView(){
         this.view=new OverViewPanalView(this.config)
