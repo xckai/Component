@@ -20,12 +20,21 @@
         text-align: center;
         .title-panel {
             margin: 1rem 1rem 1.5rem 1rem;
+            position: absolute;
+            top:0px;
+            left: 0px;
+            right: 0px;
+
         }
         >content {
+            position: relative;
+            overflow: auto;
+            height: calc( ~"100% - 3rem");
+            top:3rem;
             .tile{
                 background: @panel-color;
                 .tile-title{
-                    margin: .5rem;
+                    padding: .5rem;
                 }
             }
 

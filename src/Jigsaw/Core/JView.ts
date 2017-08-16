@@ -12,12 +12,16 @@ export interface IJViewOption extends  Backbone.ViewOptions<Backbone.Model>{
     top?: string,
     bottom?: string
     width?: string
-    height?: string    
+    height?: string 
+    appendAt?:string|HTMLElement|SVGAElement|JQuery   
 } 
 export class JView extends  Backbone.View<Backbone.Model>{
     constructor(c?:IJViewOption){
         super(c)
         this.updateView(c)
+        if(c.appendAt){
+            this.$el.appendTo(c.appendAt)
+        }
     }
     updateView(c:IJViewOption){
         if(c){

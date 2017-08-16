@@ -1,3 +1,4 @@
+import { ValueTileView } from './../View/ValueTileView';
 import { TileView } from './../View/TileView';
 import { JView } from './../../../Jigsaw/Core/JView';
 import { JController } from './../../../Jigsaw/Core/JController';
@@ -25,26 +26,23 @@ class BusPanelModel extends Backbone.Model{
     }
 }
 class BusPanelView extends JView{ 
-    template=`
-            <div class='head'><div class="title-panel"><span class='title-with-underline'>{{mainTitle}}</span></div> </div>
-    <content class='flex-container flex-row-center'>
-       <div class="tile flex-item">
-        <div class='row-1 col-1'>
-            <div class="tile-title">{{todayCardAccTitle}}</div>
-            <div class="tile-value">{{todayCardAcc}}</div>
-        </div>
-       </div>
-    </content>
-    `
+    template=`<div class='head'><div class="title-panel"><span class='title-with-underline'>{{mainTitle}}</span></div> </div>
+             <content class='flex-container flex-row-center'></content>`
     render(){
         this.$el.html(Mustache.render(this.template,this.model.toJSON()))
         this.initTile()
         return this
     }
     initTile(){
-        let todayCardAcc=new TileView({class:"today-card-acc",title:"test",value:100})
-        this.$(">content").append(todayCardAcc.el)
-        todayCardAcc.render()
+        let todayCardAcc=new ValueTileView({class:"today-card-acc",
+                                        appendAt:this.$(">content")
+                                        ,title:"今日刷卡总量",value:10000})
+        let yestodayCardAcc=new ValueTileView({class:"yestoday-card-acc",
+                                            appendAt:this.$(">content")
+                                            ,title:"昨日客运总量",value:30000})
+        let busOperatingRate=new ValueTileView({class:"bus-operation-rate",
+                                    appendAt:this.$(">content")
+                                    ,title:"出车率",value:0.77})
     }
 }
 export class BusPanel extends JController {
