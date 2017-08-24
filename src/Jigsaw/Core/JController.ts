@@ -6,14 +6,16 @@ export interface IJControllerConfig extends IJViewOption{
     id?:string
 }
 export class JController extends Evented{
-    constructor(c?:IJControllerConfig){
+    constructor(c?:IJControllerConfig,parent?:JController){
         super()
         this.config=_.extend(this.defaultConfig(),c)
-
         this.contents={}
         this.id=this.config.id
         this.initView()
         this.init()
+        if(parent){
+            parent.addContent(this)
+        }
     }
     init(){}
     getNode$(){
@@ -34,7 +36,7 @@ export class JController extends Evented{
     style(k,v?){
         this.view.style(k,v)
     }
-    private contents:{
+    protected contents:{
         [k:string]:JController
     }
     addContent(c:JController){

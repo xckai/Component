@@ -1,4 +1,4 @@
-import { Evented} from "../../Core/Evented";
+import { Evented} from "../../Jigsaw/Core/Evented";
 import L=require("leaflet")
 export class BaseDrawer extends Evented{
     map:L.Map

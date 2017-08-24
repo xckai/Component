@@ -1,17 +1,21 @@
-import { JController } from './../../Core/JController';
-import { JView } from './../../Core/JView';
+import { JController } from '../../Jigsaw/Core/JController';
+import { JView } from '../../Jigsaw/Core/JView';
 import _=require("lodash")
 import d3 = require("d3")
 import mustache=require("mustache")
 
 
-class ScreenNavi2View extends JView{
+class ScreenNaviView extends JView{
     constructor(conf?){
         super(conf)
+
     }
+    currentIndex=0;
+    accScreen=0;
     events(){
         return{
-            "click .screen-nav-btn":"switchScreen",
+            "click .screen-nav-btn-left":"previous",
+            "click .screen-nav-btn-right":"next",
             "mouseenter .screen-nav-btn-left":"leftBtnChange",
             "mouseleave .screen-nav-btn-left":"leftBtnRecover",
             "mouseenter .screen-nav-btn-right":"rightBtnChange",
@@ -19,9 +23,9 @@ class ScreenNavi2View extends JView{
         }
     }
     switchScreen(){
-        if(this.currentScreen==1){
+        if(this.currentIndex==1){
             this.navTo(2)
-        }else if(this.currentScreen==2){
+        }else if(this.currentIndex==2){
             this.navTo(1)
         } 
     }
@@ -74,7 +78,7 @@ class ScreenNavi2View extends JView{
         rightBtn.selectAll("animate").remove()
     }
     render(){
-        this.$el.html(`<div class='screen-nav-btn screen-nav-btn-left'  style='opacity:0'>
+        this.$el.html(`<div class='screen-nav-btn screen-nav-btn-left' style='opacity:0' >
                            <svg x="0px" y="0px" width="45px" height="100px" viewbox="0 0 45 100">
                              <path class='solid-btn-border' d='M0 1 L40 20 L40 80 L0 99'></path>
                              <path class='btn-border btn-border-left' id='btnLeft' d='M0 1 L40 20 L40 80 L0 99'></path>
@@ -89,7 +93,7 @@ class ScreenNavi2View extends JView{
                                </g>
                            </svg>
                        </div>
-                       <div class='screen-nav-btn screen-nav-btn-right'>
+                       <div class='screen-nav-btn screen-nav-btn-right' style='opacity:0'>
                            <svg x="0px" y="0px" width="45px" height="100px" viewbox="0 0 45 100">
                                 <path  class='solid-btn-border'  d='M45 1 L1 20 L1 80 L45 99'/>
                                <path class='btn-border btn-border-right' d='M45 1 L1 20 L1 80 L45 99'/>
@@ -101,9 +105,9 @@ class ScreenNavi2View extends JView{
                            </svg>
                        </div>
                        <content class='screen-nav-content'>
-                           <div class='screen screen1'></div>
-                           <div class='screen screen2'></div>
+                         
                        </content>`)
+        this.updateNavigator()
         return this
     }
     getScreen1(){
@@ -112,43 +116,93 @@ class ScreenNavi2View extends JView{
     getScreen2(){
         return this.$(".screen2")
     }
-    currentScreen:number=1
-    navTo(i:number){
-        if(i==this.currentScreen){
-            return
+    getLastScreen(){
+        return this.$("screen").last()
+    }
+    getContent(){
+        return this.$(".screen-nav-content")
+    }
+    addContent(dom:JQuery){
+        let div=$("<div class='screen'></div>")
+        if(this.accScreen==0){
+            div.css({
+                position:"absolute",
+                left:"0px",right:"0px",top:"0px",bottom:"0px"
+            })
         }else{
-            if(i==1){
-                this.$(">.screen-nav-content").css("transform","translate(0px,0px)")
-                this.$(".screen-nav-btn-left").animate({opacity:"0"},500).css("pointer-events","none")
-                this.$(".screen-nav-btn-right").animate({opacity:".3"},1000,()=>{this.$(".screen-nav-btn-right").css("opacity","")}).css("pointer-events","auto")
-            }else{
-                this.$(">.screen-nav-content").css("transform","translate(-100%,0px)")
-                this.$(".screen-nav-btn-left").animate({opacity:".3"},1000,()=>{this.$(".screen-nav-btn-left").css("opacity","")}).css("pointer-events","auto")
-                this.$(".screen-nav-btn-right").animate({opacity:"0"},500).css("pointer-events","none")
-            }
-            this.currentScreen=i
+            div.css({
+                position:"absolute",
+                left:`${this.accScreen*100}%`,width:"100%",top:"0px",bottom:"0px"
+            })
         }
-        this.trigger("screenChange",{i})
+        div.append(dom)
+        this.getContent().append(div)
+        this.accScreen++
+        this.updateNavigator()
         return this
     }
+    removeContent(dom:JQuery){
+        let s=this.$(`[jviewid=${dom.attr('jviewid')}]`)
+        if(!s.empty()){
+            s.parent().remove()
+        }
+        this.updateNavigator()
+        return this
+    }
+    next(){
+        let i=(this.currentIndex+1)%this.accScreen
+        this.navTo(i)
+    }
+    previous(){
+        let i=(this.currentIndex-1+this.accScreen)%this.accScreen
+        this.navTo(i)
+
+    }
+    navTo(i:number){
+        if(i==this.currentIndex){
+            return
+        }else{
+            if(i==0){
+                this.$(">.screen-nav-content").css("transform","translate(0px,0px)")
+            }else{
+                this.$(">.screen-nav-content").css("transform",`translate(${i*-100}%,0px)`)
+            }
+            this.currentIndex=i
+        }
+        this.updateNavigator()
+        this.trigger("screenChange",{index:i})
+        return this
+    }
+    updateNavigator(){
+        if(this.currentIndex<=0){
+            this.$(".screen-nav-btn-left").animate({opacity:"0"},500).css("pointer-events","none")
+        }else{
+            this.$(".screen-nav-btn-left").animate({opacity:"1"},1000).css("pointer-events","auto")
+        }
+        if(this.currentIndex>=this.accScreen-1){
+            this.$(".screen-nav-btn-right").animate({opacity:"0"},500).css("pointer-events","none")
+        }else{
+            this.$(".screen-nav-btn-right").animate({opacity:".3"},1000,()=>{this.$(".screen-nav-btn-right").css("opacity","")}).css("pointer-events","auto")            
+        }
+    }
 }
-export class ScreenNavi2Ocatagon extends JController {
+export class ScreenNaviOcatagon extends JController {
     initView(){
-        this.view=new ScreenNavi2View(this.config)
+        this.view=new ScreenNaviView(this.config)
         this.proxyEvents(this.view,"screenChange")
         this.view.addClass("screen-nav2-ocatagon")
         this.view.render()
     }
     id:string
-    view:ScreenNavi2View
-    addToScreen1(dom:JQuery){
-        this.view.getScreen1().html("")
-        this.view.getScreen1().append(dom)
-        return this
-    }
-    addToScreen2(dom:JQuery){
-        this.view.getScreen2().html("")
-        this.view.getScreen2().append(dom)
+    view:ScreenNaviView
+    addContent(c:JController){
+        if(!c.id){
+            console.error("Controller no id",c)
+        }else{
+            this.contents[c.id]=c
+            this.view.addContent(c.getNode$())
+        }
+      
         return this
     }
     NaviTo(i:number){

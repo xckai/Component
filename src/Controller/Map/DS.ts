@@ -1,4 +1,4 @@
-import {W2} from "../../Data/DataDefine"
+import {W2} from "../../Jigsaw/Data/DataDefine"
 import * as leaflet from 'leaflet';
 import _ = require("lodash")
 function _evaluate(v, args?, std?) {

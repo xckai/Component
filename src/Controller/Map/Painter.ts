@@ -1,4 +1,4 @@
-import { W2 } from '../../Data/DataDefine';
+import { W2 } from '../../Jigsaw/Data/DataDefine';
 import { Style } from './G2Map';
 import _ = require("lodash")
 import { W } from './DS';

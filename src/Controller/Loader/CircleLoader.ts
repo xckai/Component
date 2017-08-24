@@ -1,5 +1,5 @@
 import {IProgressLoader} from "./ILoader"
-import {Util} from "../../Utils/Util"
+import {Util} from "../../Jigsaw/Utils/Util"
 
 export class CircleLoader implements IProgressLoader{
     id = "loader";

@@ -1,13 +1,7 @@
-import { JView } from './../../Core/JView';
-import { JController } from './../../Core/JController';
-import {Component} from"../../Core/Component"
+import { JView } from '../../Jigsaw/Core/JView';
+import { JController } from '../../Jigsaw/Core/JController';
 import _=require("lodash")
-import {  IControllerConfig,  } from "../../Core/Controller";
-import { Container } from "../Container/Container";
 import mustache=require("mustache")
-import { BackboneView } from "../../Core/View";
-import { ControllerView } from "../../Controller/Container/ControllerView";
-
 class ScreenNavi2View extends JView{
     constructor(conf?){
         super(conf)

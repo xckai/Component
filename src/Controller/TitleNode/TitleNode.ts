@@ -1,5 +1,5 @@
-import { JController, IJControllerConfig } from './../../Core/JController';
-import { JView } from './../../Core/JView';
+import { JController, IJControllerConfig } from '../../Jigsaw/Core/JController';
+import { JView } from '../../Jigsaw/Core/JView';
 import _=require("lodash")
 
 export interface ITitleNodeConfig extends IJControllerConfig{

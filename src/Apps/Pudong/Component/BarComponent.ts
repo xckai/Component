@@ -1,8 +1,8 @@
 import { IJControllerConfig } from './../../../Jigsaw/Core/JController';
 import { JView } from './../../../Jigsaw/Core/JView';
 import _ = require("lodash")
-import { DivNode } from "../../../Jigsaw/Controller/DivNode/DivNode";
-import { TitleNode } from "../../../Jigsaw/Controller/TitleNode/TitleNode";
+import { DivNode } from "../../../Controller/DivNode/DivNode";
+import { TitleNode } from "../../../Controller/TitleNode/TitleNode";
 import { JComponent } from "../../../Jigsaw/Core/JComponent";
 export interface BarComponentConfig extends IJControllerConfig{
     title?:string

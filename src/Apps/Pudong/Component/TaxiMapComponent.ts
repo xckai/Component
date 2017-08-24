@@ -1,7 +1,7 @@
 import { IJControllerConfig } from './../../../Jigsaw/Core/JController';
 import { JComponent } from './../../../Jigsaw/Core/JComponent';
 import _ = require("lodash")
-import { G2Map, IMapConfig } from "../../../Jigsaw/Controller/Map/G2Map"
+import { G2Map, IMapConfig } from "../../../Controller/Map/G2Map"
 export interface ITaxiMapComponent extends IJControllerConfig {
     mainMapConfig?: IMapConfig
 }
