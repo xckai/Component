@@ -1,9 +1,10 @@
 *{
-    box-sizing: content-box
+    box-sizing: content-box;
+    font-family: Arial, Helvetica, sans-serif ,"Microsoft YaHei", "微软雅黑", STXihei, "华文细黑", serif;
 }
 .app{
     overflow: hidden;
-    background: linear-gradient(0deg,darken(@bg-color,10%),@bg-color 20%);
+    background: linear-gradient(180deg,rgb(9,44,89),lighten(rgb(9,44,89),10%));
     .map-component{
         z-index: 1;
         .secondMap{
@@ -15,11 +16,11 @@
         z-index: 1;
         .sap-logo{
             background: url(./imgs/sap-logo.png);
-            background-size: contain;
+            background-size:contain;
             background-position-y: bottom;
             background-repeat: no-repeat;
-            width: 3.5em;
-            height: 3em;
+            width: 3.4rem;
+            height: 3rem;
             z-index: 11000;
             background-position: center;
             margin-left: .5rem;
@@ -36,6 +37,21 @@
         height:3rem;
         background: black;
         color:#fff;
+        .data-time-container{
+            position: absolute;
+            right: 0;
+            text-align: center;
+            margin: .5rem;
+            .time{
+                font-size: 1.2rem
+            }
+            .date{
+                font-size: .8rem
+            }
+            span{
+                animation: twinkling 1s step-start infinite;
+            }
+        }
     }
         .title-with-underline{
                 position: relative
@@ -51,6 +67,19 @@
                 background: gray;
             }
     
+}
+
+
+@keyframes twinkling{	/*透明度由0到1*/
+	0%{
+		opacity: 1;				/*透明度为0*/
+	}
+	50%{
+		opacity: 0;				/*透明度为1*/
+    }
+    100%{
+        opacity: 1;
+    }
 }
 @import "./tile.less";
 @import "./overview-component.less";
