@@ -1,3 +1,6 @@
+import { Weather } from './Weather';
+import { HBox } from './../../../Controller/HBox';
+import { DateTime } from './DateTime';
 import { JView } from './../../../Jigsaw/Core/JView';
 import { JController } from './../../../Jigsaw/Core/JController';
 import Backbone =require("backbone")
@@ -40,16 +43,14 @@ class OverViewPanalView extends JView{
     }
 }
 export class OverViewPanal extends JController {
-    view:OverViewPanalView
-    model:OverViewModel
-    defaultConfig(){
-        this.model=new OverViewModel
-        return _.extend(super.defaultConfig(),{model:this.model})
-    }
-    initView(){
-        this.view=new OverViewPanalView(this.config)
-        this.view.addClass("overview-panal")
-        this.model.on("change",this.view.render)
-        this.view.render()
-    }
+        init(){
+            this.view.addClass("overview-panal")
+            this.dateTime=new DateTime()
+            this.weather=new Weather()
+            let dateTimeWeatherContainer=new HBox({left:'3rem',top:'4rem',position:'absolute',content:[this.dateTime,this.weather]},this)
+
+         
+        }
+        dateTime:DateTime
+        weather:Weather
 }

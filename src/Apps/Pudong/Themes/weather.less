@@ -1,0 +1,33 @@
+.weather{
+    margin-left: 1rem;
+    color:#eee;
+    display: block;
+    text-align: center;
+    font-size: 1.3rem;
+    .icon{
+        height: 3rem;
+        width: 3rem;
+        margin-bottom: .5rem;
+    }
+    .sun{
+        background: url(imgs/sun.svg);
+        background-size: 4.5rem;
+        background-repeat: no-repeat;
+        background-position: center;
+        margin: 0 auto .5rem auto;
+        
+    }
+    .temperate{
+        margin:  0 1rem;
+    }
+    .temperate::after{
+        content: "  ";
+        background: url(imgs/temperature-celsius.svg);
+        background-size: .8rem;
+        background-repeat: no-repeat;
+        background-position: center;
+        width: 1rem;
+        height: 1rem;
+        position: absolute;
+    }
+}

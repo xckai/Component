@@ -11,11 +11,11 @@ class dateTimeView extends JView{
     dateTime:Date
 
 }
-export class TimePanal extends JController {
+export class DateTime extends JController {
     view:dateTimeView
     initView(){
         this.view=new dateTimeView(this.config)
-        this.view.addClass("data-time-container")
+        this.view.addClass("datatime-panal")
         this.view.dateTime
         this.view.render()
     }

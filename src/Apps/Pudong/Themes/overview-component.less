@@ -1,59 +1,7 @@
 .overview-component {
-    background: rgba(0,0,0,0);
+  
     .overview-panal {
-        background:linear-gradient(180deg,rgba(0,0,0,1),rgba(0,0,0,.3));
-        text-align: center;
-        .title-panel {
-            margin: 1rem 1rem 1.5rem 1rem;
-        }
-        >content {
-            display: flex;
-            justify-content: center;
-            >.index-panel {
-                margin: 1rem;
-            }
-        }
+
     }
-    .bus-panal {
-        margin: 1rem;
-        background: rgba(0,0,0,.3);
-        text-align: center;
-        .title-panel {
-            margin: 1rem 1rem 1.5rem 1rem;
-            position: absolute;
-            top:0px;
-            left: 0px;
-            right: 0px;
-
-        }
-        >content {
-            position: relative;
-            overflow: auto;
-            height: calc( ~"100% - 3rem");
-            top:3rem;
-            .tile{
-                background: @panel-color;
-                .tile-title{
-                    padding: .5rem;
-                    text-align: left;
-                    line-height: 2rem;
-                }
-                .tile-value{
-                    line-height: 5rem;
-                }
-            }
-            .value-tile{
-                .tile-value{
-                    font-size: 2rem;
-                }
-            }
-
-
-        }
-        &.active{
-             .title-with-underline::after{
-               background: @active-color;
-             }
-        }
-    }
+    
 }

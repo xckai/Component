@@ -1,4 +1,4 @@
-import { TimePanal } from './../Controller/TimePanal';
+import { BarTimePanal } from './../Controller/BarTimePanal';
 import { IJControllerConfig } from './../../../Jigsaw/Core/JController';
 import { JView } from './../../../Jigsaw/Core/JView';
 import _ = require("lodash")
@@ -19,7 +19,7 @@ export class BarComponent extends JComponent{
         this.addContent(this.mainIcon)
         this.title=new TitleNode(_.pick(this.config,"title"))
         this.addContent(this.title)
-        this.dataTimePanel=new TimePanal({class:"data-time"},this).setTime(this.config.dateTime)
+        this.dataTimePanel=new BarTimePanal(null,this).setTime(this.config.dateTime)
         // this.bar.addController(this.title)
         // this.on("titleChange",(d)=>{
         //     setTimeout(()=>{
@@ -31,7 +31,7 @@ export class BarComponent extends JComponent{
     defaultConfig(){
        return _.extend(super.defaultConfig(),{left:"0px",right:"0px",height:"3rem",top:"0px",position:"absolute",title:"交通概况",class:"bar-component",dateTime:new Date()})
     }
-    dataTimePanel:TimePanal
+    dataTimePanel:BarTimePanal
     mainIcon:DivNode
     title:TitleNode
 }

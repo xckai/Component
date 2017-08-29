@@ -4,11 +4,11 @@
 }
 .app{
     overflow: hidden;
-    background: linear-gradient(180deg,rgb(9,44,89),lighten(rgb(9,44,89),10%));
+    background: linear-gradient(180deg,rgb(0,0,0),rgb(0, 44, 88));
     .map-component{
         z-index: 1;
         .secondMap{
-        border: black 2px solid;
+        border: black .1rem solid;
         z-index: 1000;
     }
     }
@@ -37,7 +37,7 @@
         height:3rem;
         background: black;
         color:#fff;
-        .data-time-container{
+        .bar-time-container{
             position: absolute;
             right: 0;
             text-align: center;
@@ -84,3 +84,5 @@
 @import "./tile.less";
 @import "./overview-component.less";
 @import "../../../Controller/Themes/BlueDark/blue-dark.less";
+@import './datetime.less';
+@import url("./weather");

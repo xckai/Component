@@ -25,7 +25,7 @@ export class MainApp extends JApp {
 
         this.screenNav.addContent(this.mainComponent)
             .addContent(this.taxiComponent)
-
+        
 
     }
     taxiComponent: TaxiMapComponent
